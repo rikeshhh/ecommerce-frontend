@@ -1,6 +1,4 @@
 markdown
-Copy
-
 # **E-Commerce Site with Admin Dashboard - Next.js, Tailwind CSS, TypeScript**
 
 A modern e-commerce platform built with **Next.js**, **Tailwind CSS**, and **TypeScript**. Includes a **customer-facing website** and an **admin dashboard** for managing products, orders, and users.
