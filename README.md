@@ -1,6 +1,4 @@
-markdown
-Copy
-
+`````markdown
 # **E-Commerce Site with Admin Dashboard - Next.js, Tailwind CSS, TypeScript**
 
 A modern e-commerce platform built with **Next.js**, **Tailwind CSS**, and **TypeScript**. Includes a **customer-facing website** and an **admin dashboard** for managing products, orders, and users.
@@ -43,25 +41,26 @@ A modern e-commerce platform built with **Next.js**, **Tailwind CSS**, and **Typ
 
 ---
 
+````markdown
 ## **Folder Structure**
 
-my-ecommerce-site/
-├── public/ # Static assets (images, icons, fonts)
-├── src/
-│ ├── app/ # App Router (Next.js 13+)
-│ │ ├── (auth)/ # Auth-related routes (login, signup, forgot password)
-│ │ ├── (admin)/ # Admin dashboard routes (dashboard, products, orders)
-│ │ ├── (main)/ # Main site routes (home, products, cart)
-│ │ ├── api/ # API routes (auth, products, orders)
-│ │ ├── layout.tsx # Root layout
-│ │ └── page.tsx # Home page
-│ ├── components/ # Reusable UI components (header, footer, product card)
-│ ├── hooks/ # Custom React hooks (useCart, useAuth)
-│ ├── lib/ # Utility functions and libraries (apiClient, authUtils)
-│ ├── contexts/ # React contexts (AuthContext, CartContext)
-│ ├── styles/ # Global and module styles (globals.css, theme.css)
-│ └── types/ # TypeScript types and interfaces (product.ts, order.ts)
-
+| Folder/File          | Purpose                                                |
+| -------------------- | ------------------------------------------------------ |
+| `public/`            | Static assets (images, icons, fonts)                   |
+| `src/`               | Source code for the application                        |
+| `src/app/`           | App Router (Next.js 13+)                               |
+| `src/app/(auth)/`    | Auth-related routes (login, signup, forgot password)   |
+| `src/app/(admin)/`   | Admin dashboard routes (dashboard, products, orders)   |
+| `src/app/(main)/`    | Main site routes (home, products, cart)                |
+| `src/app/api/`       | API routes (auth, products, orders)                    |
+| `src/app/layout.tsx` | Root layout for the application                        |
+| `src/app/page.tsx`   | Home page                                              |
+| `src/components/`    | Reusable UI components (header, footer, product card)  |
+| `src/hooks/`         | Custom React hooks (useCart, useAuth)                  |
+| `src/lib/`           | Utility functions and libraries (apiClient, authUtils) |
+| `src/contexts/`      | React contexts (AuthContext, CartContext)              |
+| `src/styles/`        | Global and module styles (globals.css, theme.css)      |
+| `src/types/`         | TypeScript types and interfaces (product.ts, order.ts) |
 
 ---
 
@@ -73,32 +72,44 @@ my-ecommerce-site/
 git clone https://github.com/your-username/my-ecommerce-site.git
 cd my-ecommerce-site
 ```
+````
+`````
+
 2. Install Dependencies
+
 ```bash
 npm install
 ```
+
 3. Set Up Environment Variables
-Create a .env.local file and add the following variables:
+   Create a .env.local file and add the following variables:
 
 env
+
 ```bash
 NEXT_PUBLIC_API_URL=http://localhost:3000/api
 NEXTAUTH_SECRET=your-secret-key
 NEXTAUTH_URL=http://localhost:3000
 ```
+
 4. Run the Development Server
+
 ```bash
 npm run dev
 ```
+
 Open http://localhost:3000 in your browser to view the project.
 
 Deployment
+
 1. Build the Project
+
 ```bash
 npm run build
 ```
+
 2. Deploy to Vercel
-Install the Vercel CLI:
+   Install the Vercel CLI:
 
 ```bash
 npm install -g vercel
