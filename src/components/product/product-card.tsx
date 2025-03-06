@@ -6,14 +6,7 @@ import { Heart } from "lucide-react";
 import { motion } from "framer-motion";
 import { Product } from "@/lib/schema/zod-schema";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogFooter,
-  DialogClose,
-} from "@/components/ui/dialog";
+import { useRouter } from "next/navigation";
 
 interface Card1Props {
   product: Product;
@@ -22,7 +15,6 @@ interface Card1Props {
 export default function ProductCard({ product }: Card1Props) {
   const [selectedImage, setSelectedImage] = useState(product.image);
   const [isActive, setIsActive] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleFavoriteClick = () => {
     setIsActive((prevState) => !prevState);
@@ -38,6 +30,12 @@ export default function ProductCard({ product }: Card1Props) {
   const handleColorChange = (img: string, color: string) => {
     setSelectedImage(img);
     setSelectedColor(color);
+  };
+
+  const router = useRouter();
+
+  const handleViewDetails = () => {
+    router.push(`/main/products?id=${product._id}`);
   };
 
   return (
@@ -88,35 +86,12 @@ export default function ProductCard({ product }: Card1Props) {
             </div>
           </div>
 
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button
-                className="w-full bg-black text-white py-3 rounded-md"
-                onClick={() => setIsDialogOpen(true)}
-              >
-                Add to cart
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-md">
-              <DialogHeader>
-                <h2 className="text-xl font-semibold">Added to Cart</h2>
-                <p className="text-sm text-gray-500">
-                  "{product.name}" has been added to your cart.
-                </p>
-              </DialogHeader>
-              <DialogFooter className="flex justify-end">
-                <DialogClose asChild>
-                  <Button variant="outline">Continue Shopping</Button>
-                </DialogClose>
-                <Button
-                  variant="default"
-                  onClick={() => setIsDialogOpen(false)}
-                >
-                  Go to Cart
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <Button
+            className="w-full bg-black text-white py-3 rounded-md"
+            onClick={handleViewDetails}
+          >
+            View Details
+          </Button>
         </div>
       </div>
     </div>
