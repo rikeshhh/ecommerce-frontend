@@ -5,10 +5,10 @@ import { privateRoutes } from "@/route/api.route";
 import ProtectedRoute from "@/route/protected-route/protected-route";
 
 export default function AdminDashboardPage() {
-  const user = useUser(); // Get user from context
+  const user = useUser();
 
   return (
-    <ProtectedRoute>
+    <ProtectedRoute access="admin">
       <h1>Admin Dashboard</h1>
       <p>Welcome, {user.name}!</p>
       <ul>

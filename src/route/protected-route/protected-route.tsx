@@ -5,29 +5,40 @@ import { useEffect } from "react";
 
 import { ReactNode } from "react";
 
-export default function ProtectedRoute({
-  children,
-  redirectUnauthorized = "/unauthorized",
-  redirectUnauthenticated = "/login",
-}: {
+interface ProtectedRouteProps {
   children: ReactNode;
+  access?: "public" | "user" | "admin";
   redirectUnauthorized?: string;
   redirectUnauthenticated?: string;
-}) {
+}
+
+export default function ProtectedRoute({
+  children,
+  access = "public",
+  redirectUnauthorized = "/unauthorized",
+  redirectUnauthenticated = "/login",
+}: ProtectedRouteProps) {
   const user = useUser();
   const router = useRouter();
 
-  useEffect(() => {
-    if (!user) {
-      router.push(redirectUnauthenticated);
-    } else if (!user.isAdmin) {
-      router.push(redirectUnauthorized);
-    }
-  }, [user, router, redirectUnauthorized, redirectUnauthenticated]);
-
-  if (!user || !user.isAdmin) {
+  if (access === "user" && !user) {
+    router.push(redirectUnauthenticated);
     return <div>Loading...</div>;
   }
+  if (access === "admin" && (!user || !user.isAdmin)) {
+    router.push(redirectUnauthorized);
+    return <div>Loading...</div>;
+  }
+
+  useEffect(() => {
+    if (access === "user" && !user) {
+      router.push(redirectUnauthenticated);
+    } else if (access === "admin" && (!user || !user.isAdmin)) {
+      router.push(redirectUnauthorized);
+    } else if (access === "public" && user) {
+      router.push(user.isAdmin ? "/admin" : "/user");
+    }
+  }, [user, access, router, redirectUnauthorized, redirectUnauthenticated]);
 
   return <>{children}</>;
 }
