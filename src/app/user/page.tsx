@@ -11,6 +11,7 @@ export default function UserHome({ routes }: UserHomeProps) {
   return (
     <ProtectedRoute access="user">
       <h1>User Home</h1>
+      {user && <p>Welcome, {user.isAdmin}</p>}
     </ProtectedRoute>
   );
 }

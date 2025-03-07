@@ -6,11 +6,13 @@ import { privateRoutes, publicRoutes } from "@/route/api.route";
 import UserHome from "./user/page";
 
 export default function Home() {
-  const user = useUser();
-  console.log("Home user:", user);
+  const { user, isLoggedIn, isAdmin } = useUser();
 
-  if (!user) return <PublicHome routes={publicRoutes} />;
-  if (user.isAdmin === true) return <AdminDashboardPage />;
-  if (user.isAdmin === false) return <UserHome routes={privateRoutes} />;
-  return <PublicHome routes={publicRoutes} />;
+  if (!isLoggedIn || !user) {
+    return <PublicHome routes={publicRoutes} />;
+  }
+  if (isAdmin) {
+    return <AdminDashboardPage />;
+  }
+  return <UserHome routes={privateRoutes} />;
 }

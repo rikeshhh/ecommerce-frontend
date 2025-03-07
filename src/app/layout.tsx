@@ -31,16 +31,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${poppins.variable} antialiased `}>
-        <Header />
-        <CartProvider>
-          <UserProvider>
+        <UserProvider>
+          <Header />
+          <CartProvider>
             <main className="min-h-screen flex flex-col justify-center">
               {children}
             </main>
-          </UserProvider>
-        </CartProvider>
-        <Footer />
-        <Toaster />
+          </CartProvider>
+          <Footer />
+          <Toaster />
+        </UserProvider>
       </body>
     </html>
   );

@@ -11,14 +11,23 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Menu, ShoppingCart, User, LogOut } from "lucide-react";
+import { Menu, ShoppingCart, User, LogOut, UserIcon } from "lucide-react";
 import { dummyProducts } from "@/data/product";
+import { useUser } from "@/context/UserContext";
 
 const categories = Array.from(new Set(dummyProducts.map((p) => p.category)));
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
+  const { user, isLoggedIn, isAdmin, logout } = useUser();
+  console.log(
+    "Header - isLoggedIn:",
+    isLoggedIn,
+    "user:",
+    user,
+    "isAdmin:",
+    isAdmin
+  );
   return (
     <header className="sticky top-0 z-50 bg-white dark:bg-gray-900 shadow-md">
       <div className=" w-full container mx-auto px-4  py-4 flex items-center justify-between">
@@ -72,30 +81,44 @@ export default function Header() {
             Cart
           </Link>
         </nav>
-
         <div className="hidden md:flex items-center space-x-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="icon">
-                <User className="w-5 h-5" />
+                <UserIcon className="w-5 h-5" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuItem>
-                <Link href="/auth/login">Login</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Link href="/auth/register">Signup</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Link href="/admin">Admin Dashboard</Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
-              </DropdownMenuItem>
+              {isLoggedIn ? (
+                <>
+                  <DropdownMenuLabel>
+                    Welcome, {user?.name || "User"}
+                  </DropdownMenuLabel>
+                  <DropdownMenuItem>
+                    <Link href="/profile">Profile</Link>
+                  </DropdownMenuItem>
+                  {isAdmin && (
+                    <DropdownMenuItem>
+                      <Link href="/admin">Admin Dashboard</Link>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={logout}>
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <>
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuItem>
+                    <Link href="/auth/login">Login</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link href="/auth/register">Signup</Link>
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
