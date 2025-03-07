@@ -13,7 +13,7 @@ import {
   FiUsers,
 } from "react-icons/fi";
 import { motion } from "framer-motion";
-import { SignupFormDemo } from "../auth/register";
+import { SignupForm } from "../auth/register";
 
 export const Example = () => {
   return (
@@ -182,7 +182,6 @@ const TitleSection = ({ open }: { open: boolean }) => {
 };
 
 const Logo = () => {
-  // Temp logo from https://logoipsum.com/
   return (
     <motion.div
       layout
@@ -249,6 +248,6 @@ const ToggleClose = ({
 
 const ExampleContent = () => (
   <div className="h-[200vh] w-full">
-    <SignupFormDemo />
+    <SignupForm />
   </div>
 );

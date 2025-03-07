@@ -36,6 +36,12 @@ export default function Header() {
           >
             Home
           </Link>
+          <Link
+            href="/main/product-listing"
+            className="text-gray-700 dark:text-gray-200 hover:text-blue-500"
+          >
+            Product Listing
+          </Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button

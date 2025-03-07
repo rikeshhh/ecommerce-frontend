@@ -4,6 +4,8 @@ import "./globals.css";
 import { UserProvider } from "@/context/UserContext";
 import Header from "@/components/common/header/Header";
 import Footer from "@/components/common/footer/Footer";
+import { CartProvider } from "@/context/CartContext";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,10 +32,15 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${poppins.variable} antialiased `}>
         <Header />
-        <main className="min-h-screen flex flex-col justify-center">
-          <UserProvider>{children}</UserProvider>
-        </main>
+        <CartProvider>
+          <UserProvider>
+            <main className="min-h-screen flex flex-col justify-center">
+              {children}
+            </main>
+          </UserProvider>
+        </CartProvider>
         <Footer />
+        <Toaster />
       </body>
     </html>
   );

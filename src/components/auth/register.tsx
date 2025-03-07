@@ -33,7 +33,6 @@ export function SignupForm() {
 
   const onSubmit = async (data: SignupFormValues) => {
     console.log("Form Data:", data);
-    // Handle signup logic (e.g., API request)
   };
 
   return (

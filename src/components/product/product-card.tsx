@@ -35,11 +35,11 @@ export default function ProductCard({ product }: Card1Props) {
   const router = useRouter();
 
   const handleViewDetails = () => {
-    router.push(`/main/products?id=${product._id}`);
+    router.push(`/main/products-detail?id=${product._id}`);
   };
 
   return (
-    <div className="w-[350px] mx-auto">
+    <div className="w-[300px] mx-auto">
       <div className="rounded-md p-2 bg-gray-100 dark:bg-white">
         <Image
           src={selectedImage || ""}

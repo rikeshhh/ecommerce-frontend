@@ -1,0 +1,141 @@
+export const faqQuestions = [
+  {
+    value: "item-1",
+    question: "What’s this e-commerce site all about?",
+    answer: `We’re your one-stop shop for everything you need online! Think dope products, fast shipping, and customer service that’s actually lit. No cap, just real deals and vibes! 🚀 You get:`,
+    answerInpoint: [
+      "Top-quality products",
+      "Fast delivery",
+      "Easy returns",
+      "24/7 support",
+      "Exclusive discounts",
+    ],
+  },
+  {
+    value: "item-2",
+    question: "How do I find the perfect product?",
+    answer: `It’s a breeze:`,
+    answerInpoint: [
+      "Scroll through categories like it’s TikTok",
+      "Use the search bar to find your vibe",
+      "Check reviews from real buyers",
+      "Filter by price, rating, or whatever you’re feeling",
+    ],
+  },
+  {
+    value: "item-3",
+    question: "Do I have to pay extra? Spill the tea ☕",
+    answer: `Keeping it real:`,
+    answerInpoint: [
+      "Browsing? Totally free",
+      "Shipping? Free on orders over $50 (check the deets)",
+      "Premium membership? Optional for extra perks",
+      "No hidden fees—prices are straight up",
+    ],
+  },
+  {
+    value: "item-4",
+    question: "Are these products legit?",
+    answer: `For real! We don’t mess around with quality:`,
+    answerInpoint: [
+      "All sellers are verified",
+      "Products checked for authenticity",
+      "Customer reviews keep it honest",
+      "Money-back guarantee if it’s not right",
+    ],
+  },
+  {
+    value: "item-5",
+    question: "How do I place an order?",
+    answer: `Add to cart, checkout, and you’re golden. Track your order in real-time and hit us up if you need help!`,
+    answerInpoint: [],
+  },
+  {
+    value: "item-6",
+    question: "Can I sell my stuff here?",
+    answer: `If you’ve got:`,
+    answerInpoint: [
+      "Fire products to share",
+      "A legit business vibe",
+      "Good customer service skills",
+      "Some hustle to stand out",
+    ],
+  },
+  {
+    value: "item-7",
+    question: "What’s the shipping like?",
+    answer: "Smooth and speedy:",
+    answerInpoint: [
+      "Most orders ship within 24 hours",
+      "Real-time tracking so you’re not guessing",
+      "Options for express if you’re in a rush",
+      "Free shipping on big orders",
+    ],
+  },
+  {
+    value: "item-8",
+    question: "What if my order ain’t it?",
+    answer: `No worries:`,
+    answerInpoint: [
+      "Return it within 30 days",
+      "Not vibing? Get a refund or exchange",
+      "Hit up support—we’ll sort it fast",
+    ],
+  },
+  {
+    value: "item-9",
+    question: "How do I track my package?",
+    answer: `We’ve got you covered:`,
+    answerInpoint: [
+      "Tracking link in your email",
+      "Check status in your account",
+      "Support chat for any hiccups",
+    ],
+  },
+  {
+    value: "item-10",
+    question: "Can I shop by my specific style?",
+    answer: `Totally! Filter by:`,
+    answerInpoint: [
+      "Category (clothes, tech, etc.)",
+      "Price range",
+      "Brand names",
+      "Customer ratings",
+      "New arrivals or best sellers",
+    ],
+  },
+  {
+    value: "item-11",
+    question: "What kind of support can I get?",
+    answer: `We’ve got the full hookup:`,
+    answerInpoint: [
+      "Live chat for instant help",
+      "Email support for the details",
+      "FAQs for quick answers",
+      "Returns made easy",
+      "Order troubleshooting",
+    ],
+  },
+  {
+    value: "item-12",
+    question: "How do I get the best deals?",
+    answer: "Stay ready:",
+    answerInpoint: [
+      "Sign up for the newsletter",
+      "Check out flash sales",
+      "Use promo codes at checkout",
+      "Join the loyalty program for points",
+    ],
+  },
+  {
+    value: "item-13",
+    question: "What makes this shop different?",
+    answer: "We’re not like the rest:",
+    answerInpoint: [
+      "Real customer-first vibes",
+      "Curated products that slap",
+      "Fast shipping that doesn’t play",
+      "Support that actually cares",
+    ],
+  },
+];

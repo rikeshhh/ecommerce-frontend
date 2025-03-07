@@ -5,17 +5,22 @@ import { Product } from "@/lib/schema/zod-schema";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { dummyProducts } from "@/data/product";
+import { useCart } from "@/context/CartContext";
+import { toast } from "sonner";
 
 const ProductDetail = () => {
   const searchParams = useSearchParams();
   const id = searchParams?.get("id");
-
+  const { addToCart } = useCart();
   const product = dummyProducts.find((prod) => prod._id === id);
 
   if (!product) {
     return <div>Loading...</div>;
   }
-
+  const handleAddToCart = () => {
+    addToCart(product);
+    toast.success(`${product.name} added to cart!`);
+  };
   return (
     <div className="w-full container mx-auto  p-6 bg-white rounded-md shadow-lg">
       <div className="flex justify-center mb-6">
@@ -45,7 +50,10 @@ const ProductDetail = () => {
             </span>
           </div>
 
-          <Button className="w-full py-3 bg-black text-white font-semibold rounded-md hover:bg-gray-800 transition duration-300">
+          <Button
+            className="w-full py-3 bg-black text-white font-semibold rounded-md hover:bg-gray-800 transition duration-300"
+            onClick={handleAddToCart}
+          >
             Add to Cart
           </Button>
 
