@@ -17,12 +17,15 @@ export default function PublicHome({
   user,
 }: HomePageProps) {
   return (
-    <section className="min-h-screen flex flex-col justify-center items-center container mx-auto">
-      <HeroSection />
-      <RecentlyAdded />
-      <ProductCategory />
-      <ContactPage />
-      <FAQAccordion />
-    </section>
+    <>
+      
+      <section className="min-h-screen flex flex-col justify-center items-center container mx-auto">
+        <HeroSection />
+        <RecentlyAdded />
+        <ProductCategory />
+        <ContactPage />
+        <FAQAccordion />
+      </section>
+    </>
   );
 }

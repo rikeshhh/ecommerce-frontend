@@ -6,6 +6,7 @@ import Header from "@/components/common/header/Header";
 import Footer from "@/components/common/footer/Footer";
 import { Toaster } from "sonner";
 import { useUserStore } from "@/store/userStore";
+import { usePathname } from "next/navigation";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,19 +26,23 @@ const poppins = Poppins({
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  useUserStore();
+}: Readonly<{ children: React.ReactNode }>) {
+  const pathname = usePathname();
+  const { isAdmin } = useUserStore();
+
+  const isAdminRoute = pathname.startsWith("/admin");
 
   return (
     <html lang="en">
       <body className={`${poppins.variable} antialiased`}>
-        <Header />
+        {!isAdminRoute && <Header />}
+
         <main className="min-h-screen flex flex-col justify-center">
           {children}
         </main>
-        <Footer />
+
+        {!isAdminRoute && <Footer />}
+
         <Toaster />
       </body>
     </html>

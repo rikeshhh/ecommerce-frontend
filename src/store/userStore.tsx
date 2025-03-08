@@ -13,11 +13,12 @@ interface UserState {
   login: (credentials: { email: string; password: string }) => Promise<void>;
   logout: () => Promise<void>;
   fetchUserData: (token: string) => Promise<void>;
+  initialize: () => Promise<void>;
 }
 
 export const useUserStore = create<UserState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       isLoggedIn: false,
       isAdmin: false,
@@ -46,9 +47,7 @@ export const useUserStore = create<UserState>()(
         try {
           const loginResponse = await login(credentials);
           const token = loginResponse.token;
-          if (!token) {
-            throw new Error("No token received from login");
-          }
+          if (!token) throw new Error("No token received from login");
           localStorage.setItem("authToken", token);
           const response = await axios.get(
             `${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`,
@@ -56,7 +55,6 @@ export const useUserStore = create<UserState>()(
               headers: { Authorization: `Bearer ${token}` },
             }
           );
-
           set({
             user: response.data,
             isLoggedIn: true,
@@ -81,6 +79,13 @@ export const useUserStore = create<UserState>()(
         }
         set({ user: null, isLoggedIn: false, isAdmin: false });
         localStorage.removeItem("authToken");
+      },
+
+      initialize: async () => {
+        const token = localStorage.getItem("authToken");
+        if (token) {
+          await get().fetchUserData(token);
+        }
       },
     }),
     {
