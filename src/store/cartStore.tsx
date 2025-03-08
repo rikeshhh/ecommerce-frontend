@@ -18,7 +18,7 @@ interface CartState {
 
 export const useCartStore = create<CartState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       cart: [],
       addToCart: (product) =>
         set((state) => {
@@ -34,9 +34,7 @@ export const useCartStore = create<CartState>()(
               ),
             };
           }
-          return {
-            cart: [...state.cart, { ...product, quantity: 1 }],
-          };
+          return { cart: [...state.cart, { ...product, quantity: 1 }] };
         }),
       removeFromCart: (id) =>
         set((state) => ({
@@ -50,13 +48,13 @@ export const useCartStore = create<CartState>()(
               : item
           ),
         })),
-      clearCart: () =>
-        set(() => ({
-          cart: [],
-        })),
+      clearCart: () => {
+        console.log("Before clearCart, cart:", get().cart);
+        set({ cart: [] });
+        localStorage.removeItem("cart-storage");
+        console.log("After clearCart, cart:", get().cart);
+      },
     }),
-    {
-      name: "cart-storage",
-    }
+    { name: "cart-storage" }
   )
 );

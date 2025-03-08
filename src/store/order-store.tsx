@@ -9,6 +9,7 @@ interface Order {
   products: { product: { _id: string; name: string }; quantity: number }[];
   totalAmount: number;
   status: string;
+  paymentStatus: string;
   createdAt: string;
   updatedAt: string;
   __v: number;
@@ -18,6 +19,11 @@ interface OrderState {
   orders: Order[];
   fetchOrders: () => Promise<void>;
   cancelOrder: (id: string) => Promise<void>;
+  updateOrder: (
+    id: string,
+    status?: string,
+    paymentStatus?: string
+  ) => Promise<void>;
 }
 
 export const useOrderStore = create<OrderState>((set) => ({
@@ -64,6 +70,40 @@ export const useOrderStore = create<OrderState>((set) => ({
       }));
     } catch (error) {
       console.error("Error cancelling order:", error);
+    }
+  },
+
+  updateOrder: async (id: string, status?: string, paymentStatus?: string) => {
+    const token = localStorage.getItem("authToken");
+    if (!token) return;
+    try {
+      const payload: { status?: string; paymentStatus?: string } = {};
+      if (status) payload.status = status;
+      if (paymentStatus) payload.paymentStatus = paymentStatus;
+
+      const response = await axios.patch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/orders/${id}`,
+        payload,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      set((state) => ({
+        orders: state.orders.map((order) =>
+          order._id === id
+            ? {
+                ...order,
+                status: response.data.status,
+                paymentStatus: response.data.paymentStatus,
+              }
+            : order
+        ),
+      }));
+    } catch (error) {
+      console.error(
+        "Error updating order:",
+        axios.isAxiosError(error)
+          ? error.response?.data || error.message
+          : error
+      );
     }
   },
 }));

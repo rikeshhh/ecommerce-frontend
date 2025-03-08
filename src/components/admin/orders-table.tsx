@@ -1,6 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import {
+  useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  flexRender,
+  ColumnDef,
+  SortingState,
+} from "@tanstack/react-table";
+import { useUserStore } from "@/store/userStore";
+import { useOrderStore } from "@/store/order-store";
 import {
   Table,
   TableBody,
@@ -8,38 +18,191 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+} from "../ui/table";
+import { Loader2 } from "lucide-react";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { MoreHorizontal } from "lucide-react";
-import { useUserStore } from "@/store/userStore";
-import { useOrderStore } from "@/store/order-store";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
+import { Button } from "../ui/button";
+
+const columns: ColumnDef<any>[] = [
+  { accessorKey: "_id", header: "Order ID" },
+  {
+    accessorKey: "user.name",
+    header: "Customer",
+    cell: ({ row }) => row.original.user?.name || "Unknown Customer",
+  },
+  {
+    accessorFn: (row) => row.products?.length || 0,
+    header: "Products",
+    id: "productsCount",
+  },
+  {
+    accessorKey: "totalAmount",
+    header: "Total",
+    cell: ({ row }) => `$${row.original.totalAmount?.toFixed(2) || "0.00"}`,
+    sortingFn: "basic",
+  },
+  {
+    accessorKey: "status",
+    header: "Order Status",
+    cell: ({ row }) => {
+      const { updateOrder } = useOrderStore.getState();
+      return (
+        <Select
+          defaultValue={row.original.status || "Pending"}
+          onValueChange={(value) => updateOrder(row.original._id, value)}
+        >
+          <SelectTrigger className="w-[140px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Placed">Placed</SelectItem>
+            <SelectItem value="Processing">Processing</SelectItem>
+            <SelectItem value="Shipped">Shipped</SelectItem>
+            <SelectItem value="Delivered">Delivered</SelectItem>
+            <SelectItem value="Cancelled">Cancelled</SelectItem>
+          </SelectContent>
+        </Select>
+      );
+    },
+  },
+  {
+    accessorKey: "paymentStatus",
+    header: "Payment Status",
+    cell: ({ row }) => {
+      const { updateOrder } = useOrderStore.getState();
+      return (
+        <Select
+          defaultValue={row.original.paymentStatus || "Pending"}
+          onValueChange={(value) =>
+            updateOrder(row.original._id, undefined, value)
+          }
+        >
+          <SelectTrigger className="w-[140px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Pending">Pending</SelectItem>
+            <SelectItem value="Paid">Paid</SelectItem>
+            <SelectItem value="Failed">Failed</SelectItem>
+          </SelectContent>
+        </Select>
+      );
+    },
+  },
+  {
+    accessorKey: "createdAt",
+    header: "Date",
+    cell: ({ row }) =>
+      new Date(row.original.createdAt).toLocaleDateString() || "N/A",
+    sortingFn: "datetime",
+  },
+  {
+    id: "actions",
+    header: "Actions",
+    cell: ({ row }) => {
+      const order = row.original;
+      return (
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="sm">
+              View Details
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Order Details - {order._id}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <strong>Customer:</strong>{" "}
+                {order.user?.name || "Unknown Customer"}
+              </div>
+              <div>
+                <strong>Total Amount:</strong> $
+                {order.totalAmount?.toFixed(2) || "0.00"}
+              </div>
+              <div>
+                <strong>Order Status:</strong> {order.status || "Pending"}
+              </div>
+              <div>
+                <strong>Payment Status:</strong>{" "}
+                {order.paymentStatus || "Pending"}
+              </div>
+              <div>
+                <strong>Date:</strong>{" "}
+                {new Date(order.createdAt).toLocaleString() || "N/A"}
+              </div>
+              <div>
+                <strong>Products:</strong>
+                <ul className="list-disc pl-5">
+                  {order.products && order.products.length > 0 ? (
+                    order.products.map((item: { product?: { _id?: string; name?: string; price?: number }; quantity?: number }, index: number) => (
+                      <li key={item.product?._id || index}>
+                        {item.product?.name || "Unknown Product"} (x
+                        {item.quantity || 0}) - $
+                        {((item.product?.price ?? 0) * (item.quantity ?? 0)).toFixed(2)}
+                      </li>
+                    ))
+                  ) : (
+                    <li>No products available</li>
+                  )}
+                </ul>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      );
+    },
+  },
+];
 
 export default function OrdersTable() {
-  const { orders, fetchOrders, cancelOrder } = useOrderStore();
+  const { orders, fetchOrders } = useOrderStore();
   const { isAdmin } = useUserStore();
+  const [sorting, setSorting] = useState<SortingState>([]);
   const [loading, setLoading] = useState(true);
 
+  console.log("Orders data:", orders); 
+
   useEffect(() => {
-    console.log("OrdersTable useEffect - isAdmin:", isAdmin);
     const loadOrders = async () => {
-      if (isAdmin) {
-        await fetchOrders();
-      }
+      if (isAdmin) await fetchOrders();
       setLoading(false);
     };
     loadOrders();
   }, [fetchOrders, isAdmin]);
 
-  if (loading) return <div className="text-center">Loading orders...</div>;
+  const table = useReactTable({
+    data: orders || [],
+    columns,
+    state: { sorting },
+    onSortingChange: setSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+  });
+
+  if (loading)
+    return (
+      <div className="text-center">
+        <Loader2 className="h-6 w-6 animate-spin inline-block" /> Loading
+        orders...
+      </div>
+    );
   if (!isAdmin) return <div className="text-center">Unauthorized</div>;
 
-  console.log("Rendering orders:", orders);
   return (
     <div className="space-y-4">
       <h2 className="text-2xl font-bold">Orders</h2>
@@ -48,46 +211,35 @@ export default function OrdersTable() {
       ) : (
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>Order ID</TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead>Products</TableHead>
-              <TableHead>Total</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead
+                    key={header.id}
+                    onClick={header.column.getToggleSortingHandler()}
+                    className="cursor-pointer"
+                  >
+                    {flexRender(
+                      header.column.columnDef.header,
+                      header.getContext()
+                    )}
+                    {{
+                      asc: " ↑",
+                      desc: " ↓",
+                    }[header.column.getIsSorted() as string] ?? null}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
           </TableHeader>
           <TableBody>
-            {orders.map((order) => (
-              <TableRow key={order._id}>
-                <TableCell>{order._id}</TableCell>
-                <TableCell>{order.user.name || "Unknown"}</TableCell>
-                <TableCell>{order.products.length} items</TableCell>
-                <TableCell>${order.totalAmount.toFixed(2)}</TableCell>
-                <TableCell>{order.status}</TableCell>
-                <TableCell>
-                  {new Date(order.createdAt).toLocaleDateString()}
-                </TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem>View Details</DropdownMenuItem>
-                      {order.status !== "Cancelled" && (
-                        <DropdownMenuItem
-                          onClick={() => cancelOrder(order._id)}
-                        >
-                          Cancel Order
-                        </DropdownMenuItem>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
+            {table.getRowModel().rows.map((row) => (
+              <TableRow key={row.id}>
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
               </TableRow>
             ))}
           </TableBody>

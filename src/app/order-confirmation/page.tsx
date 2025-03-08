@@ -42,10 +42,9 @@ export default function OrderConfirmation() {
         const url = `${process.env.NEXT_PUBLIC_API_URL}/api/orders/${orderId}`;
         console.log("Fetching order from:", url);
         const response = await axios.get(url, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
+        console.log("Raw order response:", response.data); 
         setOrder(response.data);
       } catch (error) {
         console.error("Failed to fetch order:", error);
