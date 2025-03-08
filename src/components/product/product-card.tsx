@@ -7,6 +7,8 @@ import { motion } from "framer-motion";
 import { Product } from "@/lib/schema/zod-schema";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { useCartStore } from "@/store/cartStore";
+import { toast } from "sonner";
 
 interface Card1Props {
   product: Product;
@@ -15,7 +17,6 @@ interface Card1Props {
 export default function ProductCard({ product }: Card1Props) {
   const [selectedImage, setSelectedImage] = useState(product.image);
   const [isActive, setIsActive] = useState(false);
-
   const handleFavoriteClick = () => {
     setIsActive((prevState) => !prevState);
   };
@@ -33,11 +34,17 @@ export default function ProductCard({ product }: Card1Props) {
   };
 
   const router = useRouter();
+  const { addToCart } = useCartStore();
 
   const handleViewDetails = () => {
     router.push(`/main/products-detail?id=${product._id}`);
   };
-
+  const handleAddToCart = () => {
+    addToCart(product);
+    toast(`${product.name} has been added to your cart.`, {
+      duration: 3000,
+    });
+  };
   return (
     <div className="w-[300px] mx-auto">
       <div className="rounded-md p-2 bg-gray-100 dark:bg-white">
@@ -91,6 +98,12 @@ export default function ProductCard({ product }: Card1Props) {
             onClick={handleViewDetails}
           >
             View Details
+          </Button>
+          <Button
+            className="w-full bg-black text-white py-3 rounded-md mt-4 "
+            onClick={handleAddToCart}
+          >
+            Add to Cart
           </Button>
         </div>
       </div>

@@ -1,18 +1,22 @@
 "use client";
+
+import { useUserStore } from "@/store/userStore";
 import AdminDashboardPage from "@/app/admin/dashboard/page";
-import PublicHome from "./main/home/page";
-import { useUser } from "@/context/UserContext";
 import { privateRoutes, publicRoutes } from "@/route/api.route";
-import UserHome from "./user/page";
+import PublicHome from "./main/home/page";
 
 export default function Home() {
-  const { user, isLoggedIn, isAdmin } = useUser();
+  const { user, isLoggedIn, isAdmin } = useUserStore();
 
-  if (!isLoggedIn || !user) {
-    return <PublicHome routes={publicRoutes} />;
-  }
   if (isAdmin) {
     return <AdminDashboardPage />;
   }
-  return <UserHome routes={privateRoutes} />;
+
+  return (
+    <PublicHome
+      routes={isLoggedIn ? privateRoutes : publicRoutes}
+      isLoggedIn={isLoggedIn}
+      user={user}
+    />
+  );
 }

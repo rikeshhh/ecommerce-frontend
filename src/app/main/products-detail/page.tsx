@@ -5,13 +5,13 @@ import { Product } from "@/lib/schema/zod-schema";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { dummyProducts } from "@/data/product";
-import { useCart } from "@/context/CartContext";
 import { toast } from "sonner";
+import { useCartStore } from "@/store/cartStore";
 
 const ProductDetail = () => {
   const searchParams = useSearchParams();
   const id = searchParams?.get("id");
-  const { addToCart } = useCart();
+  const { addToCart } = useCartStore();
   const product = dummyProducts.find((prod) => prod._id === id);
 
   if (!product) {

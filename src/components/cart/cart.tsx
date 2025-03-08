@@ -22,13 +22,22 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { useCart } from "@/context/CartContext";
+import { useCartStore } from "@/store/cartStore";
+import { useUserStore } from "@/store/userStore";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function Cart() {
-  const { cart, removeFromCart, updateQuantity } = useCart();
+  const { cart, removeFromCart, updateQuantity } = useCartStore();
+  const { isLoggedIn } = useUserStore();
+  const router = useRouter();
 
   const handleQuantityChange = (id: string, delta: number) => {
-    updateQuantity(id, delta);
+    const item = cart.find((item) => item._id === id);
+    if (item) {
+      const newQuantity = Math.max(1, item.quantity + delta);
+      updateQuantity(id, newQuantity);
+    }
   };
 
   const handleRemoveItem = (id: string) => {
@@ -39,6 +48,14 @@ export default function Cart() {
     (total, item) => total + item.price * item.quantity,
     0
   );
+
+  const handleCheckout = () => {
+    if (isLoggedIn) {
+      router.push("/user/checkout");
+    } else {
+      router.push("/auth/login?returnUrl=/main/cart");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12">
@@ -57,9 +74,11 @@ export default function Cart() {
               <p className="text-lg text-muted-foreground">
                 Your cart is empty. Start shopping!
               </p>
-              <Button variant="outline" className="mt-4">
-                Browse Products
-              </Button>
+              <Link href="/main/product-listing">
+                <Button variant="outline" className="mt-4">
+                  Browse Products
+                </Button>
+              </Link>
             </div>
           ) : (
             <div className="space-y-6">
@@ -68,7 +87,6 @@ export default function Cart() {
                   key={item._id}
                   className="group flex items-center p-4 bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100"
                 >
-                  {/* Image Section */}
                   <div className="relative w-24 h-24 flex-shrink-0 overflow-hidden rounded-lg">
                     <Image
                       src={item.image || "/placeholder-image.png"}
@@ -77,8 +95,6 @@ export default function Cart() {
                       className="object-cover transition-transform duration-300 group-hover:scale-105"
                     />
                   </div>
-
-                  {/* Product Info */}
                   <div className="flex-1 px-6">
                     <p className="text-xl font-semibold text-gray-900 line-clamp-1">
                       {item.name}
@@ -92,7 +108,6 @@ export default function Cart() {
                       </span>
                     </div>
                   </div>
-
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1 bg-muted/50 rounded-full p-1">
                       <Button
@@ -170,7 +185,7 @@ export default function Cart() {
                     </Button>
                     <Button
                       className="bg-green-600 hover:bg-green-700 text-white rounded-lg"
-                      onClick={() => console.log("Payment confirmed!")}
+                      onClick={handleCheckout}
                     >
                       Confirm Payment
                     </Button>

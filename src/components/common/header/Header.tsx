@@ -11,23 +11,25 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Menu, ShoppingCart, User, LogOut, UserIcon } from "lucide-react";
+import {
+  Menu,
+  ShoppingCart,
+  User,
+  LogOut,
+  UserIcon,
+  Package,
+} from "lucide-react";
 import { dummyProducts } from "@/data/product";
-import { useUser } from "@/context/UserContext";
+import { useUserStore } from "@/store/userStore";
+import { useCartStore } from "@/store/cartStore";
 
 const categories = Array.from(new Set(dummyProducts.map((p) => p.category)));
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { user, isLoggedIn, isAdmin, logout } = useUser();
-  console.log(
-    "Header - isLoggedIn:",
-    isLoggedIn,
-    "user:",
-    user,
-    "isAdmin:",
-    isAdmin
-  );
+  const { user, isLoggedIn, isAdmin, logout } = useUserStore();
+  const { cart } = useCartStore();
+  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
   return (
     <header className="sticky top-0 z-50 bg-white dark:bg-gray-900 shadow-md">
       <div className=" w-full container mx-auto px-4  py-4 flex items-center justify-between">
@@ -51,7 +53,7 @@ export default function Header() {
           >
             Product Listing
           </Link>
-          <DropdownMenu>
+          {/* <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
@@ -72,13 +74,18 @@ export default function Header() {
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
-          </DropdownMenu>
+          </DropdownMenu> */}
           <Link
             href="/main/cart"
-            className="text-gray-700 dark:text-gray-200 hover:text-blue-500"
+            className="text-gray-700 dark:text-gray-200 hover:text-blue-500 flex items-center"
           >
             <ShoppingCart className="inline w-5 h-5 mr-1" />
             Cart
+            {totalItems > 0 && (
+              <span className="ml-1 bg-blue-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                {totalItems}
+              </span>
+            )}
           </Link>
         </nav>
         <div className="hidden md:flex items-center space-x-4">
@@ -96,6 +103,10 @@ export default function Header() {
                   </DropdownMenuLabel>
                   <DropdownMenuItem>
                     <Link href="/profile">Profile</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Package className="w-4 h-4 mr-2" />
+                    <Link href="/user/order-history">Order History</Link>
                   </DropdownMenuItem>
                   {isAdmin && (
                     <DropdownMenuItem>

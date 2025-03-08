@@ -12,10 +12,9 @@ import {
   IconBrandGoogle,
   IconBrandOnlyfans,
 } from "@tabler/icons-react";
-import { login } from "@/lib/api/auth-api";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useUser } from "@/context/UserContext";
+import { useUserStore } from "../../store/userStore";
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
@@ -40,7 +39,7 @@ export function LoginForm() {
     resolver: zodResolver(loginSchema),
   });
   const router = useRouter();
-  const { login } = useUser();
+  const { login } = useUserStore();
   const onSubmit = async (data: LoginFormValues) => {
     try {
       await login({ email: data.email, password: data.password });
@@ -48,7 +47,6 @@ export function LoginForm() {
         description: "Welcome back!",
       });
       router.push("/");
-      console.log("Login successful - context updated");
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Login failed";

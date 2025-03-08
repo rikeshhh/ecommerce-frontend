@@ -1,5 +1,5 @@
 "use client";
-import { useUser } from "@/context/UserContext";
+import { useUserStore } from "@/store/userStore";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -18,7 +18,7 @@ export default function ProtectedRoute({
   redirectUnauthorized = "/unauthorized",
   redirectUnauthenticated = "/login",
 }: ProtectedRouteProps) {
-  const user = useUser();
+  const user = useUserStore();
   const router = useRouter();
 
   if (access === "user" && !user) {

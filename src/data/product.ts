@@ -2,7 +2,7 @@ import { Product } from "@/lib/schema/zod-schema";
 
 export const dummyProducts: Product[] = [
   {
-    _id: "1",
+    _id: "507f1f77bcf86cd799439011",
     sku: "abc-123",
     name: "Sample Product 1",
     description: "This is a sample product.",
@@ -14,7 +14,7 @@ export const dummyProducts: Product[] = [
     updatedAt: "2024-01-02T00:00:00Z",
   },
   {
-    _id: "2",
+    _id: "507f191e810c19729de860ea",
     sku: "def-456",
     name: "Sample Product 2",
     description: "Another great product.",
@@ -26,7 +26,7 @@ export const dummyProducts: Product[] = [
     updatedAt: "2024-01-04T00:00:00Z",
   },
   {
-    _id: "3",
+    _id: "5f47ac10b6e9e71e8c7d8e9f",
     sku: "ghi-789",
     name: "Sample Product 3",
     description: "A third product example.",
@@ -38,7 +38,7 @@ export const dummyProducts: Product[] = [
     updatedAt: "2024-01-06T00:00:00Z",
   },
   {
-    _id: "4",
+    _id: "60c72b2f9b1d8e2a4c8f9d7e",
     sku: "jkl-012",
     name: "Sample Product 4",
     description: "The fourth product in the list.",
