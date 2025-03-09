@@ -18,7 +18,6 @@ export default function PublicHome({
 }: HomePageProps) {
   return (
     <>
-      
       <section className="min-h-screen flex flex-col justify-center items-center container mx-auto">
         <HeroSection />
         <RecentlyAdded />

@@ -61,7 +61,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Links */}
           <div>
             <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
               Quick Links

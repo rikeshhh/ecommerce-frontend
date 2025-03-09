@@ -1,22 +1,31 @@
-import React from "react";
+"use client";
+
 import Image from "next/image";
-import { Product } from "@/lib/schema/zod-schema";
+import { Product } from "@/lib/types";
 
 interface ProductThumbnailProps {
   product: Product;
 }
 
 export default function ProductThumbnail({ product }: ProductThumbnailProps) {
+  const validImageSrc =
+    typeof product.image === "string" &&
+    (product.image.startsWith("/") || product.image.startsWith("http"))
+      ? product.image
+      : "/placeholder.png";
+
   return (
-    <div className="flex flex-col items-center">
+    <div className="relative h-32 w-32">
       <Image
-        src={product.image || "/placeholder.jpg"}
-        alt={product.category}
-        width={100}
-        height={100}
-        className="w-20 h-20 rounded-full object-cover border"
+        src={validImageSrc}
+        alt={product.name}
+        fill
+        className="object-cover rounded-md"
+        sizes="(max-width: 128px) 100vw"
+        placeholder="blur"
+        blurDataURL="/placeholder.jpg"
+        onError={() => console.log(`Image failed to load for ${product.name}`)}
       />
-      <p className="text-sm text-gray-700 mt-2">{product.category}</p>
     </div>
   );
 }

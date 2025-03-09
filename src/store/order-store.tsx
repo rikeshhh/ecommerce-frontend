@@ -4,10 +4,11 @@ import { create } from "zustand";
 import axios from "axios";
 import { toast } from "sonner";
 
-interface Order {
+export interface Order {
   _id: string;
   user: { _id: string; name: string };
-  products: { product: { _id: string; name: string }; quantity: number }[];
+  customerName: string;
+  products: { product: string; quantity: number; _id: string }[];
   totalAmount: number;
   status: string;
   paymentStatus: string;
@@ -15,14 +16,22 @@ interface Order {
   updatedAt: string;
   __v: number;
 }
-
 interface OrderState {
   orders: Order[];
   totalOrders: number;
   currentPage: number;
   totalPages: number;
   limit: number;
-  fetchOrders: (page: number, limit: number) => Promise<void>;
+  loading: boolean;
+  fetchOrders: (
+    page: number,
+    limit: number,
+    filters?: {
+      search?: string;
+      createdAt?: { from?: string; to?: string };
+      status?: string;
+    }
+  ) => Promise<void>;
   cancelOrder: (id: string) => Promise<void>;
   updateOrder: (
     id: string,
@@ -37,19 +46,12 @@ export const useOrderStore = create<OrderState>((set) => ({
   currentPage: 1,
   totalPages: 1,
   limit: 10,
+  loading: false,
 
-  fetchOrders: async (page = 1, limit = 10) => {
+  fetchOrders: async (page = 1, limit = 10, filters = {}) => {
+    set({ loading: true });
     const token = localStorage.getItem("authToken");
-    console.log(
-      "Fetching orders - Token:",
-      token,
-      "Page:",
-      page,
-      "Limit:",
-      limit
-    );
     if (!token) {
-      console.log("No token found, resetting orders");
       toast.error("Authentication required", {
         description: "Please log in to view orders.",
       });
@@ -59,6 +61,7 @@ export const useOrderStore = create<OrderState>((set) => ({
         currentPage: 1,
         totalPages: 1,
         limit: 10,
+        loading: false,
       });
       return;
     }
@@ -67,30 +70,26 @@ export const useOrderStore = create<OrderState>((set) => ({
         `${process.env.NEXT_PUBLIC_API_URL}/api/orders`,
         {
           headers: { Authorization: `Bearer ${token}` },
-          params: { page, limit },
+          params: {
+            page,
+            limit,
+            search: filters.search,
+            dateFrom: filters.createdAt?.from,
+            dateTo: filters.createdAt?.to,
+            status: filters.status,
+          },
         }
       );
-      console.log("Orders response data:", response.data);
+      console.log("Orders Response:", response.data.orders);
       set({
         orders: response.data.orders || [],
         totalOrders: response.data.totalOrders || 0,
-        currentPage: response.data.currentPage || 1,
+        currentPage: response.data.currentPage || page,
         totalPages: response.data.totalPages || 1,
-        limit: response.data.limit || 10,
+        limit: response.data.limit || limit,
+        loading: false,
       });
-      if (!response.data.orders || response.data.orders.length === 0) {
-        console.log("No orders returned from backend");
-        toast.info("No orders found", {
-          description: "There are no orders to display at the moment.",
-        });
-      }
     } catch (error) {
-      console.error(
-        "Error fetching orders:",
-        axios.isAxiosError(error)
-          ? error.response?.data || error.message
-          : error
-      );
       toast.error("Error fetching orders", {
         description: axios.isAxiosError(error)
           ? error.response?.data?.message || error.message
@@ -102,6 +101,7 @@ export const useOrderStore = create<OrderState>((set) => ({
         currentPage: 1,
         totalPages: 1,
         limit: 10,
+        loading: false,
       });
     }
   },
@@ -127,12 +127,6 @@ export const useOrderStore = create<OrderState>((set) => ({
       }));
       toast.success("Order cancelled successfully");
     } catch (error) {
-      console.error(
-        "Error cancelling order:",
-        axios.isAxiosError(error)
-          ? error.response?.data || error.message
-          : error
-      );
       toast.error("Error cancelling order", {
         description: axios.isAxiosError(error)
           ? error.response?.data?.message || error.message
@@ -153,12 +147,15 @@ export const useOrderStore = create<OrderState>((set) => ({
       const payload: { status?: string; paymentStatus?: string } = {};
       if (status) payload.status = status;
       if (paymentStatus) payload.paymentStatus = paymentStatus;
+      console.log("Updating order with payload:", payload);
 
       const response = await axios.patch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/orders/${id}`,
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      console.log("Update response:", response.data);
+
       set((state) => ({
         orders: state.orders.map((order) =>
           order._id === id
@@ -173,10 +170,8 @@ export const useOrderStore = create<OrderState>((set) => ({
       toast.success("Order updated successfully");
     } catch (error) {
       console.error(
-        "Error updating order:",
-        axios.isAxiosError(error)
-          ? error.response?.data || error.message
-          : error
+        "Update Order Error:",
+        (error as any).response?.data || (error as any).message
       );
       toast.error("Error updating order", {
         description: axios.isAxiosError(error)

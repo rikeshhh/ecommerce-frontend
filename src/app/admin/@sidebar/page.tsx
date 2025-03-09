@@ -10,6 +10,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import {
   LayoutDashboard,
@@ -25,6 +26,7 @@ import {
 import { useUserStore } from "@/store/userStore";
 import { LucideIcon } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 type MenuItem = {
   href: string;
@@ -55,13 +57,23 @@ export default function AdminSidebar() {
     console.log("Navigating to /");
     router.push("/");
   };
-
+  const { state } = useSidebar();
+  const isCollapsed = state === "collapsed";
   return (
-    <Sidebar className="bg-gray-900  h-screen">
+    <Sidebar
+      collapsible="icon"
+      className="w-[250px] data-[state=collapsed]:w-16 transition-all duration-300"
+    >
       <SidebarHeader className="p-4 border-b border-gray-800">
-        <h2 className="text-lg font-semibold">Admin Panel</h2>
+        <h2
+          className={cn(
+            "text-lg font-semibold",
+            isCollapsed ? "hidden" : "block"
+          )}
+        >
+          Admin Panel
+        </h2>
       </SidebarHeader>
-
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenu>
@@ -69,13 +81,19 @@ export default function AdminSidebar() {
               <SidebarMenuItem key={item.href}>
                 <SidebarMenuButton
                   asChild
-                  className={`flex items-center gap-2 ${
-                    pathname === item.href ? "bg-gray-700" : "hover:bg-gray-800"
-                  }`}
+                  className={cn(
+                    "flex items-center gap-2",
+                    pathname === item.href
+                      ? "bg-gray-300"
+                      : "hover:bg-gray-400",
+                    "data-[state=collapsed]:justify-center"
+                  )}
                 >
                   <Link href={item.href}>
                     <item.icon className="h-5 w-5" />
-                    <span>{item.label}</span>
+                    <span className="data-[state=collapsed]:hidden">
+                      {item.label}
+                    </span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -83,16 +101,18 @@ export default function AdminSidebar() {
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
-
       <SidebarFooter className="p-4 border-t border-gray-800">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              className="flex items-center gap-2 hover:bg-gray-800"
+              className={cn(
+                "flex items-center gap-2 hover:bg-gray-800",
+                "data-[state=collapsed]:justify-center"
+              )}
               onClick={handleLogout}
             >
               <LogOut className="h-5 w-5" />
-              <span>Logout</span>
+              <span className="data-[state=collapsed]:hidden">Logout</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

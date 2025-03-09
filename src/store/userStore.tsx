@@ -16,17 +16,26 @@ interface UserState {
   currentPage: number;
   totalPages: number;
   limit: number;
+  loading: boolean;
   login: (credentials: { email: string; password: string }) => Promise<void>;
   logout: () => Promise<void>;
   initialize: () => Promise<void>;
-  fetchItems: (page: number, limit: number) => Promise<void>;
+  fetchItems: (
+    page: number,
+    limit: number,
+    filters?: {
+      search?: string;
+      createdAt?: { from?: string; to?: string };
+      role?: string;
+    }
+  ) => Promise<void>;
   updateUserRole: (id: string, isAdmin: boolean) => Promise<void>;
   deleteUser: (id: string) => Promise<void>;
 }
 
 export const useUserStore = create<UserState>()(
   persist(
-    (set, get) => {
+    (set) => {
       const fetchUserData = async (token: string) => {
         try {
           const response = await axios.get(
@@ -41,7 +50,6 @@ export const useUserStore = create<UserState>()(
             isAdmin: response.data.isAdmin || false,
           });
         } catch (error) {
-          console.error("Fetch user error:", error);
           set({ user: null, isLoggedIn: false, isAdmin: false });
           localStorage.removeItem("authToken");
           throw error;
@@ -57,17 +65,19 @@ export const useUserStore = create<UserState>()(
         currentPage: 1,
         totalPages: 1,
         limit: 10,
+        loading: false,
 
         login: async (credentials: { email: string; password: string }) => {
+          console.log("Login Credentials:", credentials);
           try {
             const loginResponse = await login(credentials);
+            console.log("Login Response:", loginResponse);
             const token = loginResponse.token;
             if (!token) throw new Error("No token received from login");
             localStorage.setItem("authToken", token);
             await fetchUserData(token);
             toast.success("Logged in successfully");
           } catch (error) {
-            console.error("Login error:", error);
             set({ user: null, isLoggedIn: false, isAdmin: false });
             localStorage.removeItem("authToken");
             toast.error("Login failed", {
@@ -84,7 +94,6 @@ export const useUserStore = create<UserState>()(
               await logout();
               toast.success("Logged out successfully");
             } catch (error) {
-              console.error("Logout error:", error);
               toast.error("Logout failed", {
                 description: axios.isAxiosError(error)
                   ? error.message
@@ -103,16 +112,9 @@ export const useUserStore = create<UserState>()(
           }
         },
 
-        fetchItems: async (page: number, limit: number) => {
+        fetchItems: async (page = 1, limit = 10, filters = {}) => {
+          set({ loading: true });
           const token = localStorage.getItem("authToken");
-          console.log(
-            "Fetching users - Token:",
-            token,
-            "Page:",
-            page,
-            "Limit:",
-            limit
-          );
           if (!token) {
             toast.error("Authentication required", {
               description: "Please log in to view users.",
@@ -123,6 +125,7 @@ export const useUserStore = create<UserState>()(
               currentPage: 1,
               totalPages: 1,
               limit: 10,
+              loading: false,
             });
             return;
           }
@@ -131,19 +134,31 @@ export const useUserStore = create<UserState>()(
               `${process.env.NEXT_PUBLIC_API_URL}/api/users`,
               {
                 headers: { Authorization: `Bearer ${token}` },
-                params: { page, limit },
+                params: {
+                  page,
+                  limit,
+                  search: filters.search,
+                  dateFrom: filters.createdAt?.from,
+                  dateTo: filters.createdAt?.to,
+                  role: filters.role,
+                },
               }
             );
-            console.log("Users response data:", response.data);
+            console.log("Users Response:", response.data);
             set({
               items: response.data.users || [],
               totalItems: response.data.totalUsers || 0,
-              currentPage: response.data.currentPage || 1,
+              currentPage: response.data.currentPage || page,
               totalPages: response.data.totalPages || 1,
-              limit: response.data.limit || 10,
+              limit: response.data.limit || limit,
+              loading: false,
             });
+            if (!response.data.users || response.data.users.length === 0) {
+              toast.info("No users found", {
+                description: "There are no users to display at the moment.",
+              });
+            }
           } catch (error) {
-            console.error("Error fetching users:", error);
             toast.error("Error fetching users", {
               description: axios.isAxiosError(error)
                 ? error.response?.data?.message || error.message
@@ -155,6 +170,7 @@ export const useUserStore = create<UserState>()(
               currentPage: 1,
               totalPages: 1,
               limit: 10,
+              loading: false,
             });
           }
         },
@@ -182,7 +198,6 @@ export const useUserStore = create<UserState>()(
             }));
             toast.success("User role updated successfully");
           } catch (error) {
-            console.error("Error updating user role:", error);
             toast.error("Error updating user role", {
               description: axios.isAxiosError(error)
                 ? error.response?.data?.message || error.message
@@ -193,7 +208,6 @@ export const useUserStore = create<UserState>()(
 
         deleteUser: async (id: string) => {
           const token = localStorage.getItem("authToken");
-          console.log("Deleting user with ID:", id);
           if (!token) {
             toast.error("Authentication required", {
               description: "Please log in to delete users.",
@@ -214,7 +228,6 @@ export const useUserStore = create<UserState>()(
             }));
             toast.success("User deleted successfully");
           } catch (error) {
-            console.error("Error deleting user:", error);
             if (axios.isAxiosError(error) && error.response?.status === 404) {
               toast.error("User not found", {
                 description: "The user you tried to delete does not exist.",

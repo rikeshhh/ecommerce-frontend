@@ -14,7 +14,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     <ProtectedRoute access="admin">
       <SidebarProvider>
         <div className="flex w-full min-h-screen">
-          <aside className="w-[250px] text-white bg-gray-800">
+          <aside>
             <AdminSidebar />
           </aside>
           <main className="p-6 bg-gray-200 flex-1">
