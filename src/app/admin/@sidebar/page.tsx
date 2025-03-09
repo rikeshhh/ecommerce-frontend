@@ -20,6 +20,8 @@ import {
   ShoppingCart,
   Settings,
   LogOut,
+  icons,
+  Settings2,
 } from "lucide-react";
 import { useUserStore } from "@/store/userStore";
 import { LucideIcon } from "lucide-react";
@@ -33,13 +35,18 @@ type MenuItem = {
 
 const menuItems: MenuItem[] = [
   { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
-  { href: "/admin/users", icon: Users, label: "Manage Users" },
+  { href: "/admin/user-management", icon: Users, label: "Manage Users" },
   { href: "/admin/roles", icon: Shield, label: "Roles & Permissions" },
   { href: "/admin/analytics", icon: BarChart, label: "Analytics" },
   { href: "/admin/content", icon: FileText, label: "Content Management" },
   { href: "/admin/products", icon: FileText, label: "Products" },
   { href: "/admin/orders", icon: ShoppingCart, label: "Orders" },
   { href: "/admin/settings", icon: Settings, label: "Settings" },
+  {
+    href: "/admin/add-product-form",
+    icon: Settings2,
+    label: "Add Product",
+  },
 ];
 
 export default function AdminSidebar() {

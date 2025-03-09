@@ -2,22 +2,24 @@
 
 import { create } from "zustand";
 import axios from "axios";
+import { toast } from "sonner";
 
 interface Product {
   _id: string;
+  sku: string;
   name: string;
-  description: string;
+  description?: string;
   price: number;
   stock: number;
-  image: string;
+  image?: string;
   createdAt: string;
   updatedAt: string;
-  __v: number;
 }
 
 interface ProductState {
   products: Product[];
   fetchProducts: () => Promise<void>;
+  addProduct: (productData: Partial<Product>) => Promise<void>;
 }
 
 export const useProductStore = create<ProductState>((set) => ({
@@ -27,6 +29,9 @@ export const useProductStore = create<ProductState>((set) => ({
     const token = localStorage.getItem("authToken");
     console.log("Fetching products with token:", token);
     if (!token) {
+      toast.error("Authentication required", {
+        description: "Please log in to view products.",
+      });
       set({ products: [] });
       return;
     }
@@ -42,9 +47,42 @@ export const useProductStore = create<ProductState>((set) => ({
     } catch (error) {
       console.error(
         "Error fetching products:",
-        axios.isAxiosError(error) ? error.response?.data || error.message : error
+        axios.isAxiosError(error)
+          ? error.response?.data || error.message
+          : error
       );
+      const errorMessage = axios.isAxiosError(error)
+        ? error.response?.data?.message || error.message
+        : "Failed to fetch products";
+      toast.error("Error fetching products", {
+        description: errorMessage,
+      });
       set({ products: [] });
+    }
+  },
+
+  addProduct: async (productData: Partial<Product>) => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      throw new Error("No authentication token found");
+    }
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/products`,
+        productData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      set((state) => ({
+        products: [...state.products, response.data.product],
+      }));
+    } catch (error) {
+      console.error("Error adding product:", error);
+      throw error;
     }
   },
 }));

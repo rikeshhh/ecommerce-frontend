@@ -1,4 +1,3 @@
-// app/components/SignupForm.tsx
 "use client";
 
 import React from "react";

@@ -2,7 +2,7 @@
 
 import ProductsTable from "@/components/admin/products-table";
 
-export default function OrdersPage() {
+export default function Products() {
   return (
     <div className="p-6">
       <ProductsTable />
