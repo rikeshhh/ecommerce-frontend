@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { DataTable } from "@/components/admin/data-table";
 import { useUserStore } from "@/store/userStore";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +9,10 @@ import type { User } from "@/lib/schema/zod-schema";
 
 export default function UsersTable() {
   const { items, fetchItems, loading } = useUserStore();
+
+  useEffect(() => {
+    fetchItems(1, 10); 
+  }, [fetchItems]);
 
   const columns = [
     { key: "_id", header: "User ID" },
@@ -29,6 +34,8 @@ export default function UsersTable() {
     },
   ];
 
+  console.log("UsersTable - Items:", items, "Loading:", loading);
+
   return (
     <DataTable
       title="Users"
@@ -37,7 +44,7 @@ export default function UsersTable() {
       fetchData={fetchItems}
       loading={loading}
       filterOptions={{
-        statusOptions: ["Admin", "User"],
+        statusOptions: ["Admin", "User"], 
         dateField: "createdAt",
       }}
     />

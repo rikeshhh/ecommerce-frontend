@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react"; // Add useEffect
 import { useProductStore } from "@/store/product-store";
 import { DataTable } from "@/components/admin/data-table";
 import { format, isValid } from "date-fns";
@@ -39,12 +40,15 @@ export default function ProductsTable() {
       page,
       limit,
       search: filters.search || "",
-      ...(filters.createdAt && {
-        from: filters.createdAt.from,
-        to: filters.createdAt.to,
-      }),
+      from: filters.createdAt?.from || undefined,
+      to: filters.createdAt?.to || undefined,
     });
   };
+
+  useEffect(() => {
+    console.log("Fetching initial products...");
+    fetchProducts({ page: 1, limit: 10 });
+  }, [fetchProducts]);
 
   return (
     <DataTable

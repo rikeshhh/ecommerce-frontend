@@ -31,6 +31,7 @@ interface UserState {
   ) => Promise<void>;
   updateUserRole: (id: string, isAdmin: boolean) => Promise<void>;
   deleteUser: (id: string) => Promise<void>;
+  error?: string;
 }
 
 export const useUserStore = create<UserState>()(
@@ -113,64 +114,38 @@ export const useUserStore = create<UserState>()(
         },
 
         fetchItems: async (page = 1, limit = 10, filters = {}) => {
-          set({ loading: true });
-          const token = localStorage.getItem("authToken");
-          if (!token) {
-            toast.error("Authentication required", {
-              description: "Please log in to view users.",
-            });
-            set({
-              items: [],
-              totalItems: 0,
-              currentPage: 1,
-              totalPages: 1,
-              limit: 10,
-              loading: false,
-            });
-            return;
-          }
+          set({ loading: true, error: undefined });
           try {
-            const response = await axios.get(
-              `${process.env.NEXT_PUBLIC_API_URL}/api/users`,
-              {
-                headers: { Authorization: `Bearer ${token}` },
-                params: {
-                  page,
-                  limit,
-                  search: filters.search,
-                  dateFrom: filters.createdAt?.from,
-                  dateTo: filters.createdAt?.to,
-                  role: filters.role,
-                },
-              }
-            );
-            console.log("Users Response:", response.data);
+            const API_URL =
+              process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
+            const token = localStorage.getItem("authToken");
+            if (!token) throw new Error("No auth token found");
+            const mappedFilters = {
+              search: filters.search,
+              dateFrom: filters.createdAt?.from,
+              dateTo: filters.createdAt?.to,
+              role: filters.role,
+            };
+            const response = await axios.get(`${API_URL}/api/users`, {
+              headers: { Authorization: `Bearer ${token}` },
+              params: { page, limit, ...mappedFilters },
+            });
+            console.log("Fetched users:", response.data.users);
             set({
               items: response.data.users || [],
-              totalItems: response.data.totalUsers || 0,
-              currentPage: response.data.currentPage || page,
-              totalPages: response.data.totalPages || 1,
-              limit: response.data.limit || limit,
               loading: false,
+              error: undefined,
             });
-            if (!response.data.users || response.data.users.length === 0) {
-              toast.info("No users found", {
-                description: "There are no users to display at the moment.",
-              });
-            }
           } catch (error) {
-            toast.error("Error fetching users", {
-              description: axios.isAxiosError(error)
-                ? error.response?.data?.message || error.message
-                : "Unknown error",
-            });
+            const errorMessage =
+              axios.isAxiosError(error) && error.response?.data?.message
+                ? error.response.data.message
+                : "Failed to fetch users";
+            console.error("Fetch Users Error:", errorMessage);
             set({
               items: [],
-              totalItems: 0,
-              currentPage: 1,
-              totalPages: 1,
-              limit: 10,
               loading: false,
+              error: errorMessage,
             });
           }
         },

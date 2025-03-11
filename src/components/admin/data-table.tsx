@@ -24,10 +24,12 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Search, CalendarIcon, Filter } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Search, CalendarIcon, Filter } from "lucide-react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { format, isValid } from "date-fns";
 import { DateRange } from "react-day-picker";
+import { cn } from "@/lib/utils";
 
 interface Column<T> {
   key: keyof T | string;
@@ -65,42 +67,25 @@ export function DataTable<T>({
   const router = useRouter();
   const pathname = usePathname();
 
-  const fetchDataWithFilters = useCallback(async () => {
-    const filters = {
-      search: searchQuery,
-      [filterOptions.dateField || "createdAt"]: dateRange
-        ? {
-            from: dateRange.from?.toISOString(),
-            to: dateRange.to?.toISOString(),
-          }
-        : undefined,
-      status: statusFilter,
-    };
-    await fetchData(1, 10, filters);
-  }, [
-    searchQuery,
-    dateRange,
-    statusFilter,
-    fetchData,
-    filterOptions.dateField,
-  ]);
-
-  useEffect(() => {
-    const q = searchParams.get("q") || "";
-    const from = searchParams.get("from");
-    const to = searchParams.get("to");
-    const status = searchParams.get("status");
-
-    setSearchQuery(q);
-    if (from && to && isValid(new Date(from)) && isValid(new Date(to))) {
-      setDateRange({ from: new Date(from), to: new Date(to) });
-    } else {
-      setDateRange(undefined);
-    }
-    setStatusFilter(status);
-
-    fetchDataWithFilters();
-  }, [searchParams, fetchDataWithFilters]);
+  const fetchDataWithFilters = useCallback(
+    async (overrideRange?: DateRange) => {
+      const effectiveRange = overrideRange || dateRange;
+      const filters = {
+        search: searchQuery || undefined,
+        [filterOptions.dateField || "createdAt"]:
+          effectiveRange?.from && effectiveRange?.to
+            ? {
+                from: effectiveRange.from.toISOString(),
+                to: effectiveRange.to.toISOString(),
+              }
+            : undefined,
+        status: statusFilter || undefined,
+      };
+      console.log("Fetching with filters:", filters);
+      await fetchData(1, 10, filters);
+    },
+    [searchQuery, dateRange, statusFilter, fetchData, filterOptions.dateField]
+  );
 
   const updateUrl = useCallback(() => {
     const params = new URLSearchParams();
@@ -115,6 +100,41 @@ export function DataTable<T>({
     router.replace(newUrl, { scroll: false });
   }, [searchQuery, dateRange, statusFilter, pathname, router]);
 
+  useEffect(() => {
+    const q = searchParams.get("q") || "";
+    const from = searchParams.get("from");
+    const to = searchParams.get("to");
+    const status = searchParams.get("status");
+
+    let shouldFetch = false;
+    if (q !== searchQuery) {
+      setSearchQuery(q);
+      shouldFetch = true;
+    }
+    if (status !== statusFilter) {
+      setStatusFilter(status);
+      shouldFetch = true;
+    }
+
+    if (from && to && isValid(new Date(from)) && isValid(new Date(to))) {
+      const newRange = { from: new Date(from), to: new Date(to) };
+      if (
+        dateRange?.from?.toISOString() !== newRange.from.toISOString() ||
+        dateRange?.to?.toISOString() !== newRange.to.toISOString()
+      ) {
+        setDateRange(newRange);
+        shouldFetch = true;
+      }
+    } else if (dateRange) {
+      setDateRange(undefined);
+      shouldFetch = true;
+    }
+
+    if (shouldFetch) {
+      fetchDataWithFilters();
+    }
+  }, [searchParams, fetchDataWithFilters]);
+
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     fetchDataWithFilters();
@@ -123,35 +143,62 @@ export function DataTable<T>({
 
   const filteredData = useMemo(() => {
     let result = [...data];
-    if (searchQuery) {
-      const searchTerms = searchQuery.toLowerCase().split(" ").filter(Boolean);
-      result = result.filter((item) =>
-        searchTerms.every((term) =>
-          Object.values(item as any)
-            .join(" ")
-            .toLowerCase()
-            .includes(term)
-        )
-      );
-    }
-    if (statusFilter && filterOptions.statusOptions) {
-      result = result.filter((item) => (item as any).status === statusFilter);
-    }
     if (dateRange?.from && dateRange?.to && filterOptions.dateField) {
       result = result.filter((item) => {
-        const date = new Date((item as any)[filterOptions.dateField!]);
-        return (
-          isValid(date) && date >= dateRange.from! && date <= dateRange.to!
-        );
+        const dateStr = (item as any)[filterOptions.dateField!];
+        const date = new Date(dateStr);
+        const isDateValid = isValid(date);
+        if (!isDateValid) return false;
+        const withinRange = date >= dateRange.from! && date <= dateRange.to!;
+        return withinRange;
       });
     }
     return result;
-  }, [data, searchQuery, statusFilter, dateRange, filterOptions]);
+  }, [data, dateRange, filterOptions]);
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <Loader2 className="h-8 w-8 animate-spin" />
+      <div className="p-4 max-w-5xl mx-auto space-y-6">
+        <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+          <Skeleton className="h-10 w-full md:w-1/3" />
+          <div className="flex gap-4">
+            <Skeleton className="h-10 w-[280px]" />
+            {filterOptions.statusOptions && (
+              <Skeleton className="h-10 w-[150px]" />
+            )}
+          </div>
+        </div>
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-6 w-1/4" />
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  {columns.map((col) => (
+                    <TableHead key={col.key as string}>
+                      <Skeleton className="h-6 w-20" />
+                    </TableHead>
+                  ))}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {Array(5)
+                  .fill(0)
+                  .map((_, i) => (
+                    <TableRow key={i}>
+                      {columns.map((col) => (
+                        <TableCell key={col.key as string}>
+                          <Skeleton className="h-6 w-full" />
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -200,7 +247,9 @@ export function DataTable<T>({
                   selected={dateRange}
                   onSelect={(range) => {
                     setDateRange(range);
-                    fetchDataWithFilters();
+                    if (range?.from && range?.to) {
+                      fetchDataWithFilters(range);
+                    }
                     updateUrl();
                   }}
                   initialFocus

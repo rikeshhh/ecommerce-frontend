@@ -30,7 +30,7 @@ export default function OrdersTable() {
     {
       key: "user.name",
       header: "Customer",
-      render: (order: Order) => order.user?.name || "Unknown",
+      render: (order: Order) => order.customerName || "Unknown",
     },
     {
       key: "totalAmount",
@@ -49,9 +49,9 @@ export default function OrdersTable() {
             <SelectValue>
               <Badge
                 variant={
-                  order.status === "Placed"
+                  order.status === "Processing"
                     ? "default"
-                    : order.status === "Processing"
+                    : order.status === "Placed"
                     ? "secondary"
                     : order.status === "Shipped"
                     ? "outline"

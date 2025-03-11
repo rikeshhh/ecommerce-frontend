@@ -19,6 +19,8 @@ interface ProductState {
     search?: string;
     category?: string;
     exclude?: string;
+    from?: string;
+    to?: string;
   }) => Promise<void>;
   fetchProductById: (id: string) => Promise<void>;
   addProduct: (data: FormData) => Promise<Product>;
@@ -39,6 +41,8 @@ export const useProductStore = create<ProductState>((set) => ({
     search = "",
     category = "",
     exclude = "",
+    from,
+    to,
   } = {}) => {
     set({ loading: true, error: undefined });
     try {

@@ -16,6 +16,7 @@ export interface Order {
   updatedAt: string;
   __v: number;
 }
+
 interface OrderState {
   orders: Order[];
   totalOrders: number;
@@ -23,6 +24,8 @@ interface OrderState {
   totalPages: number;
   limit: number;
   loading: boolean;
+  newOrderCount: number; 
+  lastChecked: string | null; 
   fetchOrders: (
     page: number,
     limit: number,
@@ -38,15 +41,18 @@ interface OrderState {
     status?: string,
     paymentStatus?: string
   ) => Promise<void>;
+  markOrdersAsRead: () => void;
 }
 
-export const useOrderStore = create<OrderState>((set) => ({
+export const useOrderStore = create<OrderState>((set, get) => ({
   orders: [],
   totalOrders: 0,
   currentPage: 1,
   totalPages: 1,
   limit: 10,
   loading: false,
+  newOrderCount: 0,
+  lastChecked: null, 
 
   fetchOrders: async (page = 1, limit = 10, filters = {}) => {
     set({ loading: true });
@@ -80,14 +86,23 @@ export const useOrderStore = create<OrderState>((set) => ({
           },
         }
       );
-      console.log("Orders Response:", response.data.orders);
+      const newOrders = response.data.orders || [];
+      const lastChecked = get().lastChecked;
+      const newOrderCount = lastChecked
+        ? newOrders.filter(
+            (order: Order) => new Date(order.createdAt) > new Date(lastChecked)
+          ).length
+        : 0; 
+
       set({
-        orders: response.data.orders || [],
+        orders: newOrders,
         totalOrders: response.data.totalOrders || 0,
         currentPage: response.data.currentPage || page,
         totalPages: response.data.totalPages || 1,
         limit: response.data.limit || limit,
         loading: false,
+        newOrderCount: get().newOrderCount + newOrderCount, 
+        lastChecked: new Date().toISOString(), 
       });
     } catch (error) {
       toast.error("Error fetching orders", {
@@ -147,14 +162,12 @@ export const useOrderStore = create<OrderState>((set) => ({
       const payload: { status?: string; paymentStatus?: string } = {};
       if (status) payload.status = status;
       if (paymentStatus) payload.paymentStatus = paymentStatus;
-      console.log("Updating order with payload:", payload);
 
       const response = await axios.patch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/orders/${id}`,
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      console.log("Update response:", response.data);
 
       set((state) => ({
         orders: state.orders.map((order) =>
@@ -180,4 +193,12 @@ export const useOrderStore = create<OrderState>((set) => ({
       });
     }
   },
+
+  markOrdersAsRead: () => {
+    set({ newOrderCount: 0 });
+  },
 }));
+function get() {
+  throw new Error("Function not implemented.");
+}
+

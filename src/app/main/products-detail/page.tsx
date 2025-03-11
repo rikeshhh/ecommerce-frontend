@@ -25,21 +25,24 @@ export default function ProductDetail() {
     fetchProductById,
     fetchProducts,
   } = useProductStore();
-  const [relatedProducts, setRelatedProducts] = useState(products);
-
+  const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
   useEffect(() => {
     if (!id) return;
 
     const fetchData = async () => {
-      await fetchProductById(id);
-      const product = useProductStore.getState().selectedProduct;
-      if (product) {
-        await fetchProducts({
-          category: product.category,
-          limit: 3,
-          exclude: id,
-        });
-        setRelatedProducts(useProductStore.getState().products);
+      try {
+        await fetchProductById(id);
+        const product = useProductStore.getState().selectedProduct;
+        if (product) {
+          await fetchProducts({
+            category: product.category,
+            limit: 3,
+            exclude: id,
+          });
+          setRelatedProducts(useProductStore.getState().products);
+        }
+      } catch (err) {
+        console.error("Error fetching product data:", err);
       }
     };
 
@@ -57,12 +60,17 @@ export default function ProductDetail() {
 
   const normalizeImageUrl = (image?: string) => {
     console.log("Raw Image URL:", image);
-    if (!image) return "/placeholder.png";
-    if (image.startsWith("http://") || image.startsWith("https://"))
-      return image;
-    if (image.startsWith("/")) return image;
-    return `/uploads/${image}`;
+    const normalized = !image
+      ? "/placeholder.png"
+      : image.startsWith("http://") || image.startsWith("https://")
+      ? image
+      : image.startsWith("/")
+      ? image
+      : `/uploads/${image}`;
+    console.log("Normalized Image URL:", normalized);
+    return normalized;
   };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-50 dark:bg-gray-900">
