@@ -25,6 +25,7 @@ export const UserSchema = z.object({
   isAdmin: z.boolean().optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
+  favorites: z.array(z.string()).optional(),
 });
 
 export type User = z.infer<typeof UserSchema>;

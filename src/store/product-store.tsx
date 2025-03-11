@@ -38,35 +38,48 @@ export const useProductStore = create<ProductState>((set) => ({
   fetchProducts: async ({
     page = 1,
     limit = 10,
-    search = "",
-    category = "",
-    exclude = "",
+    search,
     from,
     to,
+    category,
+    exclude,
   } = {}) => {
     set({ loading: true, error: undefined });
     try {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/api/products`,
         {
-          params: {
-            page,
-            limit,
-            search: search || undefined,
-            category: category || undefined,
-            exclude: exclude || undefined,
-          },
+          params: { page, limit, search, from, to, category, exclude },
         }
       );
-      console.log("Fetched Products:", response.data.products);
-      set({ products: response.data.products || [], loading: false });
-    } catch (error) {
+      const {
+        products,
+        totalProducts,
+        currentPage,
+        totalPages,
+        limit: responseLimit,
+      } = response.data;
+      console.log(
+        `Fetched ${products.length} products for category: ${
+          category || "all"
+        }`,
+        products
+      );
+      set({
+        products,
+        totalProducts,
+        currentPage,
+        totalPages,
+        limit: responseLimit,
+        loading: false,
+      });
+    } catch (err) {
       const errorMessage =
-        axios.isAxiosError(error) && error.response?.data?.message
-          ? error.response.data.message
-          : "Failed to fetch products";
-      console.error("Fetch Products Error:", errorMessage);
-      set({ loading: false, error: errorMessage });
+        axios.isAxiosError(err) && err.response?.data?.message
+          ? err.response.data.message
+          : "Failed to load products";
+      console.error("Fetch Products Error:", err);
+      set({ error: errorMessage, loading: false });
     }
   },
 

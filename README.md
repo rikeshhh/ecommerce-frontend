@@ -87,9 +87,9 @@ npm install
 env
 
 ```bash
-NEXT_PUBLIC_API_URL=http://localhost:3000/api
+NEXT_PUBLIC_API_URL=http://localhost:5001/api
 NEXTAUTH_SECRET=your-secret-key
-NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_URL=http://localhost:5001
 ```
 
 4. Run the Development Server

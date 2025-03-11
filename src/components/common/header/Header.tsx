@@ -53,6 +53,7 @@ export default function Header() {
           >
             Product Listing
           </Link>
+          <Link href="/main/favourite">Favorite</Link>
           {/* <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button

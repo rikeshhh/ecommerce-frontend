@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react"; // Add useEffect
+import { useEffect } from "react";
 import { useProductStore } from "@/store/product-store";
 import { DataTable } from "@/components/admin/data-table";
 import { format, isValid } from "date-fns";

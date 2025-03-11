@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Image from "next/image";
 import { Heart } from "lucide-react";
 import { motion } from "framer-motion";
@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cartStore";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useFavoritesStore } from "@/store/favorites-store";
 
 interface ProductCardProps {
   product: Product;
@@ -21,21 +22,28 @@ interface ColorOption {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  console.log("ProductCard Product:", product);
-  const [selectedImage, setSelectedImage] = useState<string>(() => {
-    console.log("Initial product.image:", product.image);
-    return typeof product.image === "string" &&
-      (product.image.startsWith("/") ||
-        product.image.startsWith("http") ||
-        product.image.startsWith("https"))
-      ? product.image
-      : "/placeholder.png";
-  });
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [selectedImage, setSelectedImage] =
+    useState<string>("/placeholder.png");
+  useEffect(() => {
+    const img =
+      typeof product.image === "string" && product.image.trim()
+        ? product.image
+        : "/placeholder.png";
+    const finalImg =
+      img.startsWith("http") || img.startsWith("https")
+        ? img
+        : `${process.env.NEXT_PUBLIC_API_URL}${
+            img.startsWith("/") ? img : `/${img}`
+          }`;
+    setSelectedImage(finalImg);
+    console.log("Set image for", product._id, ":", finalImg);
+  }, [product.image, product._id]);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
-
+  const { favorites, toggleFavorite, loading } = useFavoritesStore();
   const router = useRouter();
   const { addToCart } = useCartStore();
+
+  const isFavorite = favorites.includes(product._id);
 
   const colorOptions: ColorOption[] = [
     { img: product.image || "/placeholder.png", color: "#FF5733" },
@@ -43,14 +51,17 @@ export default function ProductCard({ product }: ProductCardProps) {
     { img: product.image || "/placeholder.png", color: "#3357FF" },
   ];
 
-  const handleFavoriteToggle = useCallback(() => {
-    setIsFavorite((prev) => !prev);
-  }, []);
+  const handleFavoriteToggle = useCallback(async () => {
+    try {
+      await toggleFavorite(product._id);
+    } catch (error) {
+      console.error("Toggle favorite failed:", error);
+    }
+  }, [product._id, toggleFavorite]);
 
   const handleColorChange = useCallback((img: string, color: string) => {
     setSelectedImage(img);
     setSelectedColor(color);
-    console.log("Selected Image Updated To:", img);
   }, []);
 
   const handleViewDetails = useCallback(() => {
@@ -59,11 +70,19 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   const handleAddToCart = useCallback(() => {
     addToCart(product);
-    toast.success(`${product.name} has been added to your cart`, {
-      duration: 3000,
-    });
+    toast.success(`${product.name} has been added to your cart`);
   }, [addToCart, product]);
-
+  useEffect(() => {
+    const img =
+      typeof product.image === "string" ? product.image : "/placeholder.png";
+    const finalImg =
+      img.startsWith("http") || img.startsWith("https")
+        ? img
+        : `${process.env.NEXT_PUBLIC_API_URL}${
+            img.startsWith("/") ? img : `/${img}`
+          }`;
+    setSelectedImage(finalImg);
+  }, [product.image]);
   return (
     <motion.div
       className="w-[300px] mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300"
@@ -73,19 +92,17 @@ export default function ProductCard({ product }: ProductCardProps) {
       transition={{ duration: 0.3 }}
     >
       <div className="relative h-52 w-full bg-gray-100 dark:bg-gray-700">
-        <Image
-          src={selectedImage}
-          alt={product.name}
-          fill
-          className="object-cover transition-opacity duration-300 hover:opacity-90"
-          sizes="(max-width: 300px) 100vw"
-          placeholder="blur"
-          blurDataURL="/placeholder.png"
-          onError={(e) => {
-            console.log("Image Load Error for:", selectedImage);
-            setSelectedImage("/placeholder.png");
-          }}
-        />
+        <div className="relative h-52 w-full bg-gray-100 dark:bg-gray-700">
+          <Image
+            src={selectedImage}
+            alt={product.name}
+            fill
+            className="object-cover transition-opacity duration-300 hover:opacity-90"
+            sizes="(max-width: 300px) 100vw"
+            placeholder="blur"
+            blurDataURL="/placeholder.png"
+          />
+        </div>
         <motion.button
           className="absolute top-2 right-2 p-1 rounded-full bg-white/80 dark:bg-gray-800/80"
           onClick={handleFavoriteToggle}
@@ -93,6 +110,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           animate={{ scale: isFavorite ? 1.1 : 1 }}
           transition={{ type: "spring", stiffness: 1000, damping: 10 }}
           aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+          disabled={loading}
         >
           <Heart
             className={cn(
