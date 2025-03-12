@@ -12,7 +12,7 @@ const categories = [
 
 export default function ProductCategory() {
   return (
-    <section className="py-12">
+    <section className="py-12 w-full container">
       <h2 className="text-2xl font-bold mb-6 text-center">Shop by Category</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {categories.map((category) => (

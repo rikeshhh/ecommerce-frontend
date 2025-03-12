@@ -32,6 +32,7 @@ interface Order {
   }[];
   totalAmount?: number;
   status: string;
+  paymentStatus: string;
   createdAt: string;
 }
 
@@ -58,6 +59,7 @@ const OrderHistory = () => {
           }
         );
         setOrders(response.data.orders);
+        console.log(response.data.orders);
       } catch (error) {
         console.error("Failed to fetch orders:", error);
         toast.error("Failed to load your order history. Please try again.");
@@ -133,6 +135,7 @@ const OrderHistory = () => {
                       </span>
                     </div>
                   </CardHeader>
+                  <span>{order?.paymentStatus}</span>
                 </AccordionTrigger>
                 <AccordionContent>
                   <CardContent className="p-6 pt-0">

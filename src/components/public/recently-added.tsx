@@ -36,7 +36,7 @@ export default function RecentlyAdded() {
   }
 
   return (
-    <div className="py-8">
+    <div className="py-8 w-full">
       <h2 className="text-2xl font-bold text-center mb-6">
         Recently Added Products
       </h2>

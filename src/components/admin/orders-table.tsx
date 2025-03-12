@@ -25,6 +25,19 @@ export default function OrdersTable() {
     updateOrder(orderId, newStatus);
   };
 
+  const handleFetchData = async (page: number, limit: number, filters: any) => {
+    try {
+      const response = await fetchOrders(page, limit, {
+        search: filters.search || "",
+        status: filters.status || undefined,
+      });
+      return response;
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+      throw error;
+    }
+  };
+
   const columns = [
     { key: "_id", header: "Order ID" },
     {
@@ -65,8 +78,8 @@ export default function OrdersTable() {
             </SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="Placed">Placed</SelectItem>
             <SelectItem value="Processing">Processing</SelectItem>
+            <SelectItem value="Placed">Placed</SelectItem>
             <SelectItem value="Shipped">Shipped</SelectItem>
             <SelectItem value="Delivered">Delivered</SelectItem>
             <SelectItem value="Cancelled">Cancelled</SelectItem>
@@ -86,8 +99,7 @@ export default function OrdersTable() {
       title="Orders"
       data={orders}
       columns={columns}
-      fetchData={fetchOrders}
-      loading={loading}
+      fetchData={handleFetchData}
       filterOptions={{
         statusOptions: [
           "Placed",
@@ -98,6 +110,8 @@ export default function OrdersTable() {
         ],
         dateField: "createdAt",
       }}
+      initialPage={1}
+      initialLimit={10}
     />
   );
 }

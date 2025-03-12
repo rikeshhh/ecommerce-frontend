@@ -29,9 +29,8 @@ export default function ProductListingPage() {
   useEffect(() => {
     fetchProducts({
       search: searchTerm,
-      category: selectedCategory || undefined,
     });
-  }, [fetchProducts, searchTerm, selectedCategory]);
+  }, [fetchProducts, searchTerm]);
 
   const categories = useMemo(
     () => Array.from(new Set(products.map((p) => p.category).filter(Boolean))),
@@ -41,10 +40,7 @@ export default function ProductListingPage() {
   const getCategoryCount = (category: string) =>
     products.filter((p) => p.category === category).length;
 
-  const filteredProducts = useMemo(() => {
-    if (!selectedCategory) return products;
-    return products.filter((product) => product.category === selectedCategory);
-  }, [products, selectedCategory]);
+  const filteredProducts = useMemo(() => products, [products]);
 
   const sidebarX =
     isMobile === undefined ? -300 : isSidebarOpen || !isMobile ? 0 : -300;

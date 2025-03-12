@@ -14,7 +14,6 @@ import {
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
-import { dummyProducts } from "@/data/product";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!

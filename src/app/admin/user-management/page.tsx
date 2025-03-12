@@ -11,8 +11,20 @@ export default function UsersTable() {
   const { items, fetchItems, loading } = useUserStore();
 
   useEffect(() => {
-    fetchItems(1, 10); 
+    fetchItems(1, 10);
   }, [fetchItems]);
+
+  const handleFetchData = async (page: number, limit: number, filters: any) => {
+    try {
+      const response = await fetchItems(page, limit, {
+        search: filters.search || "",
+      });
+      return response;
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      throw error;
+    }
+  };
 
   const columns = [
     { key: "_id", header: "User ID" },
@@ -41,12 +53,13 @@ export default function UsersTable() {
       title="Users"
       data={items}
       columns={columns}
-      fetchData={fetchItems}
-      loading={loading}
+      fetchData={handleFetchData}
       filterOptions={{
-        statusOptions: ["Admin", "User"], 
+        statusOptions: ["Admin", "User"],
         dateField: "createdAt",
       }}
+      initialPage={1}
+      initialLimit={10}
     />
   );
 }

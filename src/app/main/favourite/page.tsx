@@ -20,8 +20,6 @@ export default function FavoritesPage() {
     const loadFavorites = async () => {
       setFetchError(null);
       try {
-        await fetchFavorites();
-        console.log("Favorites:", favorites);
         if (favorites.length > 0) {
           const fetchedProducts = await Promise.all(
             favorites.map(async (id) => {
@@ -36,8 +34,9 @@ export default function FavoritesPage() {
           );
           const validProducts = fetchedProducts.filter((p) => p !== null);
           setProducts(validProducts);
-          if (validProducts.length === 0)
+          if (validProducts.length === 0) {
             setFetchError("No valid products found");
+          }
         } else {
           setProducts([]);
         }
@@ -46,9 +45,9 @@ export default function FavoritesPage() {
         console.error("Load favorites error:", error);
       }
     };
-    loadFavorites();
-  }, [fetchFavorites, favorites]);
 
+    loadFavorites();
+  }, [favorites]);
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6">Your Favorites</h1>

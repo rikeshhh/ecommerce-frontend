@@ -14,7 +14,15 @@ interface Product {
 }
 
 export default function ProductsTable() {
-  const { products, fetchProducts, loading } = useProductStore();
+  const { products, fetchProducts, loading, totalPages } =
+    useProductStore();
+
+  useEffect(() => {
+    console.log("Products:", products);
+    products.forEach((product, index) => {
+      console.log(`Product ${index} createdAt:`, product.createdAt);
+    });
+  }, [products]);
 
   const columns = [
     { key: "_id", header: "Product ID" },
@@ -29,6 +37,10 @@ export default function ProductsTable() {
       key: "createdAt",
       header: "Added On",
       render: (product: Product) => {
+        console.log(
+          `Rendering createdAt for ${product._id}:`,
+          product.createdAt
+        );
         const date = new Date(product.createdAt);
         return isValid(date) ? format(date, "LLL dd, y") : "Invalid Date";
       },
@@ -36,17 +48,22 @@ export default function ProductsTable() {
   ];
 
   const handleFetchData = async (page: number, limit: number, filters: any) => {
-    await fetchProducts({
-      page,
-      limit,
-      search: filters.search || "",
-      from: filters.createdAt?.from || undefined,
-      to: filters.createdAt?.to || undefined,
-    });
+    try {
+      const response = await fetchProducts({
+        page,
+        limit,
+        search: filters.search || "",
+        from: filters.createdAt?.from || undefined,
+        to: filters.createdAt?.to || undefined,
+      });
+      return;
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      throw error;
+    }
   };
 
   useEffect(() => {
-    console.log("Fetching initial products...");
     fetchProducts({ page: 1, limit: 10 });
   }, [fetchProducts]);
 
@@ -56,8 +73,9 @@ export default function ProductsTable() {
       data={products}
       columns={columns}
       fetchData={handleFetchData}
-      loading={loading}
       filterOptions={{ dateField: "createdAt" }}
+      initialPage={1}
+      initialLimit={10}
     />
   );
 }
