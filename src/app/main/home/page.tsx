@@ -7,6 +7,7 @@ import RecentlyAdded from "@/components/public/recently-added";
 import { useFavoritesStore } from "@/store/favorites-store";
 import ProductCategory from "@/components/product/product-category";
 import ContactPage from "@/components/public/conatct";
+import Recommendations from "../recommended-products/page";
 
 export default function PublicHome() {
   const { initialize } = useFavoritesStore();
@@ -20,6 +21,7 @@ export default function PublicHome() {
       <HeroSection />
       <RecentlyAdded />
       <ProductCategory />
+      <Recommendations />
       <ContactPage />
       <FAQAccordion />
     </section>

@@ -36,7 +36,6 @@ export default function ProductCard({ product }: ProductCardProps) {
             img.startsWith("/") ? img : `/${img}`
           }`;
     setSelectedImage(finalImg);
-    console.log("Set image for", product._id, ":", finalImg);
   }, [product.image, product._id]);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const { favorites, toggleFavorite, loading } = useFavoritesStore();
@@ -72,9 +71,18 @@ export default function ProductCard({ product }: ProductCardProps) {
     addToCart(product);
     toast.success(`${product.name} has been added to your cart`);
   }, [addToCart, product]);
+
+  const handleImageError = (
+    e: React.SyntheticEvent<HTMLImageElement, Event>
+  ) => {
+    setSelectedImage("/placeholder.png");
+  };
+
   useEffect(() => {
     const img =
-      typeof product.image === "string" ? product.image : "/placeholder.png";
+      typeof product.image === "string" && product.image.trim()
+        ? product.image
+        : "/placeholder.png";
     const finalImg =
       img.startsWith("http") || img.startsWith("https")
         ? img
@@ -83,6 +91,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           }`;
     setSelectedImage(finalImg);
   }, [product.image]);
+
   return (
     <motion.div
       className="w-[300px] mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300"
@@ -94,12 +103,13 @@ export default function ProductCard({ product }: ProductCardProps) {
       <div className="relative h-52 w-full bg-gray-100 dark:bg-gray-700">
         <div className="relative h-52 w-full bg-gray-100 dark:bg-gray-700">
           <Image
-            src={selectedImage}
+            src={selectedImage || "placeholder.png"}
             alt={product.name}
             fill
             className="object-cover transition-opacity duration-300 hover:opacity-90"
             sizes="(max-width: 300px) 100vw"
             placeholder="blur"
+            onError={handleImageError}
             blurDataURL="/placeholder.png"
           />
         </div>

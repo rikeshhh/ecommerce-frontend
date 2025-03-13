@@ -7,6 +7,7 @@ import { Product } from "@/lib/types";
 interface ProductState {
   products: Product[];
   totalProducts: number;
+  recommendations: Product[];
   currentPage: number;
   totalPages: number;
   limit: number;
@@ -27,11 +28,13 @@ interface ProductState {
     totalPages: number;
   }>;
   fetchProductById: (id: string) => Promise<void>;
+  fetchRecommendations: (userId: string) => Promise<void>;
   addProduct: (data: FormData) => Promise<Product>;
 }
 
 export const useProductStore = create<ProductState>((set) => ({
   products: [],
+  recommendations: [],
   totalProducts: 0,
   currentPage: 1,
   totalPages: 1,
@@ -144,6 +147,25 @@ export const useProductStore = create<ProductState>((set) => ({
       console.error("Fetch Product Error:", errorMessage);
       set({ loading: false, error: errorMessage });
       throw new Error(errorMessage);
+    }
+  },
+
+  fetchRecommendations: async (userId: string) => {
+    set({ loading: true, error: undefined });
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/recommendations`,
+        {
+          params: { userId },
+        }
+      );
+      set({ recommendations: response.data.recommendations, loading: false });
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "An unknown error occurred";
+      console.error("Fetch Recommendations Error:", err);
+      set({ error: errorMessage, loading: false });
+      throw new Error(errorMessage); 
     }
   },
 
