@@ -4,8 +4,15 @@ import { create } from "zustand";
 import axios from "axios";
 import { Product } from "@/lib/types";
 
+interface Category {
+  name: string;
+  slug: string;
+  image: string;
+}
+
 interface ProductState {
   products: Product[];
+  categories: Category[];
   totalProducts: number;
   recommendations: Product[];
   currentPage: number;
@@ -30,10 +37,12 @@ interface ProductState {
   fetchProductById: (id: string) => Promise<void>;
   fetchRecommendations: (userId: string) => Promise<void>;
   addProduct: (data: FormData) => Promise<Product>;
+  fetchCategories: () => Promise<Category[]>;
 }
 
 export const useProductStore = create<ProductState>((set) => ({
   products: [],
+  categories: [],
   recommendations: [],
   totalProducts: 0,
   currentPage: 1,
@@ -54,16 +63,6 @@ export const useProductStore = create<ProductState>((set) => ({
   } = {}) => {
     set({ loading: true, error: undefined });
     try {
-      console.log("fetchProducts params:", {
-        page,
-        limit,
-        search,
-        from,
-        to,
-        category,
-        exclude,
-      });
-
       const params = {
         page,
         limit,
@@ -74,7 +73,7 @@ export const useProductStore = create<ProductState>((set) => ({
         exclude: exclude || undefined,
       };
 
-      console.log("Sending params to API:", params);
+      console.log("fetchProducts params:", params);
 
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/api/products`,
@@ -95,11 +94,25 @@ export const useProductStore = create<ProductState>((set) => ({
       }));
 
       console.log(
-        `Fetched ${products.length} products for category: ${
-          category || "all"
-        }`,
-        products
+        `Fetched ${products.length} products for category: ${category || "all"}`
       );
+
+      if (search && search.trim()) {
+        try {
+          const token = localStorage.getItem("authToken");
+          const config = token
+            ? { headers: { Authorization: `Bearer ${token}` } }
+            : {};
+          await axios.post(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/products/search-history`,
+            { query: search.trim() },
+            config
+          );
+          console.log(`Search "${search}" logged successfully`);
+        } catch (logError) {
+          console.error("Failed to log search (non-critical):", logError);
+        }
+      }
 
       set({
         products,
@@ -109,6 +122,7 @@ export const useProductStore = create<ProductState>((set) => ({
         limit: responseLimit,
         loading: false,
       });
+
       return {
         items: products,
         totalItems: totalProducts,
@@ -131,20 +145,22 @@ export const useProductStore = create<ProductState>((set) => ({
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`
       );
-      console.log("Fetched Product by ID:", response.data);
       const product = response.data.product;
       if (!product) throw new Error("Product not found in response");
+
       const updatedProduct = {
         ...product,
         createdAt: product.createdAt || new Date().toISOString(),
       };
+      console.log("Fetched Product by ID:", updatedProduct);
+
       set({ selectedProduct: updatedProduct, loading: false });
-    } catch (error) {
+    } catch (err) {
       const errorMessage =
-        axios.isAxiosError(error) && error.response?.data?.message
-          ? error.response.data.message
+        axios.isAxiosError(err) && err.response?.data?.message
+          ? err.response.data.message
           : "Failed to fetch product";
-      console.error("Fetch Product Error:", errorMessage);
+      console.error("Fetch Product Error:", err);
       set({ loading: false, error: errorMessage });
       throw new Error(errorMessage);
     }
@@ -153,19 +169,27 @@ export const useProductStore = create<ProductState>((set) => ({
   fetchRecommendations: async (userId: string) => {
     set({ loading: true, error: undefined });
     try {
+      if (!userId) throw new Error("User ID is required");
+
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/api/recommendations`,
-        {
-          params: { userId },
-        }
+        { params: { userId } }
       );
-      set({ recommendations: response.data.recommendations, loading: false });
+
+      const recommendations = response.data.recommendations || [];
+      console.log(
+        `Fetched ${recommendations.length} recommendations for user ${userId}`
+      );
+
+      set({ recommendations, loading: false });
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : "An unknown error occurred";
+        axios.isAxiosError(err) && err.response?.data?.message
+          ? err.response.data.message
+          : "Failed to fetch recommendations";
       console.error("Fetch Recommendations Error:", err);
       set({ error: errorMessage, loading: false });
-      throw new Error(errorMessage); 
+      throw new Error(errorMessage);
     }
   },
 
@@ -174,6 +198,11 @@ export const useProductStore = create<ProductState>((set) => ({
     try {
       const token = localStorage.getItem("authToken");
       if (!token) throw new Error("Authentication required");
+
+      const decodedToken = JSON.parse(atob(token.split(".")[1]));
+      if (decodedToken.exp * 1000 < Date.now()) {
+        throw new Error("Token expired");
+      }
 
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/api/products`,
@@ -192,6 +221,8 @@ export const useProductStore = create<ProductState>((set) => ({
         createdAt: newProduct.createdAt || new Date().toISOString(),
       };
 
+      console.log("Added Product:", updatedProduct);
+
       set((state) => ({
         products: [...state.products, updatedProduct],
         totalProducts: state.totalProducts + 1,
@@ -205,6 +236,47 @@ export const useProductStore = create<ProductState>((set) => ({
           ? err.response.data.message
           : "Failed to add product";
       console.error("Add Product Error:", err);
+      set({ error: errorMessage, loading: false });
+      throw new Error(errorMessage);
+    }
+  },
+
+  fetchCategories: async () => {
+    set({ loading: true, error: undefined });
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/products`,
+        {
+          params: { page: 1, limit: 100 },
+        }
+      );
+
+      const products = response.data.products || [];
+      const uniqueCategories = Array.from(
+        new Set(products.map((p: Product) => p.category))
+      )
+        .filter((category): category is string => !!category)
+        .map((category) => {
+          const firstProduct = products.find(
+            (p: Product) => p.category === category
+          );
+          return {
+            name: category,
+            slug: category.toLowerCase().replace(/\s+/g, "-"),
+            image: firstProduct?.image || "/placeholder.png",
+          };
+        });
+
+      console.log(`Fetched ${uniqueCategories.length} categories`);
+
+      set({ categories: uniqueCategories, loading: false });
+      return uniqueCategories;
+    } catch (err) {
+      const errorMessage =
+        axios.isAxiosError(err) && err.response?.data?.message
+          ? err.response.data.message
+          : "Failed to load categories";
+      console.error("Fetch Categories Error:", err);
       set({ error: errorMessage, loading: false });
       throw new Error(errorMessage);
     }

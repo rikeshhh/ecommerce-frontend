@@ -2,22 +2,17 @@
 
 import Image from "next/image";
 import { Product } from "@/lib/types";
+import { normalizeImageUrl } from "@/lib/utils";
 
 interface ProductThumbnailProps {
   product: Product;
 }
 
 export default function ProductThumbnail({ product }: ProductThumbnailProps) {
-  const validImageSrc =
-    typeof product.image === "string" &&
-    (product.image.startsWith("/") || product.image.startsWith("http"))
-      ? product.image
-      : "/placeholder.png";
-
   return (
     <div className="relative h-32 w-32">
       <Image
-        src={validImageSrc}
+        src={normalizeImageUrl(product.image)}
         alt={product.name}
         fill
         className="object-cover rounded-md"

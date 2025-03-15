@@ -5,11 +5,10 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "ecommerce-backend-ouo6.onrender.com",
-        pathname: "/uploads/**",
+        hostname: "c6hcsoourpmi8p32.public.blob.vercel-storage.com",
+        pathname: "/**",
       },
     ],
   },
 };
-
 export default nextConfig;

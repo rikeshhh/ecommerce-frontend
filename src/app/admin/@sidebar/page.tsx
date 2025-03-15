@@ -37,12 +37,12 @@ type MenuItem = {
 const menuItems: MenuItem[] = [
   { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/admin/user-management", icon: Users, label: "Manage Users" },
-  { href: "/admin/roles", icon: Shield, label: "Roles & Permissions" },
+  { href: "/admin/comments-table", icon: Shield, label: "Comments" },
   { href: "/admin/analytics", icon: BarChart, label: "Analytics" },
-  { href: "/admin/content", icon: FileText, label: "Content Management" },
+  // { href: "/admin/content", icon: FileText, label: "Content Management" },
   { href: "/admin/products", icon: FileText, label: "Products" },
   { href: "/admin/orders", icon: ShoppingCart, label: "Orders" },
-  { href: "/admin/settings", icon: Settings, label: "Settings" },
+  // { href: "/admin/settings", icon: Settings, label: "Settings" },
   { href: "/admin/add-product-form", icon: Settings2, label: "Add Product" },
 ];
 

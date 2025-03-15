@@ -20,27 +20,39 @@ import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function ProductListingPage() {
-  const { products, fetchProducts, loading, error } = useProductStore();
+  const {
+    products,
+    categories,
+    fetchProducts,
+    fetchCategories,
+    loading,
+    error,
+  } = useProductStore();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const isMobile = useIsMobile();
 
   useEffect(() => {
+    if (categories.length === 0 && !loading) {
+      fetchCategories();
+    }
     fetchProducts({
-      search: searchTerm,
+      search: searchTerm || undefined,
+      category: selectedCategory || undefined,
     });
-  }, [fetchProducts, searchTerm]);
-
-  const categories = useMemo(
-    () => Array.from(new Set(products.map((p) => p.category).filter(Boolean))),
-    [products]
-  );
+  }, [fetchProducts, fetchCategories, searchTerm, selectedCategory]);
 
   const getCategoryCount = (category: string) =>
     products.filter((p) => p.category === category).length;
 
-  const filteredProducts = useMemo(() => products, [products]);
+  const filteredProducts = useMemo(() => {
+    let result = products;
+    if (selectedCategory) {
+      result = products.filter((p) => p.category === selectedCategory);
+    }
+    return result;
+  }, [products, selectedCategory]);
 
   const sidebarX =
     isMobile === undefined ? -300 : isSidebarOpen || !isMobile ? 0 : -300;
@@ -80,25 +92,33 @@ export default function ProductListingPage() {
             Categories
           </h2>
           <ScrollArea className="h-[calc(100vh-8rem)]">
-            <div className="space-y-2">
-              <Button
-                variant={selectedCategory === null ? "default" : "ghost"}
-                className="w-full justify-start text-left hover:bg-indigo-100 dark:hover:bg-gray-700"
-                onClick={() => setSelectedCategory(null)}
-              >
-                All Products ({products.length})
-              </Button>
-              {categories.map((category) => (
+            {loading && categories.length === 0 ? (
+              <p className="text-gray-500 dark:text-gray-400">
+                Loading categories...
+              </p>
+            ) : (
+              <div className="space-y-2">
                 <Button
-                  key={category}
-                  variant={selectedCategory === category ? "default" : "ghost"}
+                  variant={selectedCategory === null ? "default" : "ghost"}
                   className="w-full justify-start text-left hover:bg-indigo-100 dark:hover:bg-gray-700"
-                  onClick={() => setSelectedCategory(category as string)}
+                  onClick={() => setSelectedCategory(null)}
                 >
-                  {category} ({getCategoryCount(category || "")})
+                  All Products
                 </Button>
-              ))}
-            </div>
+                {categories.map((category) => (
+                  <Button
+                    key={category.slug}
+                    variant={
+                      selectedCategory === category.name ? "default" : "ghost"
+                    }
+                    className="w-full justify-start text-left hover:bg-indigo-100 dark:hover:bg-gray-700"
+                    onClick={() => setSelectedCategory(category.name)}
+                  >
+                    {category.name}
+                  </Button>
+                ))}
+              </div>
+            )}
           </ScrollArea>
         </div>
       </motion.aside>
@@ -120,7 +140,7 @@ export default function ProductListingPage() {
         </div>
 
         <AnimatePresence mode="wait">
-          {loading ? (
+          {loading && products.length === 0 ? (
             <motion.div
               key="loading"
               initial={{ opacity: 0 }}

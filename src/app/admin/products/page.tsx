@@ -4,18 +4,10 @@ import { useEffect } from "react";
 import { useProductStore } from "@/store/product-store";
 import { DataTable } from "@/components/admin/data-table";
 import { format, isValid } from "date-fns";
-
-interface Product {
-  _id: string;
-  name: string;
-  price: number;
-  stock: number;
-  createdAt: string;
-}
+import { Product } from "@/lib/types";
 
 export default function ProductsTable() {
-  const { products, fetchProducts, loading, totalPages } =
-    useProductStore();
+  const { products, fetchProducts, loading, totalPages } = useProductStore();
 
   useEffect(() => {
     console.log("Products:", products);
@@ -25,8 +17,14 @@ export default function ProductsTable() {
   }, [products]);
 
   const columns = [
+    {
+      key: "image",
+      header: "Image",
+      isImage: true,
+      render: (product: Product) => <span>{product.name}</span>,
+    },
     { key: "_id", header: "Product ID" },
-    { key: "name", header: "Name" },
+    { key: "sku", header: "SKU" },
     {
       key: "price",
       header: "Price",
@@ -49,14 +47,13 @@ export default function ProductsTable() {
 
   const handleFetchData = async (page: number, limit: number, filters: any) => {
     try {
-      const response = await fetchProducts({
+      await fetchProducts({
         page,
         limit,
         search: filters.search || "",
         from: filters.createdAt?.from || undefined,
         to: filters.createdAt?.to || undefined,
       });
-      return;
     } catch (error) {
       console.error("Error fetching products:", error);
       throw error;

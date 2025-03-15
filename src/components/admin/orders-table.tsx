@@ -12,10 +12,12 @@ import {
 } from "@/components/ui/select";
 import { format } from "date-fns";
 import { DataTable } from "@/components/admin/data-table";
+import { normalizeImageUrl } from "@/lib/utils";
 import type { Order } from "@/store/order-store";
 
 export default function OrdersTable() {
   const { orders, fetchOrders, updateOrder, loading } = useOrderStore();
+  console.log(orders, "orders");
 
   useEffect(() => {
     fetchOrders(1, 10);
@@ -44,6 +46,33 @@ export default function OrdersTable() {
       key: "user.name",
       header: "Customer",
       render: (order: Order) => order.customerName || "Unknown",
+    },
+    {
+      key: "products",
+      header: "Products",
+      isImage: true,
+      render: (order: Order) => (
+        <div className="space-y-2">
+          {order.products.map((p) => (
+            <div key={p._id} className="flex items-center gap-2">
+              {p.product ? (
+                <>
+                  <img
+                    src={normalizeImageUrl(p.product.image)}
+                    alt={p.product.name || "Unknown Product"}
+                    className="h-10 w-10 object-cover rounded"
+                  />
+                  <span>
+                    {p.product.name || "Unknown"} (Qty: {p.quantity})
+                  </span>
+                </>
+              ) : (
+                <span>Product Not Found (Qty: {p.quantity})</span>
+              )}
+            </div>
+          ))}
+        </div>
+      ),
     },
     {
       key: "totalAmount",

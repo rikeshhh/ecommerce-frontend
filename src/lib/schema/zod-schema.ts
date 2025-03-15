@@ -40,6 +40,7 @@ export const OrderSchema = z.object({
     })
   ),
   totalAmount: z.number().min(0, "Total amount must be positive"),
+  image: z.instanceof(File).optional().nullable(),
   status: z.string().default("Pending"),
   createdAt: z.string(),
   updatedAt: z.string(),

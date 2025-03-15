@@ -29,7 +29,7 @@ import { Search, CalendarIcon, Filter, X } from "lucide-react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { format, isValid } from "date-fns";
 import { DateRange } from "react-day-picker";
-import { cn } from "@/lib/utils";
+import { cn, normalizeImageUrl } from "@/lib/utils";
 import { usePagination } from "@/hooks/use-pagination";
 import { Pagination } from "../ui/pagination";
 
@@ -37,6 +37,7 @@ interface Column<T> {
   key: keyof T | string;
   header: string;
   render?: (item: T) => React.ReactNode;
+  isImage?: boolean;
 }
 
 interface FilterOptions {
@@ -440,7 +441,23 @@ export function DataTable<T>({
                   <TableRow key={index}>
                     {columns.map((col) => (
                       <TableCell key={col.key as string}>
-                        {col.render ? col.render(item) : (item as any)[col.key]}
+                        {col.isImage &&
+                        typeof (item as any)[col.key] === "string" ? (
+                          <div className="flex items-center gap-2">
+                            <img
+                              src={normalizeImageUrl((item as any)[col.key])}
+                              alt={(item as any).name || "Product"}
+                              className="h-10 w-10 object-cover rounded"
+                            />
+                            {col.render
+                              ? col.render(item)
+                              : (item as any)[col.key]}
+                          </div>
+                        ) : col.render ? (
+                          col.render(item)
+                        ) : (
+                          (item as any)[col.key]
+                        )}
                       </TableCell>
                     ))}
                   </TableRow>

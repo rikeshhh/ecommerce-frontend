@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import Image from "next/image";
 import { Heart } from "lucide-react";
 import { motion } from "framer-motion";
@@ -17,26 +17,15 @@ interface ProductCardProps {
 }
 
 interface ColorOption {
-  img: string;
   color: string;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const [selectedImage, setSelectedImage] =
-    useState<string>("/placeholder.png");
-  useEffect(() => {
-    const img =
-      typeof product.image === "string" && product.image.trim()
-        ? product.image
-        : "/placeholder.png";
-    const finalImg =
-      img.startsWith("http") || img.startsWith("https")
-        ? img
-        : `${process.env.NEXT_PUBLIC_API_URL}${
-            img.startsWith("/") ? img : `/${img}`
-          }`;
-    setSelectedImage(finalImg);
-  }, [product.image, product._id]);
+  const [selectedImage, setSelectedImage] = useState<string>(
+    product.image && typeof product.image === "string" && product.image.trim()
+      ? product.image
+      : "/placeholder.png"
+  );
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const { favorites, toggleFavorite, loading } = useFavoritesStore();
   const router = useRouter();
@@ -45,9 +34,9 @@ export default function ProductCard({ product }: ProductCardProps) {
   const isFavorite = favorites.includes(product._id);
 
   const colorOptions: ColorOption[] = [
-    { img: product.image || "/placeholder.png", color: "#FF5733" },
-    { img: product.image || "/placeholder.png", color: "#33FF57" },
-    { img: product.image || "/placeholder.png", color: "#3357FF" },
+    { color: "#FF5733" },
+    { color: "#33FF57" },
+    { color: "#3357FF" },
   ];
 
   const handleFavoriteToggle = useCallback(async () => {
@@ -58,8 +47,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     }
   }, [product._id, toggleFavorite]);
 
-  const handleColorChange = useCallback((img: string, color: string) => {
-    setSelectedImage(img);
+  const handleColorChange = useCallback((color: string) => {
     setSelectedColor(color);
   }, []);
 
@@ -78,20 +66,6 @@ export default function ProductCard({ product }: ProductCardProps) {
     setSelectedImage("/placeholder.png");
   };
 
-  useEffect(() => {
-    const img =
-      typeof product.image === "string" && product.image.trim()
-        ? product.image
-        : "/placeholder.png";
-    const finalImg =
-      img.startsWith("http") || img.startsWith("https")
-        ? img
-        : `${process.env.NEXT_PUBLIC_API_URL}${
-            img.startsWith("/") ? img : `/${img}`
-          }`;
-    setSelectedImage(finalImg);
-  }, [product.image]);
-
   return (
     <motion.div
       className="w-[300px] mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300"
@@ -101,18 +75,16 @@ export default function ProductCard({ product }: ProductCardProps) {
       transition={{ duration: 0.3 }}
     >
       <div className="relative h-52 w-full bg-gray-100 dark:bg-gray-700">
-        <div className="relative h-52 w-full bg-gray-100 dark:bg-gray-700">
-          <Image
-            src={selectedImage || "placeholder.png"}
-            alt={product.name}
-            fill
-            className="object-cover transition-opacity duration-300 hover:opacity-90"
-            sizes="(max-width: 300px) 100vw"
-            placeholder="blur"
-            onError={handleImageError}
-            blurDataURL="/placeholder.png"
-          />
-        </div>
+        <Image
+          src={selectedImage}
+          alt={product.name}
+          fill
+          className="object-cover transition-opacity duration-300 hover:opacity-90"
+          sizes="(max-width: 300px) 100vw"
+          placeholder="blur"
+          blurDataURL="/placeholder.png"
+          onError={handleImageError}
+        />
         <motion.button
           className="absolute top-2 right-2 p-1 rounded-full bg-white/80 dark:bg-gray-800/80"
           onClick={handleFavoriteToggle}
@@ -122,12 +94,34 @@ export default function ProductCard({ product }: ProductCardProps) {
           aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
           disabled={loading}
         >
-          <Heart
-            className={cn(
-              "h-5 w-5",
-              isFavorite ? "fill-red-400 text-red-400" : "text-gray-500"
-            )}
-          />
+          {loading ? (
+            <svg
+              className="animate-spin h-5 w-5 text-gray-500"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+                fill="none"
+              />
+              <path
+                d="M4 12a8 8 0 018-8"
+                stroke="currentColor"
+                strokeWidth="4"
+                fill="none"
+              />
+            </svg>
+          ) : (
+            <Heart
+              className={cn(
+                "h-5 w-5",
+                isFavorite ? "fill-red-400 text-red-400" : "text-gray-500"
+              )}
+            />
+          )}
         </motion.button>
       </div>
 
@@ -147,7 +141,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             {colorOptions.map((option) => (
               <button
                 key={option.color}
-                onClick={() => handleColorChange(option.img, option.color)}
+                onClick={() => handleColorChange(option.color)}
                 className={cn(
                   "w-6 h-6 rounded-full border-2 transition-all duration-200",
                   selectedColor === option.color

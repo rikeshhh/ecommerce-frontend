@@ -8,7 +8,16 @@ export interface Order {
   _id: string;
   user: { _id: string; name: string };
   customerName: string;
-  products: { product: string; quantity: number; _id: string }[];
+  products: {
+    product: {
+      _id: string;
+      name: string;
+      image?: string;
+      price?: number;
+    } | null;
+    quantity: number;
+    _id: string;
+  }[];
   totalAmount: number;
   status: string;
   paymentStatus: string;
@@ -24,8 +33,8 @@ interface OrderState {
   totalPages: number;
   limit: number;
   loading: boolean;
-  newOrderCount: number; 
-  lastChecked: string | null; 
+  newOrderCount: number;
+  lastChecked: string | null;
   fetchOrders: (
     page: number,
     limit: number,
@@ -52,7 +61,7 @@ export const useOrderStore = create<OrderState>((set, get) => ({
   limit: 10,
   loading: false,
   newOrderCount: 0,
-  lastChecked: null, 
+  lastChecked: null,
 
   fetchOrders: async (page = 1, limit = 10, filters = {}) => {
     set({ loading: true });
@@ -92,7 +101,7 @@ export const useOrderStore = create<OrderState>((set, get) => ({
         ? newOrders.filter(
             (order: Order) => new Date(order.createdAt) > new Date(lastChecked)
           ).length
-        : 0; 
+        : 0;
 
       set({
         orders: newOrders,
@@ -101,8 +110,8 @@ export const useOrderStore = create<OrderState>((set, get) => ({
         totalPages: response.data.totalPages || 1,
         limit: response.data.limit || limit,
         loading: false,
-        newOrderCount: get().newOrderCount + newOrderCount, 
-        lastChecked: new Date().toISOString(), 
+        newOrderCount: get().newOrderCount + newOrderCount,
+        lastChecked: new Date().toISOString(),
       });
     } catch (error) {
       toast.error("Error fetching orders", {
@@ -201,4 +210,3 @@ export const useOrderStore = create<OrderState>((set, get) => ({
 function get() {
   throw new Error("Function not implemented.");
 }
-

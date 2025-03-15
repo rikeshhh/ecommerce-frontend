@@ -6,6 +6,7 @@ import { useProductStore } from "@/store/product-store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
+import { normalizeImageUrl } from "@/lib/utils";
 
 interface Product {
   _id: string;
@@ -57,11 +58,7 @@ export default function CategoryPage() {
             >
               <CardHeader>
                 <Image
-                  src={
-                    product.image
-                      ? `/uploads/${product.image}`
-                      : "/placeholder.png"
-                  }
+                  src={normalizeImageUrl(product.image)}
                   alt={product.name}
                   width={200}
                   height={200}
