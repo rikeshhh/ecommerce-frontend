@@ -1,68 +1,96 @@
 "use client";
 
-import { useEffect } from "react";
+import { useCallback } from "react";
 import { useProductStore } from "@/store/product-store";
 import { DataTable } from "@/components/admin/data-table";
 import { format, isValid } from "date-fns";
 import { Product } from "@/lib/types";
 
 export default function ProductsTable() {
-  const { products, fetchProducts, loading, totalPages } = useProductStore();
+  const { products, fetchProducts } = useProductStore();
 
-  useEffect(() => {
+  if (process.env.NODE_ENV === "development") {
     console.log("Products:", products);
     products.forEach((product, index) => {
       console.log(`Product ${index} createdAt:`, product.createdAt);
     });
-  }, [products]);
+  }
+
+  const handleFetchData = useCallback(
+    async (
+      page: number,
+      limit: number,
+      filters: { search?: string; createdAt?: { from?: Date; to?: Date } }
+    ) => {
+      console.log("handleFetchData called:", { page, limit, filters });
+      try {
+        const response = await fetchProducts({
+          page,
+          limit,
+          search: filters.search,
+          from: filters.createdAt?.from
+            ? filters.createdAt.from.toISOString()
+            : undefined,
+          to: filters.createdAt?.to
+            ? filters.createdAt.to.toISOString()
+            : undefined,
+        });
+        console.log("handleFetchData response:", response);
+        return response;
+      } catch (error) {
+        console.error("handleFetchData error:", error);
+        return { items: [], totalItems: 0, totalPages: 1 };
+      }
+    },
+    [fetchProducts]
+  );
 
   const columns = [
     {
       key: "image",
       header: "Image",
       isImage: true,
-      render: (product: Product) => <span>{product.name}</span>,
+      render: (product: Product) => (
+        <span className="truncate max-w-[150px] sm:max-w-none">
+          {product.name}
+        </span>
+      ),
     },
-    { key: "_id", header: "Product ID" },
-    { key: "sku", header: "SKU" },
+    {
+      key: "_id",
+      header: "Product ID",
+      hiddenOnMobile: true,
+    },
+    {
+      key: "sku",
+      header: "SKU",
+      hiddenOnMobile: true,
+    },
     {
       key: "price",
       header: "Price",
       render: (product: Product) => `$${product.price.toLocaleString()}`,
     },
-    { key: "stock", header: "Stock" },
+    {
+      key: "stock",
+      header: "Stock",
+    },
     {
       key: "createdAt",
       header: "Added On",
+      hiddenOnMobile: true,
       render: (product: Product) => {
-        console.log(
-          `Rendering createdAt for ${product._id}:`,
-          product.createdAt
-        );
+        if (process.env.NODE_ENV === "development") {
+          console.log(
+            `Rendering createdAt for ${product._id}:`,
+            product.createdAt
+          );
+        }
         const date = new Date(product.createdAt);
         return isValid(date) ? format(date, "LLL dd, y") : "Invalid Date";
       },
     },
   ];
-
-  const handleFetchData = async (page: number, limit: number, filters: any) => {
-    try {
-      await fetchProducts({
-        page,
-        limit,
-        search: filters.search || "",
-        from: filters.createdAt?.from || undefined,
-        to: filters.createdAt?.to || undefined,
-      });
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      throw error;
-    }
-  };
-
-  useEffect(() => {
-    fetchProducts({ page: 1, limit: 10 });
-  }, [fetchProducts]);
 
   return (
     <DataTable

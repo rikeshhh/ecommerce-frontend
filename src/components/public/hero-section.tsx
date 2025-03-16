@@ -1,27 +1,92 @@
+"use client";
+
 import Carousel from "../ui/caroussel/carousel";
 import CarouselSlide from "../ui/caroussel/carousel-slide";
+import { Button } from "@/components/ui/button";
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+import Feature from "./feature";
 
 export function HeroSection() {
+  const slidesData = [
+    {
+      gradient: "from-blue-600 to-blue-800",
+      textColor: "text-blue-600",
+      hoverBg: "hover:bg-blue-100",
+      title: "Explore New Arrivals!",
+      description:
+        "Fresh styles just dropped – elevate your wardrobe with the latest trends.",
+      ctaText: "Browse Now",
+      ctaLink: "/main/product-listing",
+      imageSrc: "/hero-slider/hero-slide-1.jpg",
+      altText: "New Arrivals Collection",
+    },
+    {
+      gradient: "from-green-500 to-green-700",
+      textColor: "text-green-700",
+      hoverBg: "hover:bg-green-100",
+      title: "Save Big This Week!",
+      description:
+        "Enjoy up to 40% off on selected items – shop smart, save more!",
+      ctaText: "Discover Deals",
+      ctaLink: "/main/product-listing?category=sale",
+      imageSrc: "/hero-slider/hero-slide-2.jpg",
+      altText: "Weekly Deals Promotion",
+    },
+    {
+      gradient: "from-purple-500 to-purple-700",
+      textColor: "text-purple-700",
+      hoverBg: "hover:bg-purple-100",
+      title: "Fast & Free Delivery!",
+      description: "Get your orders delivered free on purchases over $75.",
+      ctaText: "Shop Today",
+      ctaLink: "/main/product-listing",
+      imageSrc: "/hero-slider/hero-slide-3.jpg",
+      altText: "Free Delivery Offer",
+    },
+  ];
+
   return (
-    <div className="w-full">
+    <section className="w-full relative overflow-hidden min-h-screen flex  flex-col justify-center">
       <Carousel
-        slides={[
-          <CarouselSlide className="bg-gradient-to-r from-blue-400 to-blue-600 text-white text-center">
-            <h3 className="text-xl font-bold">Slide 1</h3>
-            <p className="mt-2">Short content.</p>
-          </CarouselSlide>,
-          <CarouselSlide className="bg-gradient-to-r from-green-400 to-green-600 text-white text-center">
-            <h3 className="text-xl font-bold">Slide 2</h3>
-            <p className="mt-2">
-              Longer content to test auto height and spacing.
-            </p>
-          </CarouselSlide>,
-          <CarouselSlide className="bg-gradient-to-r from-purple-400 to-purple-600 text-white text-center">
-            <h3 className="text-xl font-bold">Slide 3</h3>
-            <p className="mt-2">Medium content here.</p>
-          </CarouselSlide>,
-        ]}
-      ></Carousel>
-    </div>
+        slides={slidesData.map((slide, index) => (
+          <CarouselSlide
+            key={`slide-${index}`}
+            className={`relative bg-gradient-to-r h-auto ${slide.gradient} text-white flex`}
+          >
+            <div className="container mx-auto px-4 flex flex-col-reverse md:flex-row items-center gap-8">
+              <div className="text-center md:text-left md:w-1/2">
+                <h3 className="text-3xl md:text-5xl font-extrabold mb-4">
+                  {slide.title}
+                </h3>
+                <p className="text-lg md:text-xl mb-6 opacity-90">
+                  {slide.description}
+                </p>
+                <Link href={slide.ctaLink}>
+                  <Button
+                    size="lg"
+                    className={`bg-white ${slide.textColor} ${slide.hoverBg} rounded-md px-6 py-3 font-semibold transition-all duration-300`}
+                  >
+                    {slide.ctaText} <ArrowRight className="ml-2 w-5 h-5" />
+                  </Button>
+                </Link>
+              </div>
+              <div className="md:w-1/2 w-full">
+                <div className="relative w-full h-64">
+                  <Image
+                    src={slide.imageSrc}
+                    alt={slide.altText}
+                    fill
+                    className="object-cover rounded-2xl"
+                  />
+                </div>
+              </div>
+            </div>
+          </CarouselSlide>
+        ))}
+      />
+      <Feature />
+    </section>
   );
 }

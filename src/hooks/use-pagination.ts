@@ -1,87 +1,113 @@
-"use client";
-
 import { useState, useEffect } from "react";
-import { toast } from "sonner";
 
-interface PaginationState<T> {
+interface PaginationStore<T> {
   items: T[];
   totalItems: number;
   currentPage: number;
   totalPages: number;
   limit: number;
+  fetchItems: (
+    page: number,
+    limit: number
+  ) => Promise<{
+    items: T[];
+    totalItems: number;
+    totalPages: number;
+  }>;
 }
 
 interface PaginationOptions<T> {
-  store: {
-    items: T[];
-    totalItems: number;
-    currentPage: number;
-    totalPages: number;
-    limit: number;
-    fetchItems: (page: number, limit: number) => Promise<void>;
-  };
-  initialPage?: number;
-  initialLimit?: number;
+  store: PaginationStore<T>;
+  initialPage: number;
+  initialLimit: number;
 }
 
-export const usePagination = <T>({
+export function usePagination<T>({
   store,
-  initialPage = 1,
-  initialLimit = 10,
-}: PaginationOptions<T>) => {
-  const [loading, setLoading] = useState(true);
+  initialPage,
+  initialLimit,
+}: PaginationOptions<T>) {
+  const [state, setState] = useState(() => ({
+    items: store.items || [],
+    totalItems: store.totalItems || 0,
+    currentPage: store.currentPage || initialPage,
+    totalPages: store.totalPages || 1,
+    limit: store.limit || initialLimit,
+    loading: !store.items.length,
+  }));
+
+  const handlePageChange = async (page: number) => {
+    if (page < 1 || page > state.totalPages) return;
+    setState((prev) => ({ ...prev, loading: true }));
+    try {
+      const result = await store.fetchItems(page, state.limit);
+      console.log("handlePageChange completed:", { page, result });
+      setState((prev) => ({
+        ...prev,
+        items: result.items || [],
+        totalItems: result.totalItems || 0,
+        totalPages: result.totalPages || 1,
+        currentPage: page,
+        loading: false,
+      }));
+    } catch (error) {
+      console.error("handlePageChange error:", error);
+      setState((prev) => ({ ...prev, loading: false }));
+    }
+  };
+
+  const handleLimitChange = async (limit: number) => {
+    setState((prev) => ({ ...prev, loading: true }));
+    try {
+      const result = await store.fetchItems(1, limit);
+      console.log("handleLimitChange completed:", { limit, result });
+      setState((prev) => ({
+        ...prev,
+        items: result.items || [],
+        totalItems: result.totalItems || 0,
+        totalPages: result.totalPages || 1,
+        currentPage: 1,
+        limit,
+        loading: false,
+      }));
+    } catch (error) {
+      console.error("handleLimitChange error:", error);
+      setState((prev) => ({ ...prev, loading: false }));
+    }
+  };
 
   useEffect(() => {
-    const loadItems = async () => {
+    if (state.items.length) return;
+    const fetchInitialData = async () => {
+      setState((prev) => ({ ...prev, loading: true }));
       try {
-        setLoading(true);
-        await store.fetchItems(initialPage, initialLimit);
+        const result = await store.fetchItems(initialPage, initialLimit);
+        console.log("Initial fetch completed:", result);
+        setState((prev) => ({
+          ...prev,
+          items: result.items || [],
+          totalItems: result.totalItems || 0,
+          totalPages: result.totalPages || 1,
+          currentPage: initialPage,
+          limit: initialLimit,
+          loading: false,
+        }));
       } catch (error) {
-        toast.error("Error fetching items", {
-          description: "Failed to load data. Please try again.",
-        });
-      } finally {
-        setLoading(false);
+        console.error("Initial fetch error:", error);
+        setState((prev) => ({ ...prev, loading: false }));
       }
     };
-    loadItems();
+    fetchInitialData();
   }, [store.fetchItems, initialPage, initialLimit]);
 
-  const handlePageChange = async (newPage: number) => {
-    if (newPage < 1 || newPage > store.totalPages) return;
-    try {
-      setLoading(true);
-      await store.fetchItems(newPage, store.limit);
-    } catch (error) {
-      toast.error("Error changing page", {
-        description: "Failed to fetch page data.",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleLimitChange = async (newLimit: number) => {
-    try {
-      setLoading(true);
-      await store.fetchItems(1, newLimit);
-    } catch (error) {
-      toast.error("Error changing limit", {
-        description: "Failed to update limit.",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return {
-    items: store.items,
-    totalItems: store.totalItems,
-    currentPage: store.currentPage,
-    totalPages: store.totalPages,
-    limit: store.limit,
-    loading,
+    items: state.items,
+    totalItems: state.totalItems,
+    currentPage: state.currentPage,
+    totalPages: state.totalPages,
+    limit: state.limit,
+    loading: state.loading,
     handlePageChange,
     handleLimitChange,
   };
-};
+}

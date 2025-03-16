@@ -105,7 +105,7 @@ const OrderHistory = () => {
             >
               <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
                 <AccordionTrigger className="p-2">
-                  <CardHeader className="flex flex-row items-center justify-between p-6">
+                  <CardHeader className="flex md:flex-row flex-col items-start2057 justify-start md:justify-between w-full">
                     <CardTitle className="text-xl font-semibold text-gray-800 dark:text-gray-200">
                       Order #{order._id.slice(-6)}
                     </CardTitle>
@@ -134,8 +134,8 @@ const OrderHistory = () => {
                         })}
                       </span>
                     </div>
+                    <span>{order?.paymentStatus}</span>
                   </CardHeader>
-                  <span>{order?.paymentStatus}</span>
                 </AccordionTrigger>
                 <AccordionContent>
                   <CardContent className="p-6 pt-0">

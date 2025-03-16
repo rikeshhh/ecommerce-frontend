@@ -8,7 +8,7 @@ interface CartResponse {
   user?: string;
   items?: Array<{
     _id?: string;
-    product: any;
+    product: string;
     quantity: number;
   }>;
   message?: string;

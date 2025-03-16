@@ -60,15 +60,13 @@ export default function ProductCard({ product }: ProductCardProps) {
     toast.success(`${product.name} has been added to your cart`);
   }, [addToCart, product]);
 
-  const handleImageError = (
-    e: React.SyntheticEvent<HTMLImageElement, Event>
-  ) => {
+  const handleImageError = () => {
     setSelectedImage("/placeholder.png");
   };
 
   return (
     <motion.div
-      className="w-[300px] mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300"
+      className="w-full md:w-[300px]   mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300"
       whileHover={{ y: -5 }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -135,7 +133,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         <div className="flex justify-between items-center mt-3">
           <span className="text-xl font-bold text-indigo-600 dark:text-indigo-400">
-            ${product.price.toFixed(2)}
+            Rs{product.price.toFixed(2)}
           </span>
           <div className="flex gap-2">
             {colorOptions.map((option) => (

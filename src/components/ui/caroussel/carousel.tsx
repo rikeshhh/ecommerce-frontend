@@ -71,7 +71,7 @@ export default function Carousel({
       : scrollSnaps;
 
   return (
-    <div className="p-12">
+    <div className="md:p-12 p-4">
       <div className="relative">
         <div className="overflow-hidden rounded-xl shadow-lg" ref={emblaRef}>
           <div className="flex gap-4">{slides}</div>

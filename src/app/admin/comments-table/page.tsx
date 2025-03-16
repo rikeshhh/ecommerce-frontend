@@ -9,8 +9,8 @@ import { Product, User } from "@/lib/schema/zod-schema";
 
 interface Comment {
   _id: string;
-  product: Product;
-  user: User;
+  product: Product | null;
+  user: User | null;
   comment: string;
   rating?: number;
   createdAt: string;
@@ -26,16 +26,21 @@ const CommentsTable = () => {
     const fetchComments = async () => {
       try {
         const token = localStorage.getItem("authToken");
+        if (!token) {
+          throw new Error("No authentication token found");
+        }
+
         const response = await axios.get<{ comments: Comment[] }>(
           `${process.env.NEXT_PUBLIC_API_URL}/api/comments`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        setComments(response.data.comments);
+        setComments(response.data.comments ?? []);
       } catch (err) {
         console.error("Error fetching comments:", err);
         toast.error("Failed to load comments");
+        setComments([]);
       } finally {
         setLoading(false);
       }
@@ -51,6 +56,10 @@ const CommentsTable = () => {
     setToggling((prev) => [...prev, commentId]);
     try {
       const token = localStorage.getItem("authToken");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
       await axios.patch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/comments/${commentId}/toggle`,
         {},
@@ -108,12 +117,18 @@ const CommentsTable = () => {
               <tbody>
                 {comments.map((comment) => (
                   <tr key={comment._id} className="border-b">
-                    <td className="py-2 px-4">{comment.user.name}</td>
-                    <td className="py-2 px-4">{comment.product.name}</td>
-                    <td className="py-2 px-4">{comment.comment}</td>
-                    <td className="py-2 px-4">{comment.rating || "N/A"}</td>
                     <td className="py-2 px-4">
-                      {new Date(comment.createdAt).toLocaleDateString()}
+                      {comment.user?.name ?? "Unknown User"}
+                    </td>
+                    <td className="py-2 px-4">
+                      {comment.product?.name ?? "Unknown Product"}
+                    </td>
+                    <td className="py-2 px-4">{comment.comment ?? "N/A"}</td>
+                    <td className="py-2 px-4">{comment.rating ?? "N/A"}</td>
+                    <td className="py-2 px-4">
+                      {comment.createdAt
+                        ? new Date(comment.createdAt).toLocaleDateString()
+                        : "N/A"}
                     </td>
                     <td className="py-2 px-4">
                       {comment.isVisible ? "Visible" : "Hidden"}

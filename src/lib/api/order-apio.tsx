@@ -12,7 +12,7 @@ interface OrderResponse {
   _id?: string;
   user?: string;
   products?: Array<{
-    product: any;
+    product: string;
     quantity: number;
   }>;
   totalAmount?: number;

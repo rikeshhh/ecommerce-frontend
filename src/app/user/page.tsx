@@ -1,11 +1,7 @@
 "use client";
 import ProtectedRoute from "@/route/protected-route/protected-route";
 
-interface UserHomeProps {
-  routes: any;
-}
-
-export default function UserHome({ routes }: UserHomeProps) {
+export default function UserHome() {
   return (
     <ProtectedRoute access="user">
       <h1>User Home</h1>

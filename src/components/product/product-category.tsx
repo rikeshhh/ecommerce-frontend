@@ -9,14 +9,8 @@ import { useProductStore } from "@/store/product-store";
 import { motion } from "framer-motion";
 
 export default function ProductCategory() {
-  const {
-    fetchCategories,
-    fetchProducts,
-    categories,
-    products,
-    loading,
-    error,
-  } = useProductStore();
+  const { fetchCategories, categories, products, loading, error } =
+    useProductStore();
 
   useEffect(() => {
     if (categories.length === 0 && !loading) {
@@ -59,9 +53,9 @@ export default function ProductCategory() {
   }
 
   return (
-    <section className="py-16 w-full container">
+    <section className="p-4 md:p-16 container min-h-screen flex flex-col  w-full">
       <motion.h2
-        className="text-3xl md:text-4xl font-bold mb-10 text-center bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent"
+        className="text-3xl md:text-4xl font-bold mb-10 text-start "
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}

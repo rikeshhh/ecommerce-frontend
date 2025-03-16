@@ -14,7 +14,7 @@ export default function UsersTable() {
     fetchItems(1, 10);
   }, [fetchItems]);
 
-  const handleFetchData = async (page: number, limit: number, filters: any) => {
+  const handleFetchData = async (page: number, limit: number, filters: { search?: string }) => {
     try {
       const response = await fetchItems(page, limit, {
         search: filters.search || "",

@@ -1,7 +1,7 @@
 "use client";
 
 import { create } from "zustand";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { toast } from "sonner";
 
 export interface Order {
@@ -16,6 +16,7 @@ export interface Order {
       price?: number;
     } | null;
     quantity: number;
+    image?: string;
     _id: string;
   }[];
   totalAmount: number;
@@ -43,7 +44,7 @@ interface OrderState {
       createdAt?: { from?: string; to?: string };
       status?: string;
     }
-  ) => Promise<void>;
+  ) => Promise<{ items: Order[]; totalItems: number; totalPages: number }>;
   cancelOrder: (id: string) => Promise<void>;
   updateOrder: (
     id: string,
@@ -78,7 +79,7 @@ export const useOrderStore = create<OrderState>((set, get) => ({
         limit: 10,
         loading: false,
       });
-      return;
+      return { items: [], totalItems: 0, totalPages: 1 };
     }
     try {
       const response = await axios.get(
@@ -103,6 +104,12 @@ export const useOrderStore = create<OrderState>((set, get) => ({
           ).length
         : 0;
 
+      const result = {
+        items: newOrders,
+        totalItems: response.data.totalOrders || 0,
+        totalPages: response.data.totalPages || 1,
+      };
+
       set({
         orders: newOrders,
         totalOrders: response.data.totalOrders || 0,
@@ -113,6 +120,8 @@ export const useOrderStore = create<OrderState>((set, get) => ({
         newOrderCount: get().newOrderCount + newOrderCount,
         lastChecked: new Date().toISOString(),
       });
+
+      return result;
     } catch (error) {
       toast.error("Error fetching orders", {
         description: axios.isAxiosError(error)
@@ -127,6 +136,7 @@ export const useOrderStore = create<OrderState>((set, get) => ({
         limit: 10,
         loading: false,
       });
+      return { items: [], totalItems: 0, totalPages: 1 };
     }
   },
 
@@ -193,7 +203,7 @@ export const useOrderStore = create<OrderState>((set, get) => ({
     } catch (error) {
       console.error(
         "Update Order Error:",
-        (error as any).response?.data || (error as any).message
+        (error as AxiosError).response?.data || (error as Error).message
       );
       toast.error("Error updating order", {
         description: axios.isAxiosError(error)
@@ -207,6 +217,3 @@ export const useOrderStore = create<OrderState>((set, get) => ({
     set({ newOrderCount: 0 });
   },
 }));
-function get() {
-  throw new Error("Function not implemented.");
-}

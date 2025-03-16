@@ -19,7 +19,6 @@ import {
   BarChart,
   FileText,
   ShoppingCart,
-  Settings,
   LogOut,
   Settings2,
 } from "lucide-react";
@@ -39,7 +38,11 @@ const menuItems: MenuItem[] = [
   { href: "/admin/user-management", icon: Users, label: "Manage Users" },
   { href: "/admin/comments-table", icon: Shield, label: "Comments" },
   { href: "/admin/analytics", icon: BarChart, label: "Analytics" },
-  // { href: "/admin/content", icon: FileText, label: "Content Management" },
+  // {
+  //   href: "/admin/content-management",
+  //   icon: FileText,
+  //   label: "Content Management",
+  // },
   { href: "/admin/products", icon: FileText, label: "Products" },
   { href: "/admin/orders", icon: ShoppingCart, label: "Orders" },
   // { href: "/admin/settings", icon: Settings, label: "Settings" },

@@ -38,6 +38,7 @@ interface ProductState {
   fetchRecommendations: (userId: string) => Promise<void>;
   addProduct: (data: FormData) => Promise<Product>;
   fetchCategories: () => Promise<Category[]>;
+  reset: () => Promise<void>;
 }
 
 export const useProductStore = create<ProductState>((set) => ({
@@ -63,10 +64,13 @@ export const useProductStore = create<ProductState>((set) => ({
   } = {}) => {
     set({ loading: true, error: undefined });
     try {
+      const safePage = Math.max(1, parseInt(String(page), 10) || 1);
+      const safeLimit = Math.max(1, parseInt(String(limit), 10) || 10);
+
       const params = {
-        page,
-        limit,
-        search: search || undefined,
+        page: safePage,
+        limit: safeLimit,
+        search: search?.trim() || undefined,
         from: from || undefined,
         to: to || undefined,
         category: category || undefined,
@@ -280,5 +284,19 @@ export const useProductStore = create<ProductState>((set) => ({
       set({ error: errorMessage, loading: false });
       throw new Error(errorMessage);
     }
+  },
+  reset: async () => {
+    set({
+      products: [],
+      categories: [],
+      recommendations: [],
+      totalProducts: 0,
+      currentPage: 1,
+      totalPages: 1,
+      limit: 10,
+      loading: false,
+      error: undefined,
+      selectedProduct: null,
+    });
   },
 }));

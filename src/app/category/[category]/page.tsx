@@ -3,19 +3,8 @@
 import { useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useProductStore } from "@/store/product-store";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import Image from "next/image";
-import { normalizeImageUrl } from "@/lib/utils";
-
-interface Product {
-  _id: string;
-  name: string;
-  price: number;
-  stock: number;
-  image?: string;
-  category: string;
-}
+import ProductCard from "@/components/product/product-card";
 
 export default function CategoryPage() {
   const params = useParams();
@@ -52,27 +41,7 @@ export default function CategoryPage() {
       {products.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {products.map((product) => (
-            <Card
-              key={product._id}
-              className="hover:shadow-lg transition-shadow"
-            >
-              <CardHeader>
-                <Image
-                  src={normalizeImageUrl(product.image)}
-                  alt={product.name}
-                  width={200}
-                  height={200}
-                  className="object-cover w-full h-48"
-                />
-              </CardHeader>
-              <CardContent>
-                <CardTitle className="text-lg">{product.name}</CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  ${product.price.toLocaleString()}
-                </p>
-                <p className="text-sm">Stock: {product.stock}</p>
-              </CardContent>
-            </Card>
+            <ProductCard product={product} key={product._id} />
           ))}
         </div>
       ) : (

@@ -1,7 +1,7 @@
+/* eslint-disable */
 "use client";
 
-import { useEffect } from "react";
-import { useOrderStore } from "@/store/order-store";
+import { useCallback } from "react";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -13,44 +13,42 @@ import {
 import { format } from "date-fns";
 import { DataTable } from "@/components/admin/data-table";
 import { normalizeImageUrl } from "@/lib/utils";
-import type { Order } from "@/store/order-store";
+import { useOrderStore, type Order } from "@/store/order-store";
 
 export default function OrdersTable() {
-  const { orders, fetchOrders, updateOrder, loading } = useOrderStore();
-  console.log(orders, "orders");
-
-  useEffect(() => {
-    fetchOrders(1, 10);
-  }, [fetchOrders]);
+  const { orders = [], fetchOrders, updateOrder } = useOrderStore();
+  if (process.env.NODE_ENV === "development") {
+    console.log("Orders:", orders);
+  }
 
   const handleStatusChange = (orderId: string, newStatus: string) => {
     updateOrder(orderId, newStatus);
   };
 
-  const handleFetchData = async (page: number, limit: number, filters: any) => {
-    try {
-      const response = await fetchOrders(page, limit, {
-        search: filters.search || "",
-        status: filters.status || undefined,
-      });
+  const handleFetchData = useCallback(
+    async (
+      page: number,
+      limit: number,
+      filters: { search?: string; status?: string; [key: string]: any }
+    ) => {
+      console.log("handleFetchData called:", { page, limit, filters });
+      const response = await fetchOrders(page, limit, filters);
+      console.log("handleFetchData response:", response);
       return response;
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-      throw error;
-    }
-  };
+    },
+    [fetchOrders]
+  );
 
   const columns = [
-    { key: "_id", header: "Order ID" },
+    { key: "_id", header: "Order ID", hiddenOnMobile: true }, // Hidden on mobile
     {
-      key: "user.name",
+      key: "customerName",
       header: "Customer",
       render: (order: Order) => order.customerName || "Unknown",
     },
     {
       key: "products",
       header: "Products",
-      isImage: true,
       render: (order: Order) => (
         <div className="space-y-2">
           {order.products.map((p) => (
@@ -58,9 +56,9 @@ export default function OrdersTable() {
               {p.product ? (
                 <>
                   <img
-                    src={normalizeImageUrl(p.product.image)}
+                    src={normalizeImageUrl(p.image || p.product?.image || "")}
                     alt={p.product.name || "Unknown Product"}
-                    className="h-10 w-10 object-cover rounded"
+                    className="h-8 w-8 sm:h-10 sm:w-10 object-cover rounded"
                   />
                   <span>
                     {p.product.name || "Unknown"} (Qty: {p.quantity})
@@ -87,7 +85,7 @@ export default function OrdersTable() {
           value={order.status}
           onValueChange={(value) => handleStatusChange(order._id, value)}
         >
-          <SelectTrigger className="w-[120px]">
+          <SelectTrigger className="w-[100px] sm:w-[120px]">
             <SelectValue>
               <Badge
                 variant={
@@ -119,6 +117,7 @@ export default function OrdersTable() {
     {
       key: "createdAt",
       header: "Date",
+      hiddenOnMobile: true, // Hidden on mobile
       render: (order: Order) => format(new Date(order.createdAt), "LLL dd, y"),
     },
   ];

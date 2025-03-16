@@ -60,11 +60,14 @@ export const useFavoritesStore = create<FavoritesState>()(
               });
             }
           } catch (error) {
-            set({ loading: false, error: "Failed to update favorites" });
+            set({
+              loading: false,
+              error: `Failed to update favorites ${error}`,
+            });
             toast.error("Failed to update favorites");
           }
         } else {
-          let publicUserId = get().publicUserId || uuidv4();
+          const publicUserId = get().publicUserId || uuidv4();
           set({ publicUserId });
 
           try {
@@ -73,7 +76,7 @@ export const useFavoritesStore = create<FavoritesState>()(
               const response = await axios.delete(
                 `${API_URL}/api/favorites/${productId}`,
                 {
-                  data: { userId: publicUserId }, 
+                  data: { userId: publicUserId },
                 }
               );
               set({ favorites: response.data.favorites, loading: false });
@@ -87,7 +90,10 @@ export const useFavoritesStore = create<FavoritesState>()(
               toast.success("Added to favorites (public)");
             }
           } catch (error) {
-            set({ loading: false, error: "Failed to update favorites" });
+            set({
+              loading: false,
+              error: "Failed to update favorites" + error,
+            });
             toast.error("Failed to update favorites");
           }
         }
@@ -104,17 +110,25 @@ export const useFavoritesStore = create<FavoritesState>()(
               headers: { Authorization: `Bearer ${token}` },
             });
             set({
-              favorites: response.data.favorites.map((p: any) => p._id),
+              favorites: response.data.favorites.map(
+                (p: { _id: string }) => p._id
+              ),
               loading: false,
             });
+            toast.success("Favorites fetched successfully");
             useUserStore.setState({
               user: {
                 ...user,
-                favorites: response.data.favorites.map((p: any) => p._id),
+                favorites: response.data.favorites.map(
+                  (p: { _id: string }) => p._id
+                ),
               },
             });
           } catch (error) {
-            set({ loading: false, error: "Failed to fetch favorites" });
+            set({
+              loading: false,
+              error: `Failed to fetch favorites ${error}`,
+            });
           }
         } else {
           const publicUserId = get().publicUserId || uuidv4();
@@ -124,11 +138,14 @@ export const useFavoritesStore = create<FavoritesState>()(
               params: { userId: publicUserId },
             });
             set({
-              favorites: response.data.favorites.map((p: any) => p._id),
+              favorites: response.data.favorites.map((p: { _id: string }) => p._id),
               loading: false,
             });
           } catch (error) {
-            set({ loading: false, error: "Failed to fetch favorites" });
+            set({
+              loading: false,
+              error: `Failed to fetch favorites ${error}`,
+            });
           }
         }
       },

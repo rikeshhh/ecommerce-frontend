@@ -15,6 +15,7 @@ import { useProductStore } from "@/store/product-store";
 import { Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ACCEPTED_IMAGE_TYPES = [
@@ -293,7 +294,7 @@ export default function AddProductForm() {
                   animate={{ opacity: 1, scale: 1 }}
                   className="mt-4"
                 >
-                  <img
+                  <Image
                     src={imagePreview}
                     alt="Product preview"
                     className="w-full h-48 object-cover rounded-lg shadow-md"

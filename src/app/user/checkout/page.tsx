@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cartStore";
 import { useUserStore } from "@/store/userStore";
@@ -14,6 +13,7 @@ import {
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
+import { useState } from "react";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
@@ -26,13 +26,12 @@ interface OrderPayload {
 }
 
 const CheckoutForm: React.FC = () => {
-  const { cart, clearCart, addToCart } = useCartStore();
+  const { cart, clearCart } = useCartStore();
   const { user } = useUserStore();
   const router = useRouter();
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [isInitialLoad, setIsInitialLoad] = useState(true); 
 
   const totalPrice = cart.reduce(
     (total, item) => total + item.price * item.quantity,

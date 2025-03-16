@@ -1,86 +1,106 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import {
-  useReactTable,
-  getCoreRowModel,
-  flexRender,
-} from "@tanstack/react-table";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../ui/table";
-import { useUserStore } from "@/store/userStore";
+import { useCallback } from "react";
 import { useProductStore } from "@/store/product-store";
-
-const columns = [
-  { accessorKey: "_id", header: "ID" },
-  { accessorKey: "name", header: "Name" },
-  { accessorKey: "price", header: "Price" },
-];
+import { DataTable } from "@/components/admin/data-table";
+import { format, isValid } from "date-fns";
+import { Product } from "@/lib/types";
 
 export default function ProductsTable() {
   const { products, fetchProducts } = useProductStore();
-  const { isAdmin } = useUserStore();
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const loadProducts = async () => {
-      if (isAdmin) {
-        await fetchProducts();
+  if (process.env.NODE_ENV === "development") {
+    console.log("Products:", products);
+    products.forEach((product, index) => {
+      console.log(`Product ${index} createdAt:`, product.createdAt);
+    });
+  }
+
+  const handleFetchData = useCallback(
+    async (
+      page: number,
+      limit: number,
+      filters: { search?: string; createdAt?: { from?: Date; to?: Date } }
+    ) => {
+      console.log("handleFetchData called:", { page, limit, filters });
+      try {
+        const response = await fetchProducts({
+          page,
+          limit,
+          search: filters.search,
+          from: filters.createdAt?.from
+            ? filters.createdAt.from.toISOString()
+            : undefined,
+          to: filters.createdAt?.to
+            ? filters.createdAt.to.toISOString()
+            : undefined,
+        });
+        console.log("handleFetchData response:", response);
+        return response;
+      } catch (error) {
+        console.error("handleFetchData error:", error);
+        return { items: [], totalItems: 0, totalPages: 1 };
       }
-      setLoading(false);
-    };
-    loadProducts();
-  }, [fetchProducts, isAdmin]);
+    },
+    [fetchProducts]
+  );
 
-  const table = useReactTable({
-    data: products,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  });
-
-  if (loading) return <div className="text-center">Loading products...</div>;
-  if (!isAdmin) return <div className="text-center">Unauthorized</div>;
+  const columns = [
+    {
+      key: "image",
+      header: "Image",
+      isImage: true,
+      render: (product: Product) => (
+        <span className="truncate max-w-[150px] sm:max-w-none">
+          {product.name}
+        </span>
+      ),
+    },
+    {
+      key: "_id",
+      header: "Product ID",
+      hiddenOnMobile: true,
+    },
+    {
+      key: "sku",
+      header: "SKU",
+      hiddenOnMobile: true,
+    },
+    {
+      key: "price",
+      header: "Price",
+      render: (product: Product) => `$${product.price.toLocaleString()}`,
+    },
+    {
+      key: "stock",
+      header: "Stock",
+    },
+    {
+      key: "createdAt",
+      header: "Added On",
+      hiddenOnMobile: true,
+      render: (product: Product) => {
+        if (process.env.NODE_ENV === "development") {
+          console.log(
+            `Rendering createdAt for ${product._id}:`,
+            product.createdAt
+          );
+        }
+        const date = new Date(product.createdAt);
+        return isValid(date) ? format(date, "LLL dd, y") : "Invalid Date";
+      },
+    },
+  ];
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-2xl font-bold">Products</h2>
-      {products.length === 0 ? (
-        <div className="text-center">No products found</div>
-      ) : (
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
-    </div>
+    <DataTable
+      title="Products"
+      data={products}
+      columns={columns}
+      fetchData={handleFetchData}
+      filterOptions={{ dateField: "createdAt" }}
+      initialPage={1}
+      initialLimit={10}
+    />
   );
 }

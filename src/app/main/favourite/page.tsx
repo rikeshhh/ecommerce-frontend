@@ -11,7 +11,7 @@ import { useFavoritesStore } from "@/store/favorites-store";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
 
 export default function FavoritesPage() {
-  const { favorites, fetchFavorites, loading } = useFavoritesStore();
+  const { favorites, loading } = useFavoritesStore();
   const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
   const [fetchError, setFetchError] = useState<string | null>(null);

@@ -11,7 +11,7 @@ export default function CarouselSlide({
 }: CarouselSlideProps) {
   return (
     <div
-      className={`flex-none w-full min-w-0 min-h-[40vh] p-6 rounded-lg ${className}`}
+      className={`flex-none w-full min-w-0 min-h-[52vh] p-6 rounded-lg ${className}`}
     >
       {children}
     </div>
