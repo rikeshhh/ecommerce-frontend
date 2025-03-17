@@ -9,6 +9,7 @@ import Recommendations from "../recommended-products/page";
 import { useProductStore } from "@/store/product-store";
 import ProductListingPage from "../product-listing/page";
 import { FAQAccordion } from "@/components/public/faq-accordion";
+import Giveaway from "../giveaway/page";
 
 export default function PublicHome() {
   const { initialize } = useFavoritesStore();
@@ -26,6 +27,7 @@ export default function PublicHome() {
     <section className="min-h-screen flex flex-col justify-center items-center container mx-auto">
       <HeroSection />
       <RecentlyAdded />
+      <Giveaway />
       <ProductListingPage />
       <ProductCategory />
       <Recommendations />

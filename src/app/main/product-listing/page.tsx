@@ -94,7 +94,6 @@ export default function ProductListingPage() {
     setCurrentPage(page);
   };
 
-  // Only render sidebar after mount and initial fetch
   const renderSidebar = hasMounted && (
     <motion.aside
       ref={sidebarRef}

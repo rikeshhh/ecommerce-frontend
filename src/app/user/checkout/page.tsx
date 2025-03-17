@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cartStore";
 import { useUserStore } from "@/store/userStore";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { toast } from "sonner";
 import { loadStripe } from "@stripe/stripe-js";
@@ -32,7 +33,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { reverseGeocode } from "@/lib/geocode";
 
 const stripePromise = loadStripe(
@@ -54,6 +54,7 @@ interface OrderPayload {
   totalAmount: number;
   paymentMethodId: string;
   location: LocationFormValues;
+  promoCode?: string;
 }
 
 const CheckoutForm: React.FC = () => {
@@ -64,11 +65,19 @@ const CheckoutForm: React.FC = () => {
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [promoCode, setPromoCode] = useState("");
+  const [promoApplied, setPromoApplied] = useState<{
+    code: string;
+    discount: number;
+  } | null>(null);
+  const [promoError, setPromoError] = useState<string | null>(null);
 
-  const totalPrice = cart.reduce(
+  const subtotal = cart.reduce(
     (total, item) => total + item.price * item.quantity,
     0
   );
+  const discount = promoApplied ? (subtotal * promoApplied.discount) / 100 : 0;
+  const totalPrice = subtotal - discount;
 
   const locationForm = useForm<LocationFormValues>({
     resolver: zodResolver(LocationSchema),
@@ -109,15 +118,11 @@ const CheckoutForm: React.FC = () => {
           const token = localStorage.getItem("authToken");
           if (token) {
             const url = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`;
-            console.log("Attempting to update location at:", url);
             await axios.put(
               url,
               { location: liveLocation },
               { headers: { Authorization: `Bearer ${token}` } }
             );
-            console.log("Live location updated on backend");
-          } else {
-            console.log("No token, skipping backend update");
           }
         } catch (error) {
           console.error("Live location update failed:", error);
@@ -125,7 +130,7 @@ const CheckoutForm: React.FC = () => {
             toast.error("Failed to update live location", {
               description:
                 error.response?.status === 404
-                  ? "Endpoint not found. Check your API setup."
+                  ? "Endpoint not found."
                   : error.response?.data?.message || error.message,
             });
           } else {
@@ -167,6 +172,53 @@ const CheckoutForm: React.FC = () => {
     }
   };
 
+  const handleApplyPromo = async () => {
+    if (!promoCode) {
+      setPromoError("Please enter a promo code");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("authToken");
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/promo/validate`,
+        {
+          code: promoCode,
+          orders: [
+            {
+              products: cart.map((item) => ({
+                product: item._id,
+                quantity: item.quantity,
+              })),
+            },
+          ],
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data.success) {
+        setPromoApplied({
+          code: promoCode,
+          discount: response.data.promo.discount,
+        });
+        setPromoError(null);
+        toast.success(`Promo code "${promoCode}" applied!`);
+      } else {
+        setPromoError(response.data.message || "Invalid promo code");
+      }
+    } catch (error) {
+      setPromoError("Failed to validate promo code");
+      console.error("Promo validation error:", error);
+    }
+  };
+
+  const handleRemovePromo = () => {
+    setPromoApplied(null);
+    setPromoCode("");
+    setPromoError(null);
+    toast.info("Promo code removed");
+  };
+
   const handlePlaceOrder = async () => {
     if (!user) {
       router.push("/auth/login?returnUrl=/checkout");
@@ -180,13 +232,11 @@ const CheckoutForm: React.FC = () => {
     }
 
     if (!stripe || !elements) {
-      console.error("Stripe or Elements not loaded");
       toast.error("Stripe not loaded");
       return;
     }
 
     if (totalPrice <= 0) {
-      console.error("Total price is invalid:", totalPrice);
       toast.error("Cart total must be greater than zero");
       return;
     }
@@ -194,8 +244,7 @@ const CheckoutForm: React.FC = () => {
     setIsProcessing(true);
     try {
       const token = localStorage.getItem("authToken");
-      if (!token)
-        throw new Error("No authentication token found. Please log in.");
+      if (!token) throw new Error("No authentication token found");
 
       const cardElement = elements.getElement(CardElement);
       if (!cardElement) throw new Error("Card element not found");
@@ -205,10 +254,7 @@ const CheckoutForm: React.FC = () => {
         card: cardElement,
       });
 
-      if (error) {
-        console.error("Stripe createPaymentMethod error:", error);
-        throw new Error(error.message);
-      }
+      if (error) throw new Error(error.message);
 
       const orderData: OrderPayload = {
         products: cart.map((item) => ({
@@ -218,9 +264,9 @@ const CheckoutForm: React.FC = () => {
         totalAmount: Number(totalPrice),
         paymentMethodId: paymentMethod!.id,
         location: user.location,
+        promoCode: promoApplied?.code, 
       };
 
-      console.log("Sending order data:", orderData);
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/api/orders`,
         orderData,
@@ -244,7 +290,7 @@ const CheckoutForm: React.FC = () => {
         );
       } else {
         clearCart();
-        toast.success("Your order has been successfully process!");
+        toast.success("Your order has been successfully processed!");
         router.push(`/order-confirmation?orderId=${response.data._id}`);
       }
     } catch (error) {
@@ -253,7 +299,7 @@ const CheckoutForm: React.FC = () => {
         toast.error("Order Failed", {
           description:
             error.code === "ERR_NETWORK"
-              ? "Cannot connect to the server. Is it running?"
+              ? "Cannot connect to the server."
               : error.response?.data?.message || "Please try again later",
         });
       } else {
@@ -279,10 +325,44 @@ const CheckoutForm: React.FC = () => {
             <span>रु{(item.price * item.quantity).toFixed(2)}</span>
           </div>
         ))}
-        <div className="flex justify-between font-bold mt-4">
-          <span>Total:</span>
-          <span>रु{totalPrice.toFixed(2)}</span>
+        <div className="space-y-2 mt-4">
+          <div className="flex justify-between">
+            <span>Subtotal:</span>
+            <span>रु{subtotal.toFixed(2)}</span>
+          </div>
+          {promoApplied && (
+            <div className="flex justify-between text-green-600">
+              <span>Discount ({promoApplied.code}):</span>
+              <span>-रु{discount.toFixed(2)}</span>
+            </div>
+          )}
+          <div className="flex justify-between font-bold">
+            <span>Total:</span>
+            <span>रु{totalPrice.toFixed(2)}</span>
+          </div>
         </div>
+      </div>
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold">Promo Code</h2>
+        <div className="flex gap-2">
+          <Input
+            placeholder="Enter promo code (e.g., SAVE10)"
+            value={promoCode}
+            onChange={(e) => setPromoCode(e.target.value)}
+            disabled={!!promoApplied}
+            className="flex-1"
+          />
+          {promoApplied ? (
+            <Button variant="outline" onClick={handleRemovePromo}>
+              Remove
+            </Button>
+          ) : (
+            <Button onClick={handleApplyPromo}>Apply</Button>
+          )}
+        </div>
+        {promoError && (
+          <p className="text-red-500 text-sm mt-2">{promoError}</p>
+        )}
       </div>
       <div className="mb-6">
         <h2 className="text-xl font-semibold">Shipping Information</h2>

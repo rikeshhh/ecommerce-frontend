@@ -38,11 +38,11 @@ const menuItems: MenuItem[] = [
   { href: "/admin/user-management", icon: Users, label: "Manage Users" },
   { href: "/admin/comments-table", icon: Shield, label: "Comments" },
   { href: "/admin/analytics", icon: BarChart, label: "Analytics" },
-  // {
-  //   href: "/admin/content-management",
-  //   icon: FileText,
-  //   label: "Content Management",
-  // },
+  {
+    href: "/admin/promos",
+    icon: FileText,
+    label: "Promo",
+  },
   { href: "/admin/products", icon: FileText, label: "Products" },
   { href: "/admin/orders", icon: ShoppingCart, label: "Orders" },
   // { href: "/admin/settings", icon: Settings, label: "Settings" },

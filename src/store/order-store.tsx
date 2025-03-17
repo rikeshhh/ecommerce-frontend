@@ -26,9 +26,17 @@ export interface Order {
   updatedAt: string;
   __v: number;
 }
-
+interface PromoCode {
+  code: string;
+  discount: number;
+  startDate: string;
+  endDate: string;
+  productIds?: string[];
+  category?: string;
+}
 interface OrderState {
   orders: Order[];
+  activePromo: PromoCode | null;
   totalOrders: number;
   currentPage: number;
   totalPages: number;
@@ -45,6 +53,10 @@ interface OrderState {
       status?: string;
     }
   ) => Promise<{ items: Order[]; totalItems: number; totalPages: number }>;
+  applyPromoCode: (
+    code: string,
+    orders: Order[]
+  ) => Promise<{ success: boolean; message?: string }>;
   cancelOrder: (id: string) => Promise<void>;
   updateOrder: (
     id: string,
@@ -56,6 +68,7 @@ interface OrderState {
 
 export const useOrderStore = create<OrderState>((set, get) => ({
   orders: [],
+  activePromo: null,
   totalOrders: 0,
   currentPage: 1,
   totalPages: 1,
@@ -139,7 +152,18 @@ export const useOrderStore = create<OrderState>((set, get) => ({
       return { items: [], totalItems: 0, totalPages: 1 };
     }
   },
-
+  applyPromoCode: async (code, orders) => {
+    const res = await fetch("/api/promo/validate", {
+      method: "POST",
+      body: JSON.stringify({ code, orders }),
+    });
+    const result = await res.json();
+    if (result.success) {
+      set({ activePromo: result.promo });
+      return { success: true };
+    }
+    return { success: false, message: result.message };
+  },
   cancelOrder: async (id: string) => {
     const token = localStorage.getItem("authToken");
     if (!token) {
