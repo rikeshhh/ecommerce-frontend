@@ -16,9 +16,7 @@ export default function RecentlyAdded() {
   useEffect(() => {
     console.log("Mounting RecentlyAdded, fetching products...");
     fetchProducts({ page: 1, limit: 10 })
-      .then((result) => {
-        console.log("Fetch result:", result);
-      })
+      .then((result) => {})
       .catch((err) => {
         console.error("Fetch failed:", err);
       });
@@ -46,7 +44,7 @@ export default function RecentlyAdded() {
       >
         Recently Added Product{" "}
       </motion.h2>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-6 w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 md:gap-6 w-full">
         {recentProducts.map((product) => (
           <ProductCard key={product._id} product={product} />
         ))}

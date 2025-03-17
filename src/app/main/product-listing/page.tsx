@@ -37,6 +37,7 @@ export default function ProductListingPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [categorySearch, setCategorySearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [hasMounted, setHasMounted] = useState(false);
   const isMobile = useIsMobile();
   const limit = isMobile ? 4 : 9;
   const sidebarRef = useRef<HTMLDivElement | null>(null);
@@ -49,15 +50,19 @@ export default function ProductListingPage() {
   );
 
   useEffect(() => {
-    if (categories.length === 0 && !loading) {
-      fetchCategories();
-    }
-    fetchProducts({
-      page: currentPage,
-      limit,
-      search: searchTerm || undefined,
-      category: selectedCategory || undefined,
-    });
+    const loadData = async () => {
+      if (categories.length === 0 && !loading) {
+        await fetchCategories();
+      }
+      await fetchProducts({
+        page: currentPage,
+        limit,
+        search: searchTerm || undefined,
+        category: selectedCategory || undefined,
+      });
+      setHasMounted(true);
+    };
+    loadData();
   }, [
     fetchProducts,
     fetchCategories,
@@ -89,95 +94,104 @@ export default function ProductListingPage() {
     setCurrentPage(page);
   };
 
-  return (
-    <div className="w-full mx-auto px-4 py-8 flex flex-col md:flex-row gap-8">
-      <motion.aside
-        ref={sidebarRef}
-        initial={{ x: isMobile ? -300 : 0 }}
-        animate={{ x: isMobile ? sidebarX : 0 }}
-        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        className={cn(
-          "fixed md:static inset-y-0 left-0 z-40 w-72 bg-white dark:bg-gray-800 shadow-lg md:shadow-none",
-          isMobile && "h-full border-r"
-        )}
-      >
-        <div className="sticky top-0 p-4 bg-white dark:bg-gray-800 z-10 border-b">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-              Categories
-            </h2>
-            {isMobile && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsSidebarOpen(false)}
-                className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white"
-              >
-                <X className="h-5 w-5" />
-              </Button>
-            )}
-          </div>
-          <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
-            <Input
-              placeholder="Search categories..."
-              value={categorySearch}
-              onChange={(e) => setCategorySearch(e.target.value)}
-              className="pl-10 border-gray-300 dark:border-gray-600 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-            />
-          </div>
+  // Only render sidebar after mount and initial fetch
+  const renderSidebar = hasMounted && (
+    <motion.aside
+      ref={sidebarRef}
+      initial={{ x: isMobile ? -300 : 0, opacity: 0 }}
+      animate={{ x: isMobile ? sidebarX : 0, opacity: 1 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      className={cn(
+        "fixed md:static inset-y-0 left-0 z-40 w-72 bg-white dark:bg-gray-800 shadow-lg md:shadow-none",
+        isMobile && "h-full border-r"
+      )}
+    >
+      <div className="sticky top-0 p-4 bg-white dark:bg-gray-800 z-10 border-b">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+            Categories
+          </h2>
+          {isMobile && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsSidebarOpen(false)}
+              className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white"
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          )}
         </div>
-        <ScrollArea className="h-[calc(100vh-12rem)] px-4">
-          {loading && categories.length === 0 ? (
-            <div className="space-y-2">
-              {[...Array(5)].map((_, i) => (
-                <div
-                  key={i}
-                  className="h-10 w-full bg-gray-200 dark:bg-gray-700 animate-pulse rounded"
-                />
-              ))}
-            </div>
-          ) : filteredCategories.length === 0 ? (
-            <p className="text-gray-500 dark:text-gray-400 text-sm">
-              No categories found.
-            </p>
-          ) : (
-            <div className="space-y-2">
+        <div className="relative mb-4">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+          <Input
+            placeholder="Search categories..."
+            value={categorySearch}
+            onChange={(e) => setCategorySearch(e.target.value)}
+            className="pl-10 border-gray-300 dark:border-gray-600 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+          />
+        </div>
+      </div>
+      <ScrollArea className="h-[calc(100vh-12rem)] px-4">
+        {loading && categories.length === 0 ? (
+          <div className="space-y-2">
+            {[...Array(5)].map((_, i) => (
+              <div
+                key={i}
+                className="h-10 w-full bg-gray-200 dark:bg-gray-700 animate-pulse rounded"
+              />
+            ))}
+          </div>
+        ) : filteredCategories.length === 0 ? (
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
+            No categories found.
+          </p>
+        ) : (
+          <div className="space-y-2">
+            <Button
+              variant={selectedCategory === null ? "default" : "ghost"}
+              className={cn(
+                "w-full justify-start text-left text-sm font-medium",
+                selectedCategory === null
+                  ? "bg-indigo-600 text-white hover:bg-indigo-700"
+                  : "hover:bg-indigo-100 dark:hover:bg-gray-700"
+              )}
+              onClick={() => setSelectedCategory(null)}
+            >
+              All Products
+            </Button>
+            {filteredCategories.map((category) => (
               <Button
-                variant={selectedCategory === null ? "default" : "ghost"}
+                key={category.slug}
+                variant={
+                  selectedCategory === category.name ? "default" : "ghost"
+                }
                 className={cn(
                   "w-full justify-start text-left text-sm font-medium",
-                  selectedCategory === null
+                  selectedCategory === category.name
                     ? "bg-indigo-600 text-white hover:bg-indigo-700"
                     : "hover:bg-indigo-100 dark:hover:bg-gray-700"
                 )}
-                onClick={() => setSelectedCategory(null)}
+                onClick={() => setSelectedCategory(category.name)}
               >
-                All Products
+                {category.name}
               </Button>
-              {filteredCategories.map((category) => (
-                <Button
-                  key={category.slug}
-                  variant={
-                    selectedCategory === category.name ? "default" : "ghost"
-                  }
-                  className={cn(
-                    "w-full justify-start text-left text-sm font-medium",
-                    selectedCategory === category.name
-                      ? "bg-indigo-600 text-white hover:bg-indigo-700"
-                      : "hover:bg-indigo-100 dark:hover:bg-gray-700"
-                  )}
-                  onClick={() => setSelectedCategory(category.name)}
-                >
-                  {category.name}
-                </Button>
-              ))}
-            </div>
-          )}
-        </ScrollArea>
-      </motion.aside>
+            ))}
+          </div>
+        )}
+      </ScrollArea>
+    </motion.aside>
+  );
 
-      <main className="flex-1">
+  return (
+    <div className="w-full mx-auto px-4 py-8 flex flex-col md:flex-row gap-8">
+      {renderSidebar}
+      <motion.main
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3, delay: hasMounted ? 0 : 0.1 }}
+        className="flex-1"
+      >
         <div className="flex items-center justify-between mb-6 flex-col sm:flex-row gap-4">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
             {selectedCategory || "All Products"}
@@ -255,10 +269,9 @@ export default function ProductListingPage() {
           ) : (
             <motion.div
               key="products"
-              className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6"
+              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
             >
               {filteredProducts.map((product) => (
@@ -288,7 +301,7 @@ export default function ProductListingPage() {
             />
           </div>
         )}
-      </main>
+      </motion.main>
     </div>
   );
 }

@@ -12,11 +12,8 @@ const Recommendations = () => {
 
   useEffect(() => {
     const userId = isLoggedIn && user?._id ? user._id : "guest";
-    console.log(`Fetching recommendations for userId: ${userId}`);
     fetchRecommendations(userId);
   }, [fetchRecommendations, user?._id, isLoggedIn]);
-
-  console.log("Current state:", { loading, error, recommendations });
 
   if (loading)
     return <p className="text-center py-4">Loading recommendations...</p>;

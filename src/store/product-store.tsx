@@ -79,8 +79,6 @@ export const useProductStore = create<ProductState>((set) => ({
         exclude: exclude || undefined,
       };
 
-      console.log("fetchProducts params:", params);
-
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/api/products`,
         { params }
@@ -99,10 +97,6 @@ export const useProductStore = create<ProductState>((set) => ({
         createdAt: product.createdAt || new Date().toISOString(),
       }));
 
-      console.log(
-        `Fetched ${products.length} products for category: ${category || "all"}`
-      );
-
       if (search && search.trim()) {
         try {
           const token = localStorage.getItem("authToken");
@@ -114,7 +108,6 @@ export const useProductStore = create<ProductState>((set) => ({
             { query: search.trim() },
             config
           );
-          console.log(`Search "${search}" logged successfully`);
         } catch (logError) {
           console.error("Failed to log search (non-critical):", logError);
         }
@@ -139,7 +132,6 @@ export const useProductStore = create<ProductState>((set) => ({
         axios.isAxiosError(err) && err.response?.data?.message
           ? err.response.data.message
           : "Failed to load products";
-      console.error("Fetch Products Error:", err);
       set({ error: errorMessage, loading: false });
       throw new Error(errorMessage);
     }
@@ -158,7 +150,6 @@ export const useProductStore = create<ProductState>((set) => ({
         ...product,
         createdAt: product.createdAt || new Date().toISOString(),
       };
-      console.log("Fetched Product by ID:", updatedProduct);
 
       set({ selectedProduct: updatedProduct, loading: false });
     } catch (err) {
@@ -183,9 +174,6 @@ export const useProductStore = create<ProductState>((set) => ({
       );
 
       const recommendations = response.data.recommendations || [];
-      console.log(
-        `Fetched ${recommendations.length} recommendations for user ${userId}`
-      );
 
       set({ recommendations, loading: false });
     } catch (err) {
@@ -272,8 +260,6 @@ export const useProductStore = create<ProductState>((set) => ({
             image: firstProduct?.image || "/placeholder.png",
           };
         });
-
-      console.log(`Fetched ${uniqueCategories.length} categories`);
 
       set({ categories: uniqueCategories, loading: false });
       return uniqueCategories;

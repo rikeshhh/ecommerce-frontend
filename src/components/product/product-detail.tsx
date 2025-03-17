@@ -155,7 +155,7 @@ export default function ProductDetail() {
               variant="outline"
               className="text-indigo-600 border-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:border-indigo-400 dark:hover:bg-gray-800"
             >
-              <Link href="/main/products">
+              <Link href="/">
                 <ArrowLeft className="mr-2 h-4 w-4" /> Back to Products
               </Link>
             </Button>

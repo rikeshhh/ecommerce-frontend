@@ -77,7 +77,7 @@ const Pagination = React.memo(
     return (
       <nav
         className={cn(
-          "flex items-center space-x-1 sm:space-x-2 flex-wrap gap-2 justify-center max-md:px-2",
+          "flex items-center  sm:space-x-2 flex-wrap gap-2 justify-center ",
           className
         )}
         {...props}
@@ -88,7 +88,7 @@ const Pagination = React.memo(
             size="sm"
             onClick={() => onPageChange(1)}
             disabled={currentPage <= 1}
-            className="h-8 w-8 p-0"
+            className="size-6 sm:size-8 p-0"
           >
             <ChevronsLeft className="h-4 w-4" />
           </Button>
@@ -98,7 +98,7 @@ const Pagination = React.memo(
           size="sm"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage <= 1}
-          className="h-8 w-8 p-0"
+          className="size-6 sm:size-8 p-0"
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -116,7 +116,7 @@ const Pagination = React.memo(
               variant={currentPage === page ? "default" : "outline"}
               size="sm"
               onClick={() => onPageChange(page as number)}
-              className="h-8 w-8 p-0 text-xs sm:text-sm"
+              className="sm:size-8 size-6 p-0 text-xs sm:text-sm"
             >
               {page}
             </Button>
@@ -127,7 +127,7 @@ const Pagination = React.memo(
           size="sm"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage >= totalPages}
-          className="h-8 w-8 p-0"
+          className="sm:size-8 size-6 p-0"
         >
           <ChevronRight className="h-4 w-4" />
         </Button>
@@ -137,7 +137,7 @@ const Pagination = React.memo(
             size="sm"
             onClick={() => onPageChange(totalPages)}
             disabled={currentPage >= totalPages}
-            className="h-8 w-8 p-0"
+            className="sm:size-8 size-6 p-0"
           >
             <ChevronsRight className="h-4 w-4" />
           </Button>

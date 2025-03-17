@@ -8,8 +8,8 @@ import { faqQuestions } from "@/data/faqQuestion";
 
 export function FAQAccordion() {
   return (
-    <section className="w-full min-h-screen container mx-auto flex justify-center items-center py-8">
-      <div className=" w-full  rounded-2xl shadow-lg p-2 md:p-6 border border-gray-200 ">
+    <section className="w-full min-h-screen container mx-auto flex justify-center items-center p-6">
+      <div className=" w-full  rounded-2xl shadow-lg p-2 border border-gray-200 ">
         <h2 className="md:text-2xl text-sm font-bold text-gray-800 text-center mb-6">
           Frequently Asked Questions
         </h2>
@@ -21,7 +21,7 @@ export function FAQAccordion() {
               value={item.value}
               className="border bg-lightWhite rounded-lg overflow-hidden"
             >
-              <AccordionTrigger className="text-sm md:text-base font-semibold text-gray-700 md:px-4 py-3  transition-all">
+              <AccordionTrigger className="text-sm md:text-base font-semibold text-gray-700 px-4 py-3  transition-all">
                 {item.question}
               </AccordionTrigger>
               <AccordionContent className="bg-gray-50 md:px-5  bg-lightWhite py-4 text-gray-600">

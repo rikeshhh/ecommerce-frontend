@@ -100,11 +100,7 @@ export function LoginForm() {
 
       <div className="border-t border-neutral-300 dark:border-neutral-700 my-6"></div>
 
-      <div className="flex flex-col space-y-3">
-        <OAuthButton icon={IconBrandGithub} text="GitHub" />
-        <OAuthButton icon={IconBrandGoogle} text="Google" />
-        <OAuthButton icon={IconBrandOnlyfans} text="OnlyFans" />
-      </div>
+     
     </div>
   );
 }

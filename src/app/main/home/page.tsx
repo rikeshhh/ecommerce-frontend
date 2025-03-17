@@ -8,17 +8,16 @@ import ProductCategory from "@/components/product/product-category";
 import Recommendations from "../recommended-products/page";
 import { useProductStore } from "@/store/product-store";
 import ProductListingPage from "../product-listing/page";
+import { FAQAccordion } from "@/components/public/faq-accordion";
 
 export default function PublicHome() {
   const { initialize } = useFavoritesStore();
   const { reset } = useProductStore();
 
   useEffect(() => {
-    console.log("PublicHome mounted");
     initialize();
 
     return () => {
-      console.log("PublicHome unmounting, resetting product store");
       reset();
     };
   }, [initialize, reset]);
@@ -31,7 +30,8 @@ export default function PublicHome() {
       <ProductCategory />
       <Recommendations />
       {/* <ContactPage />
-      <FAQAccordion /> */}
+       */}
+      <FAQAccordion />
     </section>
   );
 }

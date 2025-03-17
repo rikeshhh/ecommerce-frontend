@@ -42,14 +42,12 @@ export default function Carousel({
     const onSelect = () => {
       const currentIndex = emblaApi.selectedScrollSnap();
       setSelectedIndex(currentIndex);
-      console.log("Selected Index:", currentIndex);
     };
 
     const onInit = () => {
       const snaps = emblaApi.scrollSnapList();
       setScrollSnaps(snaps);
       setSelectedIndex(emblaApi.selectedScrollSnap());
-      console.log("Scroll Snaps Initialized:", snaps);
     };
 
     emblaApi.on("select", onSelect);

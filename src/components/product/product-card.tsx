@@ -67,14 +67,14 @@ export default function ProductCard({ product }: ProductCardProps) {
   return (
     <motion.div
       className={cn(
-        "w-[190px] sm:w-full md:w-[300px] mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300"
+        "w-full md:w-[300px] mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300"
       )}
       whileHover={{ y: -5 }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="relative h-28 sm:h-52 w-full bg-gray-100 dark:bg-gray-700">
+      <div className="relative h-32 sm:h-52 w-full bg-gray-100 dark:bg-gray-700">
         <Image
           src={selectedImage}
           alt={product.name}
@@ -160,13 +160,13 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="mt-2 flex gap-2 sm:space-y-2 sm:flex-col">
           <Button
             variant="outline"
-            className="flex-1 text-xs border-indigo-500 text-indigo-500 hover:bg-indigo-50 dark:hover:bg-gray-700 py-1"
+            className="flex-1 text-xs md:text-sm border-indigo-500 text-indigo-500 hover:bg-indigo-50 dark:hover:bg-gray-700 py-2"
             onClick={handleViewDetails}
           >
             Details
           </Button>
           <Button
-            className="flex-1 text-xs bg-indigo-600 hover:bg-indigo-700 text-white py-1"
+            className="flex-1 text-xs md:text-sm bg-indigo-600 hover:bg-indigo-700 text-white py-1 md:py-2"
             onClick={handleAddToCart}
           >
             Cart
