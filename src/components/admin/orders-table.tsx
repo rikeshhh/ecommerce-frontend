@@ -50,8 +50,8 @@ export default function OrdersTable() {
       key: "products",
       header: "Products",
       render: (order: Order) => (
-        <div className="space-y-2">
-          {order.products.map((p) => (
+        <div className="space-y-1 sm:space-y-2">
+          {order.products.slice(0, 2).map((p) => (
             <div key={p._id} className="flex items-center gap-2">
               {p.product ? (
                 <>
@@ -60,15 +60,22 @@ export default function OrdersTable() {
                     alt={p.product.name || "Unknown Product"}
                     className="h-8 w-8 sm:h-10 sm:w-10 object-cover rounded"
                   />
-                  <span>
-                    {p.product.name || "Unknown"} (Qty: {p.quantity})
+                  <span className="text-xs sm:text-sm">
+                    {p.product.name || "Unknown"} (x{p.quantity})
                   </span>
                 </>
               ) : (
-                <span>Product Not Found (Qty: {p.quantity})</span>
+                <span className="text-xs sm:text-sm">
+                  Product Not Found (x{p.quantity})
+                </span>
               )}
             </div>
           ))}
+          {order.products.length > 2 && (
+            <span className="text-xs text-muted-foreground">
+              +{order.products.length - 2} more
+            </span>
+          )}
         </div>
       ),
     },
@@ -85,7 +92,7 @@ export default function OrdersTable() {
           value={order.status}
           onValueChange={(value) => handleStatusChange(order._id, value)}
         >
-          <SelectTrigger className="w-[100px] sm:w-[120px]">
+          <SelectTrigger className="w-[100px] sm:w-[120px] h-8 text-xs sm:text-sm">
             <SelectValue>
               <Badge
                 variant={

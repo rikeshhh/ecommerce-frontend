@@ -238,13 +238,13 @@ const CheckoutForm: React.FC = () => {
         );
         if (confirmError) throw new Error(confirmError.message);
         clearCart();
-        toast.success("Your order has been successfully placed!");
+        toast.success("Your order has been successful!");
         router.push(
           `/order-confirmation?orderId=${response.data.paymentIntentId}`
         );
       } else {
         clearCart();
-        toast.success("Your order has been successfully placed!");
+        toast.success("Your order has been successfully process!");
         router.push(`/order-confirmation?orderId=${response.data._id}`);
       }
     } catch (error) {

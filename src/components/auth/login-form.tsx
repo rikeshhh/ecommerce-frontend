@@ -7,11 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import {
-  IconBrandGithub,
-  IconBrandGoogle,
-  IconBrandOnlyfans,
-} from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useUserStore } from "../../store/userStore";
@@ -99,8 +94,6 @@ export function LoginForm() {
       </form>
 
       <div className="border-t border-neutral-300 dark:border-neutral-700 my-6"></div>
-
-     
     </div>
   );
 }
@@ -119,18 +112,3 @@ const LabelInputContainer = ({
   );
 };
 
-const OAuthButton = ({
-  icon: Icon,
-  text,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  text: string;
-}) => (
-  <Button
-    variant="outline"
-    className="flex items-center justify-center space-x-2 w-full"
-  >
-    <Icon className="h-5 w-5" />
-    <span>{text}</span>
-  </Button>
-);

@@ -16,7 +16,9 @@ export default function RecentlyAdded() {
   useEffect(() => {
     console.log("Mounting RecentlyAdded, fetching products...");
     fetchProducts({ page: 1, limit: 10 })
-      .then((result) => {})
+      .then((result) => {
+        console.log("Fetch result:", result);
+      })
       .catch((err) => {
         console.error("Fetch failed:", err);
       });

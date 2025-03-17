@@ -290,46 +290,27 @@ export function DataTable<T>({
 
   if (loading) {
     return (
-      <div className="p-2 sm:p-4 max-w-full mx-auto space-y-4 sm:space-y-6">
-        <div className="flex flex-col gap-2 sm:gap-4">
-          <Skeleton className="h-8 sm:h-10 w-full" />
+      <div className="p-4 max-w-full mx-auto space-y-6">
+        <div className="flex flex-col gap-4">
+          <Skeleton className="h-10 w-full" />
           <div className="flex flex-col gap-2 sm:flex-row sm:gap-2">
-            <Skeleton className="h-8 sm:h-10 w-full sm:w-[280px]" />
+            <Skeleton className="h-10 w-full sm:w-[280px]" />
             {filterOptions.statusOptions && (
-              <Skeleton className="h-8 sm:h-10 w-full sm:w-[150px]" />
+              <Skeleton className="h-10 w-full sm:w-[150px]" />
             )}
           </div>
         </div>
         <Card>
           <CardHeader>
-            <Skeleton className="h-5 sm:h-6 w-1/3 sm:w-1/4" />
+            <Skeleton className="h-6 w-1/4" />
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    {responsiveColumns.map((col) => (
-                      <TableHead key={col.key as string}>
-                        <Skeleton className="h-5 sm:h-6 w-16 sm:w-20" />
-                      </TableHead>
-                    ))}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {Array(5)
-                    .fill(0)
-                    .map((_, i) => (
-                      <TableRow key={i}>
-                        {responsiveColumns.map((col) => (
-                          <TableCell key={col.key as string}>
-                            <Skeleton className="h-5 sm:h-6 w-full" />
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ))}
-                </TableBody>
-              </Table>
+            <div className="space-y-4">
+              {Array(5)
+                .fill(0)
+                .map((_, i) => (
+                  <Skeleton key={i} className="h-16 w-full" />
+                ))}
             </div>
           </CardContent>
         </Card>
@@ -338,7 +319,7 @@ export function DataTable<T>({
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6 p-2 sm:p-4 max-w-full mx-auto">
+    <div className="space-y-6 p-4 max-w-full mx-auto">
       {!orderConfirmation && (
         <>
           <form
@@ -346,41 +327,38 @@ export function DataTable<T>({
             className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2"
           >
             <div className="relative flex-1">
-              <Search className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 h-3 sm:h-4 w-3 sm:w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder={`Search ${title.toLowerCase()}...`}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-8 sm:pl-10 pr-8 sm:pr-10 text-sm sm:text-base w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600"
+                className="pl-10 pr-10 text-base w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600"
               />
               {searchQuery && (
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="absolute right-1 sm:right-2 top-1/2 transform -translate-y-1/2 h-6 sm:h-8 w-6 sm:w-8"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8"
                   onClick={handleClearSearch}
                 >
-                  <X className="h-3 sm:h-4 w-3 sm:w-4" />
+                  <X className="h-4 w-4" />
                 </Button>
               )}
             </div>
-            <Button
-              type="submit"
-              className="w-full sm:w-auto text-sm sm:text-base py-1 sm:py-2"
-            >
+            <Button type="submit" className="w-full sm:w-auto text-base py-2">
               Search
             </Button>
             <Button
               variant="outline"
-              className="sm:hidden w-full py-1 text-sm"
+              className="sm:hidden w-full py-2 text-base"
               onClick={() => setIsFiltersOpen(!isFiltersOpen)}
             >
-              <Filter className="mr-2 h-3 w-3" />
+              <Filter className="mr-2 h-4 w-4" />
               Filters
               <ChevronDown
                 className={cn(
-                  "ml-2 h-3 w-3 transition-transform",
+                  "ml-2 h-4 w-4 transition-transform",
                   isFiltersOpen && "rotate-180"
                 )}
               />
@@ -398,9 +376,9 @@ export function DataTable<T>({
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className="w-full sm:w-[240px] justify-start text-left text-sm sm:text-base py-1 sm:py-2"
+                    className="w-full sm:w-[240px] justify-start text-left text-base py-2"
                   >
-                    <CalendarIcon className="mr-2 h-3 sm:h-4 w-3 sm:w-4" />
+                    <CalendarIcon className="mr-2 h-4 w-4" />
                     {dateRange?.from ? (
                       dateRange.to ? (
                         <>
@@ -423,7 +401,7 @@ export function DataTable<T>({
                       setDateRange(range);
                       if (range?.from && range?.to) {
                         fetchDataWithFilters(range);
-                        updateUrl();
+                        updateUrl(currentPage);
                         setPopoverOpen(false);
                       }
                     }}
@@ -437,9 +415,9 @@ export function DataTable<T>({
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="outline"
-                    className="w-full sm:w-[140px] text-sm sm:text-base py-1 sm:py-2"
+                    className="w-full sm:w-[140px] text-base py-2"
                   >
-                    <Filter className="mr-2 h-3 sm:h-4 w-3 sm:w-4" />
+                    <Filter className="mr-2 h-4 w-4" />
                     {statusFilter || "Status"}
                   </Button>
                 </DropdownMenuTrigger>
@@ -453,7 +431,7 @@ export function DataTable<T>({
                       onClick={() => {
                         setStatusFilter(option);
                         fetchDataWithFilters();
-                        updateUrl();
+                        updateUrl(currentPage);
                       }}
                     >
                       {option}
@@ -467,13 +445,13 @@ export function DataTable<T>({
       )}
 
       {appliedSearchQuery && (
-        <div className="text-xs sm:text-sm text-red-500 flex items-center flex-wrap gap-1">
+        <div className="text-sm text-red-500 flex items-center flex-wrap gap-1">
           Showing results for:{" "}
           <span className="font-medium">"{appliedSearchQuery}"</span>
           <Button
             variant="link"
             size="sm"
-            className="p-0 h-auto text-xs sm:text-sm"
+            className="p-0 h-auto text-sm"
             onClick={handleClearSearch}
           >
             Clear
@@ -482,18 +460,18 @@ export function DataTable<T>({
       )}
 
       <Card>
-        <CardHeader className="py-2 sm:py-4">
-          <CardTitle className="text-base sm:text-lg">{title}</CardTitle>
+        <CardHeader className="py-4">
+          <CardTitle className="text-lg">{title}</CardTitle>
         </CardHeader>
-        <CardContent className="p-2 sm:p-4">
-          <div className="overflow-x-auto">
+        <CardContent className="p-0 sm:p-4">
+          <div className="hidden sm:block overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
                   {responsiveColumns.map((col) => (
                     <TableHead
                       key={col.key as string}
-                      className="text-xs sm:text-sm whitespace-nowrap px-1 sm:px-4 py-1 sm:py-2"
+                      className="text-sm whitespace-nowrap px-4 py-2"
                     >
                       {col.header}
                     </TableHead>
@@ -503,25 +481,19 @@ export function DataTable<T>({
               <TableBody>
                 {filteredData.length ? (
                   filteredData.map((item, index) => (
-                    <TableRow
-                      key={index}
-                      className="flex justify-between sm:table-row border-b sm:border-b-0 last:border-b-0"
-                    >
+                    <TableRow key={index}>
                       {responsiveColumns.map((col) => (
                         <TableCell
                           key={col.key as string}
-                          className="text-xs sm:text-sm px-1 sm:px-4 py-1 sm:py-2 flex sm:table-cell items-start sm:items-center gap-1 sm:gap-2 flex-col sm:flex-row"
+                          className="text-sm px-4 py-3"
                         >
-                          <span className="font-medium sm:hidden">
-                            {col.header}:
-                          </span>
                           {col.isImage &&
                           typeof (item as any)[col.key] === "string" ? (
-                            <div className="flex items-center gap-1 sm:gap-2">
+                            <div className="flex items-center gap-2">
                               <img
                                 src={normalizeImageUrl((item as any)[col.key])}
                                 alt={(item as any).name || "Product"}
-                                className="h-8 w-8 sm:h-10 sm:w-10 object-cover rounded"
+                                className="h-10 w-10 object-cover rounded"
                               />
                               {col.render
                                 ? col.render(item)
@@ -540,7 +512,7 @@ export function DataTable<T>({
                   <TableRow>
                     <TableCell
                       colSpan={responsiveColumns.length}
-                      className="text-center text-muted-foreground py-4 text-xs sm:text-sm"
+                      className="text-center text-muted-foreground py-4 text-sm"
                     >
                       No {title.toLowerCase()} found.
                     </TableCell>
@@ -550,20 +522,65 @@ export function DataTable<T>({
             </Table>
           </div>
 
+          <div className="sm:hidden space-y-4 p-4">
+            {filteredData.length ? (
+              filteredData.map((item, index) => (
+                <div
+                  key={index}
+                  className="border rounded-lg p-4 bg-white dark:bg-gray-800 shadow-sm"
+                >
+                  {responsiveColumns.map((col) => (
+                    <div
+                      key={col.key as string}
+                      className="flex flex-col gap-1 py-2 border-b last:border-b-0"
+                    >
+                      <span className="text-xs font-medium text-muted-foreground">
+                        {col.header}
+                      </span>
+                      <div className="text-sm">
+                        {col.isImage &&
+                        typeof (item as any)[col.key] === "string" ? (
+                          <div className="flex items-center gap-2">
+                            <img
+                              src={normalizeImageUrl((item as any)[col.key])}
+                              alt={(item as any).name || "Product"}
+                              className="h-12 w-12 object-cover rounded"
+                            />
+                            {col.render
+                              ? col.render(item)
+                              : (item as any)[col.key]}
+                          </div>
+                        ) : col.render ? (
+                          col.render(item)
+                        ) : (
+                          (item as any)[col.key]
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ))
+            ) : (
+              <div className="text-center text-muted-foreground py-4 text-sm">
+                No {title.toLowerCase()} found.
+              </div>
+            )}
+          </div>
+
           {!orderConfirmation && (
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mt-2 sm:mt-4">
-              <div className="text-xs sm:text-sm text-muted-foreground">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mt-4 px-4">
+              <div className="text-sm text-muted-foreground">
                 Showing {filteredData.length} of {totalItems} items
               </div>
               <div className="flex flex-col items-center gap-2 sm:flex-row sm:gap-4">
-                <div className="flex items-center gap-1 sm:gap-2">
-                  <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground whitespace-nowrap">
                     Per page:
                   </span>
                   <select
                     value={limit}
                     onChange={(e) => handleLimitChange(Number(e.target.value))}
-                    className="border rounded p-1 text-xs sm:text-sm w-16 sm:w-auto"
+                    className="border rounded p-1 text-sm w-16"
                   >
                     <option value={5}>5</option>
                     <option value={10}>10</option>
@@ -575,9 +592,8 @@ export function DataTable<T>({
                   <Pagination
                     totalPages={totalPages}
                     currentPage={currentPage}
-                    // onPageChange={handlePageChange}
                     onPageChange={handlePageChangeWithUrl}
-                    className="flex-wrap justify-center text-xs sm:text-sm"
+                    className="flex-wrap justify-center text-sm"
                   />
                 )}
               </div>
