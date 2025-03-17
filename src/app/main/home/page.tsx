@@ -27,8 +27,8 @@ export default function PublicHome() {
     <section className="min-h-screen flex flex-col justify-center items-center container mx-auto">
       <HeroSection />
       <RecentlyAdded />
-      <ProductCategory />
       <ProductListingPage />
+      <ProductCategory />
       <Recommendations />
       {/* <ContactPage />
       <FAQAccordion /> */}

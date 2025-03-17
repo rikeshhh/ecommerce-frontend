@@ -66,25 +66,27 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <motion.div
-      className="w-full md:w-[300px]   mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300"
+      className={cn(
+        "w-[190px] sm:w-full md:w-[300px] mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300"
+      )}
       whileHover={{ y: -5 }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="relative h-52 w-full bg-gray-100 dark:bg-gray-700">
+      <div className="relative h-28 sm:h-52 w-full bg-gray-100 dark:bg-gray-700">
         <Image
           src={selectedImage}
           alt={product.name}
           fill
           className="object-cover transition-opacity duration-300 hover:opacity-90"
-          sizes="(max-width: 300px) 100vw"
+          sizes="(max-width: 640px) 200px, (max-width: 768px) 100vw, 300px"
           placeholder="blur"
           blurDataURL="/placeholder.png"
           onError={handleImageError}
         />
         <motion.button
-          className="absolute top-2 right-2 p-1 rounded-full bg-white/80 dark:bg-gray-800/80"
+          className="absolute top-1 sm:top-2 right-1 sm:right-2 p-1 rounded-full bg-white/80 dark:bg-gray-800/80"
           onClick={handleFavoriteToggle}
           whileTap={{ scale: 0.9 }}
           animate={{ scale: isFavorite ? 1.1 : 1 }}
@@ -94,7 +96,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         >
           {loading ? (
             <svg
-              className="animate-spin h-5 w-5 text-gray-500"
+              className="animate-spin h-4 w-4 text-gray-500"
               viewBox="0 0 24 24"
             >
               <circle
@@ -115,7 +117,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           ) : (
             <Heart
               className={cn(
-                "h-5 w-5",
+                "h-4 w-4",
                 isFavorite ? "fill-red-400 text-red-400" : "text-gray-500"
               )}
             />
@@ -123,25 +125,27 @@ export default function ProductCard({ product }: ProductCardProps) {
         </motion.button>
       </div>
 
-      <div className="p-4 text-gray-900 dark:text-gray-100">
+      <div className="p-2 sm:p-4 text-gray-900 dark:text-gray-100">
         <div className="flex justify-between items-start">
-          <h3 className="text-xl font-semibold truncate">{product.name}</h3>
+          <h3 className="text-base sm:text-xl font-semibold truncate">
+            {product.name}
+          </h3>
         </div>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
+        <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 line-clamp-1 sm:line-clamp-2">
           {product.description || "No description available"}
         </p>
 
-        <div className="flex justify-between items-center mt-3">
-          <span className="text-xl font-bold text-indigo-600 dark:text-indigo-400">
+        <div className="flex justify-between items-center mt-1 sm:mt-3">
+          <span className="text-base font-bold text-indigo-600 dark:text-indigo-400">
             Rs{product.price.toFixed(2)}
           </span>
-          <div className="flex gap-2">
+          <div className="flex gap-1">
             {colorOptions.map((option) => (
               <button
                 key={option.color}
                 onClick={() => handleColorChange(option.color)}
                 className={cn(
-                  "w-6 h-6 rounded-full border-2 transition-all duration-200",
+                  "w-4 sm:w-6 h-4 sm:h-6 rounded-full border-2 transition-all duration-200",
                   selectedColor === option.color
                     ? "border-indigo-500 scale-110"
                     : "border-gray-300"
@@ -153,19 +157,19 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
         </div>
 
-        <div className="mt-4 space-y-2">
+        <div className="mt-2 flex gap-2 sm:space-y-2 sm:flex-col">
           <Button
             variant="outline"
-            className="w-full border-indigo-500 text-indigo-500 hover:bg-indigo-50 dark:hover:bg-gray-700"
+            className="flex-1 text-xs border-indigo-500 text-indigo-500 hover:bg-indigo-50 dark:hover:bg-gray-700 py-1"
             onClick={handleViewDetails}
           >
-            View Details
+            Details
           </Button>
           <Button
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
+            className="flex-1 text-xs bg-indigo-600 hover:bg-indigo-700 text-white py-1"
             onClick={handleAddToCart}
           >
-            Add to Cart
+            Cart
           </Button>
         </div>
       </div>

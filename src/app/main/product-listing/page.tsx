@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useProductStore } from "@/store/product-store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,9 +8,9 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from "@/components/ui/card";
 import { Search, ChevronDown, X } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -18,6 +18,8 @@ import ProductCard from "@/components/product/product-card";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Pagination } from "@/components/ui/pagination";
+import { useOutsideClick } from "@/hooks/use-outside-click";
 
 export default function ProductListingPage() {
   const {
@@ -33,21 +35,37 @@ export default function ProductListingPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [limit, setLimit] = useState(6);
   const [categorySearch, setCategorySearch] = useState("");
-  const productsPerLoad = 9;
+  const [currentPage, setCurrentPage] = useState(1);
   const isMobile = useIsMobile();
+  const limit = isMobile ? 4 : 9;
+  const sidebarRef = useRef<HTMLDivElement | null>(null);
+
+  useOutsideClick(
+    sidebarRef,
+    isSidebarOpen,
+    () => setIsSidebarOpen(false),
+    isMobile
+  );
 
   useEffect(() => {
     if (categories.length === 0 && !loading) {
       fetchCategories();
     }
     fetchProducts({
+      page: currentPage,
+      limit,
       search: searchTerm || undefined,
       category: selectedCategory || undefined,
-      limit,
     });
-  }, [fetchProducts, fetchCategories, searchTerm, selectedCategory, limit]);
+  }, [
+    fetchProducts,
+    fetchCategories,
+    searchTerm,
+    selectedCategory,
+    currentPage,
+    limit,
+  ]);
 
   const filteredProducts = useMemo(() => {
     let result = products;
@@ -64,33 +82,17 @@ export default function ProductListingPage() {
     );
   }, [categories, categorySearch]);
 
-  const hasMore = filteredProducts.length < totalProducts;
-  const canViewLess = limit > productsPerLoad;
-
+  const totalPages = Math.ceil(totalProducts / limit);
   const sidebarX = isMobile && isSidebarOpen ? 0 : -300;
 
-  const handleViewMore = () => {
-    setLimit((prev) => prev + productsPerLoad);
-  };
-
-  const handleViewLess = () => {
-    setLimit((prev) => Math.max(productsPerLoad, prev - productsPerLoad));
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
   return (
     <div className="w-full mx-auto px-4 py-8 flex flex-col md:flex-row gap-8">
-      {isMobile && (
-        <div className="mb-4">
-          <Button
-            onClick={() => setIsSidebarOpen(true)}
-            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white"
-          >
-            <ChevronDown className="mr-2 h-4 w-4" /> Show Categories
-          </Button>
-        </div>
-      )}
-
       <motion.aside
+        ref={sidebarRef}
         initial={{ x: isMobile ? -300 : 0 }}
         animate={{ x: isMobile ? sidebarX : 0 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
@@ -190,7 +192,16 @@ export default function ProductListingPage() {
             />
           </div>
         </div>
-
+        {isMobile && (
+          <div className="mb-4">
+            <Button
+              onClick={() => setIsSidebarOpen(true)}
+              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white"
+            >
+              <ChevronDown className="mr-2 h-4 w-4" /> Show Categories
+            </Button>
+          </div>
+        )}
         <AnimatePresence mode="wait">
           {loading && products.length === 0 ? (
             <motion.div
@@ -244,7 +255,7 @@ export default function ProductListingPage() {
           ) : (
             <motion.div
               key="products"
-              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"
+              className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -265,26 +276,18 @@ export default function ProductListingPage() {
           )}
         </AnimatePresence>
 
-        <div className="mt-8 flex justify-center gap-4">
-          {hasMore && (
-            <Button
-              onClick={handleViewMore}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white"
-              disabled={loading}
-            >
-              {loading ? "Loading..." : "View More"}
-            </Button>
-          )}
-          {canViewLess && (
-            <Button
-              onClick={handleViewLess}
-              className="bg-gray-600 hover:bg-gray-700 text-white"
-              disabled={loading}
-            >
-              View Less
-            </Button>
-          )}
-        </div>
+        {totalPages > 1 && (
+          <div className="mt-8 flex justify-center">
+            <Pagination
+              totalPages={totalPages}
+              currentPage={currentPage}
+              onPageChange={handlePageChange}
+              showFirstLast={true}
+              siblingCount={1}
+              className="text-xs sm:text-sm"
+            />
+          </div>
+        )}
       </main>
     </div>
   );

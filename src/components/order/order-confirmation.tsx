@@ -6,12 +6,14 @@ import axios from "axios";
 import { toast } from "sonner";
 import { Package } from "lucide-react";
 import { DataTable } from "@/components/admin/data-table";
+
 interface Column<T> {
   key: keyof T | string;
   header: string;
   render?: (item: T) => React.ReactNode;
   isImage?: boolean;
 }
+
 interface Order {
   _id: string;
   products: {
@@ -21,6 +23,13 @@ interface Order {
   totalAmount: number;
   status: string;
   createdAt: string;
+  location: {
+    address: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
 }
 
 interface OrderItem {
@@ -144,6 +153,19 @@ export default function OrderConfirmation() {
         <p>
           <strong>Total Amount:</strong> ${order.totalAmount.toFixed(2)}
         </p>
+        <h3 className="text-lg font-medium mt-4 mb-2">Shipping Location</h3>
+        {order.location ? (
+          <div className="text-gray-700">
+            <p>{order.location.address}</p>
+            <p>
+              {order.location.city}, {order.location.state}{" "}
+              {order.location.postalCode}
+            </p>
+            <p>{order.location.country}</p>
+          </div>
+        ) : (
+          <p className="text-gray-500">No shipping location provided.</p>
+        )}
 
         <h3 className="text-lg font-medium mt-4 mb-2">Items</h3>
         <DataTable

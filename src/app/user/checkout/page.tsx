@@ -13,16 +13,47 @@ import {
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { reverseGeocode } from "@/lib/geocode";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 );
 
+const LocationSchema = z.object({
+  address: z.string().min(1, "Address is required"),
+  city: z.string().min(1, "City is required"),
+  state: z.string().min(1, "State is required"),
+  postalCode: z.string().min(1, "Postal code is required"),
+  country: z.string().min(1, "Country is required"),
+});
+
+type LocationFormValues = z.infer<typeof LocationSchema>;
+
 interface OrderPayload {
   products: { product: string; quantity: number }[];
   totalAmount: number;
   paymentMethodId: string;
+  location: LocationFormValues;
 }
 
 const CheckoutForm: React.FC = () => {
@@ -32,15 +63,119 @@ const CheckoutForm: React.FC = () => {
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const totalPrice = cart.reduce(
     (total, item) => total + item.price * item.quantity,
     0
   );
 
+  const locationForm = useForm<LocationFormValues>({
+    resolver: zodResolver(LocationSchema),
+    defaultValues: {
+      address: user?.location?.address || "",
+      city: user?.location?.city || "",
+      state: user?.location?.state || "",
+      postalCode: user?.location?.postalCode || "",
+      country: user?.location?.country || "",
+    },
+  });
+
+  useEffect(() => {
+    if (dialogOpen && user?.location) {
+      locationForm.reset({
+        address: user.location.address,
+        city: user.location.city,
+        state: user.location.state,
+        postalCode: user.location.postalCode,
+        country: user.location.country,
+      });
+    }
+  }, [dialogOpen, user, locationForm]);
+
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      toast.error("Geolocation not supported by your browser");
+      return;
+    }
+
+    const watchId = navigator.geolocation.watchPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        try {
+          const liveLocation = await reverseGeocode(latitude, longitude);
+          useUserStore.getState().updateLiveLocation(liveLocation);
+
+          const token = localStorage.getItem("authToken");
+          if (token) {
+            const url = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`;
+            console.log("Attempting to update location at:", url);
+            await axios.put(
+              url,
+              { location: liveLocation },
+              { headers: { Authorization: `Bearer ${token}` } }
+            );
+            console.log("Live location updated on backend");
+          } else {
+            console.log("No token, skipping backend update");
+          }
+        } catch (error) {
+          console.error("Live location update failed:", error);
+          if (axios.isAxiosError(error)) {
+            toast.error("Failed to update live location", {
+              description:
+                error.response?.status === 404
+                  ? "Endpoint not found. Check your API setup."
+                  : error.response?.data?.message || error.message,
+            });
+          } else {
+            toast.error("Geolocation error", {
+              description: (error as Error).message,
+            });
+          }
+        }
+      },
+      (error) => {
+        toast.error(`Geolocation error: ${error.message}`);
+      },
+      { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+    );
+
+    return () => navigator.geolocation.clearWatch(watchId);
+  }, []);
+
+  const handleLocationSubmit = async (data: LocationFormValues) => {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) throw new Error("No auth token found");
+
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`,
+        { location: data },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      useUserStore.getState().updateLocation(data);
+      toast.success("Location updated successfully");
+      setDialogOpen(false);
+    } catch (error) {
+      toast.error("Failed to update location", {
+        description: axios.isAxiosError(error)
+          ? error.response?.data?.message || error.message
+          : "Something went wrong",
+      });
+    }
+  };
+
   const handlePlaceOrder = async () => {
     if (!user) {
       router.push("/auth/login?returnUrl=/checkout");
+      return;
+    }
+
+    if (!user.location) {
+      toast.error("Please add a shipping address");
+      setDialogOpen(true);
       return;
     }
 
@@ -63,10 +198,11 @@ const CheckoutForm: React.FC = () => {
         throw new Error("No authentication token found. Please log in.");
 
       const cardElement = elements.getElement(CardElement);
-      console.log("CardElement retrieved:", cardElement);
+      if (!cardElement) throw new Error("Card element not found");
+
       const { paymentMethod, error } = await stripe.createPaymentMethod({
         type: "card",
-        card: cardElement!,
+        card: cardElement,
       });
 
       if (error) {
@@ -74,7 +210,6 @@ const CheckoutForm: React.FC = () => {
         throw new Error(error.message);
       }
 
-      console.log("PaymentMethod created:", paymentMethod);
       const orderData: OrderPayload = {
         products: cart.map((item) => ({
           product: item._id,
@@ -82,6 +217,7 @@ const CheckoutForm: React.FC = () => {
         })),
         totalAmount: Number(totalPrice),
         paymentMethodId: paymentMethod!.id,
+        location: user.location,
       };
 
       console.log("Sending order data:", orderData);
@@ -102,14 +238,12 @@ const CheckoutForm: React.FC = () => {
         );
         if (confirmError) throw new Error(confirmError.message);
         clearCart();
-        console.log("Cart cleared, new state:", useCartStore.getState().cart);
         toast.success("Your order has been successfully placed!");
         router.push(
           `/order-confirmation?orderId=${response.data.paymentIntentId}`
         );
       } else {
         clearCart();
-        console.log("Cart cleared, new state:", useCartStore.getState().cart);
         toast.success("Your order has been successfully placed!");
         router.push(`/order-confirmation?orderId=${response.data._id}`);
       }
@@ -120,11 +254,11 @@ const CheckoutForm: React.FC = () => {
           description:
             error.code === "ERR_NETWORK"
               ? "Cannot connect to the server. Is it running?"
-              : error.response?.data?.message || "Please try again later.",
+              : error.response?.data?.message || "Please try again later",
         });
       } else {
         toast.error("Unexpected Error", {
-          description: (error as Error).message || "Something went wrong.",
+          description: (error as Error).message || "Something went wrong",
         });
       }
     } finally {
@@ -133,7 +267,7 @@ const CheckoutForm: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="md:max-w-4xl w-full mx-auto p-6 container">
       <h1 className="text-3xl font-bold mb-6">Checkout</h1>
       <div className="mb-6">
         <h2 className="text-xl font-semibold">Order Summary</h2>
@@ -142,19 +276,204 @@ const CheckoutForm: React.FC = () => {
             <span>
               {item.name} (x{item.quantity})
             </span>
-            <span>${(item.price * item.quantity).toFixed(2)}</span>
+            <span>रु{(item.price * item.quantity).toFixed(2)}</span>
           </div>
         ))}
         <div className="flex justify-between font-bold mt-4">
           <span>Total:</span>
-          <span>${totalPrice.toFixed(2)}</span>
+          <span>रु{totalPrice.toFixed(2)}</span>
         </div>
       </div>
       <div className="mb-6">
         <h2 className="text-xl font-semibold">Shipping Information</h2>
-        <p className="text-muted-foreground">
-          Add your shipping form here (e.g., address, method).
-        </p>
+        {user?.location ? (
+          <div className="text-muted-foreground">
+            <p>{user.location.address}</p>
+            <p>
+              {user.location.city}, {user.location.state}{" "}
+              {user.location.postalCode}
+            </p>
+            <p>{user.location.country}</p>
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <button className="text-blue-600 hover:underline text-sm mt-2">
+                  Edit shipping address
+                </button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Edit Shipping Address</DialogTitle>
+                </DialogHeader>
+                <Form {...locationForm}>
+                  <form
+                    onSubmit={locationForm.handleSubmit(handleLocationSubmit)}
+                    className="space-y-4"
+                  >
+                    <FormField
+                      control={locationForm.control}
+                      name="address"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Address</FormLabel>
+                          <FormControl>
+                            <Input placeholder="123 Main St" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={locationForm.control}
+                      name="city"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>City</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Springfield" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={locationForm.control}
+                      name="state"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>State</FormLabel>
+                          <FormControl>
+                            <Input placeholder="IL" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={locationForm.control}
+                      name="postalCode"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Postal Code</FormLabel>
+                          <FormControl>
+                            <Input placeholder="62701" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={locationForm.control}
+                      name="country"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Country</FormLabel>
+                          <FormControl>
+                            <Input placeholder="USA" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button type="submit" className="w-full">
+                      Save
+                    </Button>
+                  </form>
+                </Form>
+              </DialogContent>
+            </Dialog>
+          </div>
+        ) : (
+          <div className="text-muted-foreground">
+            <p>No shipping address saved. Waiting for live location...</p>
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <button className="text-blue-600 hover:underline text-sm mt-2">
+                  Add shipping address
+                </button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add Shipping Address</DialogTitle>
+                </DialogHeader>
+                <Form {...locationForm}>
+                  <form
+                    onSubmit={locationForm.handleSubmit(handleLocationSubmit)}
+                    className="space-y-4"
+                  >
+                    <FormField
+                      control={locationForm.control}
+                      name="address"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Address</FormLabel>
+                          <FormControl>
+                            <Input placeholder="123 Main St" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={locationForm.control}
+                      name="city"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>City</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Springfield" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={locationForm.control}
+                      name="state"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>State</FormLabel>
+                          <FormControl>
+                            <Input placeholder="IL" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={locationForm.control}
+                      name="postalCode"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Postal Code</FormLabel>
+                          <FormControl>
+                            <Input placeholder="62701" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={locationForm.control}
+                      name="country"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Country</FormLabel>
+                          <FormControl>
+                            <Input placeholder="USA" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button type="submit" className="w-full">
+                      Save
+                    </Button>
+                  </form>
+                </Form>
+              </DialogContent>
+            </Dialog>
+          </div>
+        )}
       </div>
       <div className="mb-6">
         <h2 className="text-xl font-semibold">Payment Details</h2>

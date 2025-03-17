@@ -38,6 +38,8 @@ interface ProductState {
   fetchRecommendations: (userId: string) => Promise<void>;
   addProduct: (data: FormData) => Promise<Product>;
   fetchCategories: () => Promise<Category[]>;
+  updateProduct: (id: string, data: Partial<Product>) => Promise<void>;
+  deleteProduct: (id: string) => Promise<void>;
   reset: () => Promise<void>;
 }
 
@@ -284,6 +286,35 @@ export const useProductStore = create<ProductState>((set) => ({
       set({ error: errorMessage, loading: false });
       throw new Error(errorMessage);
     }
+  },
+  updateProduct: async (id: string, data: Partial<Product>) => {
+    const response = await axios.put(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`,
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      }
+    );
+    set((state) => ({
+      products: state.products.map((p) =>
+        p._id === id ? { ...p, ...response.data } : p
+      ),
+    }));
+  },
+  deleteProduct: async (id: string) => {
+    await axios.delete(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      }
+    );
+    set((state) => ({
+      products: state.products.filter((p) => p._id !== id),
+    }));
   },
   reset: async () => {
     set({

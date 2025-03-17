@@ -49,19 +49,28 @@ export const register = async ({
   name,
   email,
   password,
+  location,
 }: {
   name: string;
   email: string;
   password: string;
+  location: {
+    address: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
 }) => {
   try {
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`,
-      { name, email, password },
+      { name, email, password, location }, 
       {
         headers: { "Content-Type": "application/json" },
       }
     );
+    console.log("Register response:", response.data); 
     return response.data;
   } catch (error) {
     throw new Error(

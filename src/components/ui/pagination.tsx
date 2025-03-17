@@ -38,7 +38,6 @@ const Pagination = React.memo(
         return range(1, safeTotalPages);
       }
 
-      // Clamp currentPage to valid range
       const safeCurrentPage = Math.max(
         1,
         Math.min(currentPage, safeTotalPages)
@@ -78,7 +77,7 @@ const Pagination = React.memo(
     return (
       <nav
         className={cn(
-          "flex items-center space-x-1 sm:space-x-2 flex-wrap gap-2 justify-center",
+          "flex items-center space-x-1 sm:space-x-2 flex-wrap gap-2 justify-center max-md:px-2",
           className
         )}
         {...props}

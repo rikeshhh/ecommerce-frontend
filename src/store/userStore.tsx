@@ -5,7 +5,7 @@ import { persist } from "zustand/middleware";
 import axios from "axios";
 import { toast } from "sonner";
 import { login, logout } from "@/lib/api/auth-api";
-import { User } from "@/lib/schema/zod-schema";
+import { LocationFormValues, User } from "@/lib/schema/zod-schema";
 
 interface UserState {
   user: User | null;
@@ -31,6 +31,8 @@ interface UserState {
   ) => Promise<void>;
   updateUserRole: (id: string, isAdmin: boolean) => Promise<void>;
   deleteUser: (id: string) => Promise<void>;
+  updateLocation: (location: LocationFormValues) => void;
+  updateLiveLocation: (location: LocationFormValues) => void;
   error?: string;
 }
 
@@ -216,8 +218,19 @@ export const useUserStore = create<UserState>()(
             }
           }
         },
+        
+        updateLocation: (location: LocationFormValues) =>
+          set((state) => ({
+            user: state.user ? { ...state.user, location } : state.user,
+          })),
+        
+        updateLiveLocation: (location: LocationFormValues) =>
+          set((state) => ({
+            user: state.user ? { ...state.user, location } : null,
+          })),
       };
     },
+
     {
       name: "user-storage",
       partialize: (state) => ({

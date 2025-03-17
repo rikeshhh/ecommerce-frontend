@@ -31,7 +31,7 @@ const Recommendations = () => {
   }
 
   return (
-    <div className="w-full py-8 container mx-auto ">
+    <div className="w-full p-8 md:p-16  container mx-auto ">
       <h2 className="text-2xl font-semibold mb-6 text-gray-800">
         Recommended for You
       </h2>

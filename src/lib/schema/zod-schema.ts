@@ -23,6 +23,13 @@ export const UserSchema = z.object({
   email: z.string().email("Invalid email format"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   isAdmin: z.boolean().optional(),
+  location: z.object({
+    address: z.string().min(1, "Address is required"),
+    city: z.string().min(1, "City is required"),
+    state: z.string().min(1, "State is required"),
+    postalCode: z.string().min(1, "Postal code is required"),
+    country: z.string().min(1, "Country is required"),
+  }),
   createdAt: z.string(),
   updatedAt: z.string(),
   favorites: z.array(z.string()).optional(),
@@ -40,12 +47,18 @@ export const OrderSchema = z.object({
     })
   ),
   totalAmount: z.number().min(0, "Total amount must be positive"),
+  location: z.object({
+    address: z.string().min(1, "Address is required"),
+    city: z.string().min(1, "City is required"),
+    state: z.string().min(1, "State is required"),
+    postalCode: z.string().min(1, "Postal code is required"),
+    country: z.string().min(1, "Country is required"),
+  }),
   image: z.instanceof(File).optional().nullable(),
   status: z.string().default("Pending"),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
-
 export type Order = z.infer<typeof OrderSchema>;
 
 export const CartSchema = z.object({
@@ -62,3 +75,12 @@ export const CartSchema = z.object({
 });
 
 export type Cart = z.infer<typeof CartSchema>;
+
+export const LocationSchema = z.object({
+  address: z.string().min(1, "Address is required"),
+  city: z.string().min(1, "City is required"),
+  state: z.string().min(1, "State is required"),
+  postalCode: z.string().min(1, "Postal code is required"),
+  country: z.string().min(1, "Country is required"),
+});
+export type LocationFormValues = z.infer<typeof LocationSchema>;

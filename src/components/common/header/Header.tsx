@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,12 +14,16 @@ import {
 import { Menu, ShoppingCart, LogOut, UserIcon, Package } from "lucide-react";
 import { useUserStore } from "@/store/userStore";
 import { useCartStore } from "@/store/cartStore";
+import { useOutsideClick } from "@/hooks/use-outside-click";
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, isLoggedIn, isAdmin, logout } = useUserStore();
   const { cart } = useCartStore();
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useOutsideClick(menuRef, isMobileMenuOpen, () => setIsMobileMenuOpen(false));
 
   return (
     <header className="sticky top-0 z-50 bg-white dark:bg-gray-900 shadow-md">
@@ -115,23 +119,29 @@ export default function Header() {
       </div>
 
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-white dark:bg-gray-900 px-4 py-4 border-t border-gray-200 dark:border-gray-700">
+        <div
+          ref={menuRef}
+          className="md:hidden bg-white dark:bg-gray-900 px-4 py-4 border-t border-gray-200 dark:border-gray-700"
+        >
           <nav className="flex flex-col space-y-4">
             <Link
               href="/"
               className="text-gray-700 dark:text-gray-200 hover:text-blue-500"
+              onClick={() => setIsMobileMenuOpen(false)}
             >
               Home
             </Link>
             <Link
               href="/main/favourite"
               className="text-gray-700 dark:text-gray-200 hover:text-blue-500"
+              onClick={() => setIsMobileMenuOpen(false)}
             >
               Favorite
             </Link>
             <Link
               href="/main/cart"
               className="text-gray-700 dark:text-gray-200 hover:text-blue-500 flex items-center"
+              onClick={() => setIsMobileMenuOpen(false)}
             >
               <ShoppingCart className="inline w-5 h-5 mr-1" />
               Cart
@@ -146,12 +156,14 @@ export default function Header() {
                 <Link
                   href="/profile"
                   className="text-gray-700 dark:text-gray-200 hover:text-blue-500"
+                  onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Profile
                 </Link>
                 <Link
                   href="/user/order-history"
                   className="text-gray-700 dark:text-gray-200 hover:text-blue-500 flex items-center"
+                  onClick={() => setIsMobileMenuOpen(false)}
                 >
                   <Package className="w-4 h-4 mr-2" />
                   Order History
@@ -160,6 +172,7 @@ export default function Header() {
                   <Link
                     href="/admin"
                     className="text-gray-700 dark:text-gray-200 hover:text-blue-500"
+                    onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Admin Dashboard
                   </Link>
@@ -167,7 +180,10 @@ export default function Header() {
                 <Button
                   variant="outline"
                   className="w-full text-gray-700 dark:text-gray-200 hover:text-blue-500 hover:bg-gray-100 dark:hover:bg-gray-800"
-                  onClick={logout}
+                  onClick={() => {
+                    logout();
+                    setIsMobileMenuOpen(false);
+                  }}
                 >
                   <LogOut className="w-4 h-4 mr-2" />
                   Logout
@@ -178,12 +194,14 @@ export default function Header() {
                 <Link
                   href="/auth/login"
                   className="text-gray-700 dark:text-gray-200 hover:text-blue-500"
+                  onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Login
                 </Link>
                 <Link
                   href="/auth/register"
                   className="text-gray-700 dark:text-gray-200 hover:text-blue-500"
+                  onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Signup
                 </Link>

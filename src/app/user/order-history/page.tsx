@@ -34,6 +34,13 @@ interface Order {
   status: string;
   paymentStatus: string;
   createdAt: string;
+  location: {
+    address: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
 }
 
 const OrderHistory = () => {
@@ -87,7 +94,7 @@ const OrderHistory = () => {
   }
 
   return (
-    <div className="p-6 container  mx-auto">
+    <div className="p-6 container mx-auto">
       <h1 className="text-4xl font-extrabold mb-8 text-gray-900 dark:text-gray-50 tracking-tight">
         Your Order History
       </h1>
@@ -105,7 +112,7 @@ const OrderHistory = () => {
             >
               <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
                 <AccordionTrigger className="p-2">
-                  <CardHeader className="flex md:flex-row flex-col items-start2057 justify-start md:justify-between w-full">
+                  <CardHeader className="flex md:flex-row flex-col items-start justify-start md:justify-between w-full">
                     <CardTitle className="text-xl font-semibold text-gray-800 dark:text-gray-200">
                       Order #{order._id.slice(-6)}
                     </CardTitle>
@@ -154,6 +161,27 @@ const OrderHistory = () => {
                             timeStyle: "short",
                           })}
                         </p>
+                        {order.location ? (
+                          <div className="mt-2">
+                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                              <strong>Shipping Location:</strong>
+                            </p>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                              {order.location.address}
+                            </p>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                              {order.location.city}, {order.location.state}{" "}
+                              {order.location.postalCode}
+                            </p>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                              {order.location.country}
+                            </p>
+                          </div>
+                        ) : (
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                            <strong>Shipping Location:</strong> Not provided
+                          </p>
+                        )}
                       </div>
                       <div className="flex justify-end">
                         <Button

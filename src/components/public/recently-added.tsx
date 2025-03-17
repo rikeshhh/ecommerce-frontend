@@ -30,7 +30,7 @@ export default function RecentlyAdded() {
   if (error) {
     return <div className="py-8 text-center text-red-500">{error}</div>;
   }
-  const recentProducts = storeProducts.slice(0, 8);
+  const recentProducts = storeProducts.slice(0, 4);
 
   if (!recentProducts.length) {
     return <div className="py-8 text-center">No recently added products</div>;
@@ -46,7 +46,7 @@ export default function RecentlyAdded() {
       >
         Recently Added Product{" "}
       </motion.h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 w-full">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-6 w-full">
         {recentProducts.map((product) => (
           <ProductCard key={product._id} product={product} />
         ))}

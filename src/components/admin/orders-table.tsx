@@ -40,7 +40,7 @@ export default function OrdersTable() {
   );
 
   const columns = [
-    { key: "_id", header: "Order ID", hiddenOnMobile: true }, // Hidden on mobile
+    { key: "_id", header: "Order ID", hiddenOnMobile: true },
     {
       key: "customerName",
       header: "Customer",
@@ -117,7 +117,7 @@ export default function OrdersTable() {
     {
       key: "createdAt",
       header: "Date",
-      hiddenOnMobile: true, // Hidden on mobile
+      hiddenOnMobile: true,
       render: (order: Order) => format(new Date(order.createdAt), "LLL dd, y"),
     },
   ];

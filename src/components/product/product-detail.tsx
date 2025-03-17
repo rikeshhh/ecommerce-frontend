@@ -304,7 +304,6 @@ export default function ProductDetail() {
           </Card>
         </motion.div>
 
-        {/* Comment Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -318,7 +317,6 @@ export default function ProductDetail() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {/* Comment Form */}
               <form onSubmit={handleCommentSubmit} className="mb-6">
                 <div className="flex items-center mb-4">
                   {[1, 2, 3, 4, 5].map((star) => (
