@@ -63,7 +63,7 @@ export default function ProductCategory() {
       >
         Shop by Category
       </motion.h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
         {categories.map((category, index) => (
           <motion.div
             key={category.slug}
@@ -76,15 +76,15 @@ export default function ProductCategory() {
             <Link href={`/category/${category.slug}`}>
               <Card
                 className={cn(
-                  "relative h-60 sm:h-72 overflow-hidden bg-gray-800 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300"
+                  "relative h-[180px] sm:w-full w-44 sm:h-72 overflow-hidden bg-gray-800 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300"
                 )}
               >
-                <div className="relative h-36 sm:h-48 w-full">
+                <div className="relative h-48 w-full">
                   <Image
                     src={category.image}
                     alt={category.name}
                     fill
-                    className="object-cover transition-transform duration-300 hover:scale-105"
+                    className=" transition-transform duration-300 hover:scale-105"
                     sizes="(max-width: 640px) 200px, (max-width: 1024px) 33vw, 25vw"
                     placeholder="blur"
                     blurDataURL="/placeholder.png"
@@ -92,7 +92,7 @@ export default function ProductCategory() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                 </div>
-                <CardContent className="absolute bottom-0 p-3 sm:p-4 text-white">
+                <CardContent className="absolute bottom-0 py-4 sm:p-4 text-white">
                   <h3 className="text-base sm:text-lg font-semibold truncate drop-shadow-md">
                     {category.name}
                   </h3>

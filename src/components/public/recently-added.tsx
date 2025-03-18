@@ -46,7 +46,7 @@ export default function RecentlyAdded() {
       >
         Recently Added Product{" "}
       </motion.h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 md:gap-6 w-full">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-6 w-full">
         {recentProducts.map((product) => (
           <ProductCard key={product._id} product={product} />
         ))}

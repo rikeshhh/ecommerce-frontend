@@ -20,6 +20,8 @@ import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Pagination } from "@/components/ui/pagination";
 import { useOutsideClick } from "@/hooks/use-outside-click";
+import Link from "next/link";
+import Image from "next/image";
 
 export default function ProductListingPage() {
   const {
@@ -39,7 +41,7 @@ export default function ProductListingPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMounted, setHasMounted] = useState(false);
   const isMobile = useIsMobile();
-  const limit = isMobile ? 4 : 9;
+  const limit = isMobile ? 5 : 10;
   const sidebarRef = useRef<HTMLDivElement | null>(null);
 
   useOutsideClick(
@@ -268,10 +270,10 @@ export default function ProductListingPage() {
           ) : (
             <motion.div
               key="products"
-              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6"
+              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
             >
               {filteredProducts.map((product) => (
                 <motion.div
@@ -279,9 +281,44 @@ export default function ProductListingPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  whileHover={{ scale: 1.02 }}
                 >
-                  <ProductCard product={product} />
+                  <Link
+                    href={`/main/products-detail?id=${product._id}`}
+                    className="block"
+                  >
+                    <div className="w-full max-w-[300px] mx-auto bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl">
+                      <div className="relative w-full h-36 sm:h-56  overflow-hidden">
+                        <Image
+                          fill
+                          src={product.image || "placeholder.png"}
+                          alt={product.name}
+                          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                        />
+                        {/* {product.discount && (
+                          <span className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                            {product.discount}% OFF
+                          </span>
+                        )} */}
+                      </div>
+                      <div className="p-4 sm:p-5">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 line-clamp-1">
+                          {product.name}
+                        </h3>
+                        <div className="flex items-center justify-between">
+                          <p className="text-lg font-bold text-gray-700">
+                            ${product.price.toFixed(2)}
+                          </p>
+                          {/* {product.originalPrice && (
+                            <p className="text-sm text-gray-500 line-through">
+                              ${product.originalPrice.toFixed(2)}
+                            </p>
+                          )} */}
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
                 </motion.div>
               ))}
             </motion.div>
