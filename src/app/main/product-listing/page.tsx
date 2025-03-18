@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/card";
 import { Search, ChevronDown, X } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import ProductCard from "@/components/product/product-card";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
