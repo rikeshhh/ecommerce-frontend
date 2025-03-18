@@ -179,7 +179,7 @@ export default function ProductDetail() {
               src={normalizeImageUrl(selectedProduct.image)}
               alt={selectedProduct.name}
               fill
-              className="object-cover transition-transform duration-300 hover:scale-105"
+              className=" transition-transform duration-300 hover:scale-105"
               sizes="(max-width: 768px) 100vw, 50vw"
               placeholder="blur"
               blurDataURL="/placeholder.png"
@@ -191,7 +191,7 @@ export default function ProductDetail() {
 
           <div className="p-8 flex flex-col justify-between">
             <div>
-              <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white mb-2">
+              <h1 className="text-xl sm:text-4xl font-extrabold text-gray-900 dark:text-white mb-2">
                 {selectedProduct.name}
               </h1>
               <p className="text-lg text-gray-500 dark:text-gray-400 mb-4">
@@ -203,7 +203,7 @@ export default function ProductDetail() {
             </div>
             <div>
               <div className="flex items-center justify-between mb-6">
-                <span className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
+                <span className="text-base sm:text-3xl font-bold text-indigo-600 dark:text-indigo-400">
                   ${selectedProduct.price.toFixed(2)}
                 </span>
                 <Badge
@@ -220,7 +220,7 @@ export default function ProductDetail() {
               <Button
                 onClick={handleAddToCart}
                 disabled={selectedProduct.stock <= 0}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 text-lg font-semibold rounded-lg transition-all duration-300 flex items-center justify-center gap-2"
+                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 sm:text-lg font-semibold rounded-lg transition-all duration-300 flex items-center justify-center gap-2"
               >
                 <ShoppingCart className="h-5 w-5" />
                 {selectedProduct.stock > 0 ? "Add to Cart" : "Out of Stock"}
@@ -237,7 +237,7 @@ export default function ProductDetail() {
         >
           <Card className="bg-white dark:bg-gray-800 border-none shadow-md">
             <CardHeader>
-              <CardTitle className="text-2xl font-semibold text-gray-900 dark:text-white">
+              <CardTitle className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
                 Product Details
               </CardTitle>
             </CardHeader>
@@ -258,7 +258,7 @@ export default function ProductDetail() {
         >
           <Card className="bg-white dark:bg-gray-800 border-none shadow-md">
             <CardHeader>
-              <CardTitle className="text-2xl font-semibold text-gray-900 dark:text-white">
+              <CardTitle className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
                 You Might Also Like
               </CardTitle>
             </CardHeader>
@@ -285,7 +285,7 @@ export default function ProductDetail() {
                             sizes="(max-width: 150px) 100vw"
                           />
                         </div>
-                        <h4 className="text-lg font-medium text-gray-800 dark:text-gray-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 mb-2">
+                        <h4 className="text-xs sm:text-lg font-medium text-gray-800 dark:text-gray-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 mb-2">
                           {relatedProduct.name}
                         </h4>
                         <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">
@@ -364,7 +364,7 @@ export default function ProductDetail() {
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                           <span className="font-semibold text-gray-900 dark:text-white">
-                            {comment.user.name}
+                            {comment.user?.name || ""}
                           </span>
                           <Badge variant="secondary">Verified Buyer</Badge>
                         </div>
@@ -407,7 +407,7 @@ export default function ProductDetail() {
             variant="outline"
             className="text-indigo-600 border-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:border-indigo-400 dark:hover:bg-gray-800"
           >
-            <Link href="/main/products">
+            <Link href="/">
               <ArrowLeft className="mr-2 h-4 w-4" /> Back to Products
             </Link>
           </Button>

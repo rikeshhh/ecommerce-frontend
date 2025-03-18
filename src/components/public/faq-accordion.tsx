@@ -12,11 +12,11 @@ export function FAQAccordion() {
   return (
     <section className="w-full py-16 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl md:text-4xl font-extrabold text-gray-800 dark:text-white text-center mb-12 tracking-tight">
+        <h2 className="text-xl md:text-4xl font-bold text-gray-800 dark:text-white text-left sm:text-center mb-4 sm:mb-12 tracking-tight">
           Frequently Asked Questions
         </h2>
 
-        <div className="w-full rounded-2xl shadow-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-6 transform transition-all hover:shadow-xl">
+        <div className="w-full rounded-2xl shadow-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-1 sm:p-6 transform transition-all hover:shadow-xl">
           <Accordion type="single" collapsible className="w-full space-y-4">
             {faqQuestions.map((item) => (
               <AccordionItem

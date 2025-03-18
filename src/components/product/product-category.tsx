@@ -56,7 +56,7 @@ export default function ProductCategory() {
   return (
     <section className="p-4 md:p-16 container min-h-screen flex flex-col  w-full">
       <motion.h2
-        className="text-3xl md:text-4xl font-bold mb-10 text-start "
+        className="text-xl md:text-4xl font-bold mb-4 sm:mb-10 text-start "
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -76,7 +76,7 @@ export default function ProductCategory() {
             <Link href={`/category/${category.slug}`}>
               <Card
                 className={cn(
-                  "relative h-[180px] sm:w-full w-44 sm:h-72 overflow-hidden bg-gray-800 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300"
+                  "relative size-[160px] sm:w-full  sm:h-72 overflow-hidden bg-gray-800 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300"
                 )}
               >
                 <div className="relative h-48 w-full">

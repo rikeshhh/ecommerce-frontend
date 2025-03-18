@@ -67,7 +67,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   return (
     <motion.div
       className={cn(
-        "w-[180px] sm:max-w-[300px] sm:w-full mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300"
+        "w-[168px] sm:max-w-[300px] sm:w-full mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300"
       )}
       whileHover={{ y: -5 }}
       initial={{ opacity: 0, y: 20 }}
@@ -127,7 +127,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
       <div className="p-2 sm:p-4 text-gray-900 dark:text-gray-100">
         <div className="flex justify-between items-start">
-          <h3 className="text-base sm:text-xl font-semibold truncate">
+          <h3 className="text-sm sm:text-xl font-semibold truncate">
             {product.name}
           </h3>
         </div>
@@ -136,8 +136,8 @@ export default function ProductCard({ product }: ProductCardProps) {
         </p>
 
         <div className="flex justify-between items-center mt-1 sm:mt-3">
-          <span className="text-base font-bold text-indigo-600 dark:text-indigo-400">
-            Rs{product.price.toFixed(2)}
+          <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400">
+            Rs {product.price.toFixed(2)}
           </span>
           <div className="flex gap-1">
             {colorOptions.map((option) => (

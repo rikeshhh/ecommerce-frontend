@@ -35,7 +35,7 @@ const Recommendations = () => {
         Recommended for You
       </h2>
       {recommendations.length === 0 ? (
-        <p className="text-center py-4 text-gray-600">
+        <p className=" text-left text-red-500 sm:text-center py-4 ">
           No recommendations available at the moment.
         </p>
       ) : (

@@ -3,7 +3,11 @@ import { Suspense } from "react";
 
 export default function ProductDetailPage() {
   return (
-    <Suspense fallback={<div>Loading product details...</div>}>
+    <Suspense
+      fallback={
+        <div className="text-center font-black">Loading product details...</div>
+      }
+    >
       <ProductDetail />
     </Suspense>
   );

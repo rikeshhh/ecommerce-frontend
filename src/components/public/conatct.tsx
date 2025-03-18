@@ -69,15 +69,14 @@ const ContactPage = () => {
 
   return (
     <div className="w-full mx-auto px-4 py-12 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-      <h1 className="text-4xl font-extrabold mb-12 text-center text-gray-800 dark:text-white tracking-tight">
+      <h1 className="text-xl sm:text-4xl font-bold mb-4 sm:mb-12 text-left sm:text-center text-gray-800 dark:text-white tracking-tight">
         Get in Touch
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-        {/* Contact Form */}
         <Card className="shadow-lg rounded-xl overflow-hidden border-none bg-white dark:bg-gray-950 transform transition-all hover:scale-105">
           <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6">
-            <CardTitle className="text-2xl font-bold">
+            <CardTitle className="sm:text-2xl font-bold">
               Send Us a Message
             </CardTitle>
           </CardHeader>
@@ -220,7 +219,7 @@ const ContactPage = () => {
 
         <Card className="shadow-lg rounded-xl overflow-hidden border-none bg-white dark:bg-gray-950 transform transition-all hover:scale-105">
           <CardHeader className="bg-gradient-to-r from-purple-500 to-blue-600 text-white p-6">
-            <CardTitle className="text-2xl font-bold">
+            <CardTitle className="sm:text-2xl font-bold">
               Contact Information
             </CardTitle>
           </CardHeader>

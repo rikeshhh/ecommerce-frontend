@@ -55,12 +55,12 @@ export function HeroSection() {
             key={`slide-${index}`}
             className={`relative bg-gradient-to-r h-auto ${slide.gradient} text-white flex`}
           >
-            <div className="container mx-auto px-4 flex flex-col-reverse md:flex-row items-center gap-8">
-              <div className="text-center md:text-left md:w-1/2">
-                <h3 className="text-3xl md:text-5xl font-extrabold mb-4">
+            <div className="container mx-auto sm:px-4 flex flex-col-reverse md:flex-row items-center gap-8">
+              <div className=" text-left md:w-1/2">
+                <h3 className="text-xl md:text-4xl font-extrabold mb-4">
                   {slide.title}
                 </h3>
-                <p className="text-lg md:text-xl mb-6 opacity-90">
+                <p className="sm:text-lg md:text-xl mb-6 opacity-90">
                   {slide.description}
                 </p>
                 <Link href={slide.ctaLink}>

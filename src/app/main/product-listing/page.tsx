@@ -192,8 +192,8 @@ export default function ProductListingPage() {
         transition={{ duration: 0.3, delay: hasMounted ? 0 : 0.1 }}
         className="flex-1"
       >
-        <div className="flex items-center justify-between mb-6 flex-col sm:flex-row gap-4">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+        <div className="flex items-start sm:items-center justify-between mb-4 sm:mb-10 flex-col sm:flex-row gap-4">
+          <h1 className="text-xl md:text-4xl font-bold text-gray-900 dark:text-white">
             {selectedCategory || "All Products"}
           </h1>
           <div className="relative w-full max-w-sm">
@@ -210,9 +210,9 @@ export default function ProductListingPage() {
           <div className="mb-4">
             <Button
               onClick={() => setIsSidebarOpen(true)}
-              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white"
+              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white max-sm:text-sm"
             >
-              <ChevronDown className="mr-2 h-4 w-4" /> Show Categories
+              <ChevronDown className="mr-1 h-4 w-4" /> Show Categories
             </Button>
           </div>
         )}
@@ -269,7 +269,7 @@ export default function ProductListingPage() {
           ) : (
             <motion.div
               key="products"
-              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto"
+              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 px-0 sm:px-6 lg:px-8 max-w-7xl mx-auto"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
@@ -302,7 +302,7 @@ export default function ProductListingPage() {
                         )} */}
                       </div>
                       <div className="p-4 sm:p-5">
-                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 line-clamp-1">
+                        <h3 className="text-xs sm:text-lg font-semibold text-gray-900 mb-2 line-clamp-1">
                           {product.name}
                         </h3>
                         <div className="flex items-center justify-between">
