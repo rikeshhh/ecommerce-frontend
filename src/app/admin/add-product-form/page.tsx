@@ -144,7 +144,7 @@ export default function AddProductForm() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="text-center text-red-500 py-10"
+        className="text-center text-red-500 py-10 "
       >
         Unauthorized: Only admins can access this page
       </motion.div>
