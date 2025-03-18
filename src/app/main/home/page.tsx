@@ -10,14 +10,13 @@ import { useProductStore } from "@/store/product-store";
 import ProductListingPage from "../product-listing/page";
 import { FAQAccordion } from "@/components/public/faq-accordion";
 import Giveaway from "../giveaway/page";
+import ContactPage from "@/components/public/conatct";
 
 export default function PublicHome() {
   const { initialize } = useFavoritesStore();
   const { reset } = useProductStore();
-
   useEffect(() => {
     initialize();
-
     return () => {
       reset();
     };
@@ -31,8 +30,7 @@ export default function PublicHome() {
       <ProductListingPage />
       <ProductCategory />
       <Recommendations />
-      {/* <ContactPage />
-       */}
+      <ContactPage />
       <FAQAccordion />
     </section>
   );

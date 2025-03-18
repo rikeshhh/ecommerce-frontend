@@ -18,6 +18,7 @@ interface UserState {
   limit: number;
   loading: boolean;
   login: (credentials: { email: string; password: string }) => Promise<void>;
+  setGoogleLogin: (token: string) => Promise<void>;
   logout: () => Promise<void>;
   initialize: () => Promise<void>;
   fetchItems: (
@@ -90,6 +91,21 @@ export const useUserStore = create<UserState>()(
           }
         },
 
+        setGoogleLogin: async (token: string) => {
+          try {
+            localStorage.setItem("authToken", token);
+            await fetchUserData(token);
+            toast.success("Logged in with Google successfully");
+          } catch (error) {
+            set({ user: null, isLoggedIn: false, isAdmin: false });
+            localStorage.removeItem("authToken");
+            toast.error("Google login failed", {
+              description: (error as Error).message || "Invalid token",
+            });
+            throw error;
+          }
+        },
+
         logout: async () => {
           const token = localStorage.getItem("authToken");
           if (token) {
@@ -104,14 +120,20 @@ export const useUserStore = create<UserState>()(
               });
             }
           }
-          set({ user: null, isLoggedIn: false, isAdmin: false, items: [] });
+          set({ user: null, isLoggedIn: false, isAdmin: false });
           localStorage.removeItem("authToken");
         },
 
         initialize: async () => {
           const token = localStorage.getItem("authToken");
           if (token) {
-            await fetchUserData(token);
+            try {
+              await fetchUserData(token);
+            } catch (error) {
+              console.error("Initialize failed:", error);
+              set({ user: null, isLoggedIn: false, isAdmin: false });
+              localStorage.removeItem("authToken");
+            }
           }
         },
 
@@ -135,6 +157,10 @@ export const useUserStore = create<UserState>()(
             console.log("Fetched users:", response.data.users);
             set({
               items: response.data.users || [],
+              totalItems: response.data.totalUsers || 0,
+              currentPage: response.data.currentPage || page,
+              totalPages: response.data.totalPages || 1,
+              limit: response.data.limit || limit,
               loading: false,
               error: undefined,
             });
@@ -218,19 +244,18 @@ export const useUserStore = create<UserState>()(
             }
           }
         },
-        
+
         updateLocation: (location: LocationFormValues) =>
           set((state) => ({
             user: state.user ? { ...state.user, location } : state.user,
           })),
-        
+
         updateLiveLocation: (location: LocationFormValues) =>
           set((state) => ({
             user: state.user ? { ...state.user, location } : null,
           })),
       };
     },
-
     {
       name: "user-storage",
       partialize: (state) => ({

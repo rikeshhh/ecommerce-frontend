@@ -163,18 +163,16 @@ export const useProductStore = create<ProductState>((set) => ({
     }
   },
 
-  fetchRecommendations: async (userId: string) => {
+  fetchRecommendations: async (userId) => {
     set({ loading: true, error: undefined });
     try {
-      if (!userId) throw new Error("User ID is required");
-
+      const params = userId ? { userId } : {};
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/api/recommendations`,
-        { params: { userId } }
+        { params }
       );
 
       const recommendations = response.data.recommendations || [];
-
       set({ recommendations, loading: false });
     } catch (err) {
       const errorMessage =
@@ -182,8 +180,7 @@ export const useProductStore = create<ProductState>((set) => ({
           ? err.response.data.message
           : "Failed to fetch recommendations";
       console.error("Fetch Recommendations Error:", err);
-      set({ error: errorMessage, loading: false });
-      throw new Error(errorMessage);
+      set({ error: errorMessage, loading: false, recommendations: [] });
     }
   },
 

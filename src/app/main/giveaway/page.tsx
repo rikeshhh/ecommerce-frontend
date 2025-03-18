@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import axios from "axios";
+import { cn } from "@/lib/utils"; 
 
 export default function Giveaway() {
   const [email, setEmail] = useState("");
@@ -18,19 +19,21 @@ export default function Giveaway() {
       const now = new Date();
       const diff = targetDate.getTime() - now.getTime();
       if (diff <= 0) {
-        setTimeLeft("Giveaway ended!");
+        setTimeLeft("Giveaway Ended!");
         return;
       }
       const days = Math.floor(diff / (1000 * 60 * 60 * 24));
       const hours = Math.floor(
         (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
       );
-      setTimeLeft(`${days}d ${hours}h left`);
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      setTimeLeft(`${days}d ${hours}h ${minutes}m`);
     };
     updateTimer();
-    const interval = setInterval(updateTimer, 1000 * 60);
+    const interval = setInterval(updateTimer, 1000);
     return () => clearInterval(interval);
   }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -43,7 +46,8 @@ export default function Giveaway() {
 
       if (response.data.success) {
         toast.success(
-          "You’re in! Check your email later for a promo code if you win!"
+          "You’re in! Check your email on March 24, 2025, for a promo code if you win!",
+          { duration: 5000 }
         );
         setEmail("");
       }
@@ -59,39 +63,93 @@ export default function Giveaway() {
   };
 
   return (
-    <div className="p-6 max-w-md mx-auto">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Promo Code Giveaway</CardTitle>
+    <div className="py-12 px-4 w-full sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+      <Card className="max-w-3xl mx-auto shadow-lg rounded-xl overflow-hidden border-none bg-white dark:bg-gray-950 transform transition-all hover:scale-105">
+        <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6">
+          <CardTitle className="text-3xl font-extrabold tracking-tight">
+            🎉 Promo Code Giveaway
+          </CardTitle>
+          <p className="mt-2 text-sm opacity-90">Ends: March 24, 2025</p>
         </CardHeader>
-        <CardContent>
-          <p>{timeLeft} - timeleft</p>
-          <p className="mb-4 text-gray-600">
-            Enter your email for a chance to win a 20% off promo code! Winners
-            announced March 24, 2025.
+        <CardContent className="p-6">
+          <div className="mb-6 text-center">
+            <span className="inline-block bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 font-mono text-lg font-semibold px-4 py-2 rounded-full shadow-sm">
+              {timeLeft}
+            </span>
+          </div>
+
+          <p className="mb-6 text-gray-700 dark:text-gray-300 text-center text-base leading-relaxed">
+            Drop your email for a shot at a{" "}
+            <span className="font-bold text-blue-600 dark:text-blue-400">
+              20% off promo code
+            </span>
+            ! Winners revealed March 24, 2025.
           </p>
+
           <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              type="email"
-              placeholder="Your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? "Entering..." : "Enter Giveaway"}
+            <div className="relative">
+              <Input
+                type="email"
+                placeholder="Your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                disabled={isSubmitting}
+                className={cn(
+                  "w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200",
+                  isSubmitting && "opacity-50 cursor-not-allowed"
+                )}
+              />
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                ✉️
+              </span>
+            </div>
+            <Button
+              type="submit"
+              className={cn(
+                "w-full py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold rounded-lg shadow-md transition-all duration-300",
+                isSubmitting && "opacity-70 cursor-not-allowed"
+              )}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <span className="flex items-center justify-center">
+                  <svg
+                    className="animate-spin h-5 w-5 mr-2 text-white"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v8h8a8 8 0 01-8 8 8 8 0 01-8-8z"
+                    />
+                  </svg>
+                  Entering...
+                </span>
+              ) : (
+                "Enter Now"
+              )}
             </Button>
           </form>
-          <p className="mb-4 text-gray-600">
-            Follow us on{" "}
+
+          <p className="mt-6 text-center text-gray-600 dark:text-gray-400 text-sm">
+            Boost your chances! Follow us on{" "}
             <a
               href="https://x.com/yourhandle"
               target="_blank"
-              className="text-blue-600"
+              rel="noopener noreferrer"
+              className="text-blue-600 dark:text-blue-400 font-medium hover:underline"
             >
               X
-            </a>{" "}
-            and enter your email for a chance to win!
+            </a>
           </p>
         </CardContent>
       </Card>
