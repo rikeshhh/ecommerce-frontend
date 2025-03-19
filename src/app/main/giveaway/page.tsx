@@ -63,7 +63,7 @@ export default function Giveaway() {
   };
 
   return (
-    <div className="py-12 px-4 w-full sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="py-12 px-4 w-full sm:px-6 lg:px-8">
       <Card className="max-w-3xl mx-auto shadow-lg rounded-xl overflow-hidden border-none bg-white dark:bg-gray-950 transform transition-all hover:scale-105">
         <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6">
           <CardTitle className="text-xl  sm:text-3xl font-extrabold tracking-tight">

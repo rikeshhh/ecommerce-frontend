@@ -6,6 +6,7 @@ import Footer from "@/components/common/footer/Footer";
 import { Toaster } from "sonner";
 import { usePathname } from "next/navigation";
 import Header from "@/components/common/header/Header";
+import { ThemeProvider } from "next-themes";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -23,14 +24,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${poppins.variable} antialiased`}>
-        {!isAdminRoute && <Header />}
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {!isAdminRoute && <Header />}
 
-        <main className="min-h-screen flex flex-col justify-center">
-          {children}
-        </main>
+          <main className="min-h-screen flex flex-col justify-center">
+            {children}
+          </main>
 
-        {!isAdminRoute && <Footer />}
-
+          {!isAdminRoute && <Footer />}
+        </ThemeProvider>
         <Toaster />
       </body>
     </html>

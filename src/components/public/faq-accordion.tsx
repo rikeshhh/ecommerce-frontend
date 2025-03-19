@@ -10,7 +10,7 @@ import { faqQuestions } from "@/data/faqQuestion";
 
 export function FAQAccordion() {
   return (
-    <section className="w-full py-16 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <section className="w-full py-16 ">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-xl md:text-4xl font-bold text-gray-800 dark:text-white text-left sm:text-center mb-4 sm:mb-12 tracking-tight">
           Frequently Asked Questions

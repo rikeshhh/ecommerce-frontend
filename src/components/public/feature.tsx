@@ -35,10 +35,12 @@ export default function Feature() {
               className="flex flex-col items-center text-center border border-gray-200 rounded-lg p-6"
             >
               <div className="mb-4">{feature.icon}</div>
-              <h3 className="text-xl font-semibold text-gray-800">
+              <h3 className="text-xl font-semibold text-gray-800 dark:text-foreground">
                 {feature.title}
               </h3>
-              <p className="text-gray-600 mt-2">{feature.description}</p>
+              <p className="text-gray-600 mt-2 dark:text-foreground">
+                {feature.description}
+              </p>
             </div>
           ))}
         </div>

@@ -60,10 +60,10 @@ export default function Cart() {
 
   return (
     <div className="container mx-auto py-4 sm:py-6">
-      <Card className="border-none shadow-md rounded-lg bg-white">
+      <Card className="border-none shadow-md rounded-lg bg-white dark:bg-gray-900 ">
         <CardHeader className="py-4 sm:py-6 px-4 sm:px-6 border-b border-gray-200">
-          <CardTitle className="text-2xl sm:text-3xl font-semibold text-gray-900 flex items-center gap-2 sm:gap-3">
-            <ShoppingCart className="w-6 sm:w-8 h-6 sm:h-8 text-gray-600" />
+          <CardTitle className="text-2xl sm:text-3xl font-semibold  flex items-center gap-2 sm:gap-3">
+            <ShoppingCart className="w-6 sm:w-8 h-6 sm:h-8 dark:text-white" />
             Shopping Cart
           </CardTitle>
         </CardHeader>
@@ -90,7 +90,7 @@ export default function Cart() {
                 <div
                   key={item._id}
                   className={cn(
-                    "flex flex-wrap items-center  p-3 sm:p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+                    "flex flex-wrap items-center  p-3 sm:p-4 border border-gray-200 rounded-lg  transition-colors duration-200"
                   )}
                 >
                   <div className="relative w-full sm:w-20 h-24 sm:h-20 flex-shrink-0 rounded-md overflow-hidden bg-gray-100">
@@ -103,11 +103,11 @@ export default function Cart() {
                     />
                   </div>
                   <div className="flex-1 px-3 sm:px-4 text-center md:text-left">
-                    <p className="text-base sm:text-lg font-medium text-gray-900 line-clamp-1">
+                    <p className="text-base sm:text-lg font-medium  line-clamp-1">
                       {item.name}
                     </p>
                     <div className="flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 sm:gap-2 mt-1">
-                      <span className="text-sm sm:text-base font-semibold text-gray-800">
+                      <span className="text-sm sm:text-base font-semibold ">
                         ${(item.price * item.quantity).toFixed(2)}
                       </span>
                       <span className="text-xs sm:text-sm text-gray-500">
@@ -125,13 +125,13 @@ export default function Cart() {
                       >
                         <Minus className="w-3 sm:w-4 h-3 sm:h-4" />
                       </Button>
-                      <span className="w-6 sm:w-8 text-center font-medium text-gray-700 text-sm sm:text-base">
+                      <span className="w-6 sm:w-8 text-center font-medium  text-sm sm:text-base">
                         {item.quantity}
                       </span>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="w-7 sm:w-8 h-7 sm:h-8 text-gray-600 hover:bg-gray-100"
+                        className="w-7 sm:w-8 h-7 sm:h-8  hover:bg-gray-100"
                         onClick={() => handleQuantityChange(item._id, 1)}
                       >
                         <Plus className="w-3 sm:w-4 h-3 sm:h-4" />
@@ -157,8 +157,8 @@ export default function Cart() {
             <Separator className="my-4 sm:my-6" />
             <CardFooter className="flex flex-col items-end p-4 sm:p-6">
               <div className="flex flex-col sm:flex-row justify-between w-full mb-4 text-base sm:text-lg font-medium gap-2 sm:gap-0">
-                <span className="text-gray-600">Subtotal:</span>
-                <span className="text-lg sm:text-xl text-gray-900">
+                <span className="">Subtotal:</span>
+                <span className="text-lg sm:text-xl ">
                   ${totalPrice.toFixed(2)}
                 </span>
               </div>

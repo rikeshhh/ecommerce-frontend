@@ -11,7 +11,8 @@ import Feature from "./feature";
 export function HeroSection() {
   const slidesData = [
     {
-      gradient: "from-blue-600 to-blue-800",
+      gradient:
+        "from-blue-900 to-blue-950 dark:from-[oklch(0.3_0.1_260)] dark:to-[oklch(0.25_0.05_260)]",
       textColor: "text-blue-600",
       hoverBg: "hover:bg-blue-100",
       title: "Explore New Arrivals!",
@@ -23,7 +24,8 @@ export function HeroSection() {
       altText: "New Arrivals Collection",
     },
     {
-      gradient: "from-green-500 to-green-700",
+      gradient:
+        "from-green-800 to-green-900 dark:from-[oklch(0.3_0.1_160)] dark:to-[oklch(0.25_0.05_160)]",
       textColor: "text-green-700",
       hoverBg: "hover:bg-green-100",
       title: "Save Big This Week!",
@@ -35,7 +37,8 @@ export function HeroSection() {
       altText: "Weekly Deals Promotion",
     },
     {
-      gradient: "from-purple-500 to-purple-700",
+      gradient:
+        "from-purple-800 to-purple-900 dark:from-[oklch(0.3_0.1_280)] dark:to-[oklch(0.25_0.05_280)]",
       textColor: "text-purple-700",
       hoverBg: "hover:bg-purple-100",
       title: "Fast & Free Delivery!",

@@ -102,11 +102,11 @@ export default function ProductListingPage() {
       animate={{ x: isMobile ? sidebarX : 0, opacity: 1 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
       className={cn(
-        "fixed md:static inset-y-0 left-0 z-40 w-72 bg-white dark:bg-gray-800 shadow-lg md:shadow-none",
+        "fixed md:static inset-y-0 left-0 z-40 w-72 bg-white dark:bg-transparent shadow-lg md:shadow-none",
         isMobile && "h-full border-r"
       )}
     >
-      <div className="sticky top-0 p-4 bg-white dark:bg-gray-800 z-10 border-b">
+      <div className="sticky top-0 p-4  z-10 border-b mb-4 ">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">
             Categories

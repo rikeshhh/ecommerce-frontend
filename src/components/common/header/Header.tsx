@@ -11,10 +11,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Menu, ShoppingCart, LogOut, UserIcon, Package } from "lucide-react";
+import {
+  Menu,
+  ShoppingCart,
+  LogOut,
+  UserIcon,
+  Package,
+  Moon,
+  Sun,
+} from "lucide-react";
 import { useUserStore } from "@/store/userStore";
 import { useCartStore } from "@/store/cartStore";
 import { useOutsideClick } from "@/hooks/use-outside-click";
+import { Switch } from "@/components/ui/switch";
+import { useTheme } from "next-themes";
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -22,7 +32,10 @@ export default function Header() {
   const { cart } = useCartStore();
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
   const menuRef = useRef<HTMLDivElement>(null);
-
+  const { theme, setTheme } = useTheme();
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
   useOutsideClick(menuRef, isMobileMenuOpen, () => setIsMobileMenuOpen(false));
 
   return (
@@ -63,6 +76,15 @@ export default function Header() {
         </nav>
 
         <div className="hidden md:flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
+            <Sun className="w-5 h-5 text-[hsl(var(--muted-foreground))]" />
+            <Switch
+              checked={theme === "dark"}
+              onCheckedChange={toggleTheme}
+              aria-label="Toggle theme"
+            />
+            <Moon className="w-5 h-5 text-[hsl(var(--muted-foreground))]" />
+          </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="icon">
@@ -207,6 +229,15 @@ export default function Header() {
                 </Link>
               </>
             )}
+            <div className="flex items-center space-x-2">
+              <Sun className="w-5 h-5 text-[hsl(var(--muted-foreground))]" />
+              <Switch
+                checked={theme === "dark"}
+                onCheckedChange={toggleTheme}
+                aria-label="Toggle theme"
+              />
+              <Moon className="w-5 h-5 text-[hsl(var(--muted-foreground))]" />
+            </div>
           </nav>
         </div>
       )}
