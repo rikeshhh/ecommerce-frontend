@@ -30,7 +30,7 @@ const Recommendations = () => {
   }
 
   return (
-    <div className="w-full p-8 md:p-16 container mx-auto">
+    <div className="w-full p-6 container mx-auto">
       <h2 className="text-2xl font-semibold mb-6 text-gray-800">
         Recommended for You
       </h2>
@@ -39,7 +39,7 @@ const Recommendations = () => {
           No recommendations available at the moment.
         </p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 ">
           {recommendations.map((product) => (
             <ProductCard key={product._id} product={product} />
           ))}

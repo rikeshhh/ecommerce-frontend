@@ -66,7 +66,7 @@ export default function Giveaway() {
     <div className="py-12 px-4 w-full sm:px-6 lg:px-8">
       <Card className="max-w-3xl mx-auto shadow-lg rounded-xl overflow-hidden border-none bg-white dark:bg-gray-950 transform transition-all hover:scale-105">
         <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6">
-          <CardTitle className="text-xl  sm:text-3xl font-extrabold tracking-tight">
+          <CardTitle className="text-xl  sm:text-2xl font-extrabold tracking-tight">
             🎉 Promo Code Giveaway
           </CardTitle>
           <p className="mt-2 text-sm opacity-90">Ends: March 24, 2025</p>

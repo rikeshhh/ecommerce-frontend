@@ -7,7 +7,7 @@ import { ReactNode } from "react";
 
 interface ProtectedRouteProps {
   children: ReactNode;
-  access?: "public" | "user" | "admin"; 
+  access?: "public" | "user" | "admin";
   redirectUnauthorized?: string;
   redirectUnauthenticated?: string;
 }
@@ -16,7 +16,7 @@ export default function ProtectedRoute({
   children,
   access = "public",
   redirectUnauthorized = "/unauthorized",
-  redirectUnauthenticated = "/", 
+  redirectUnauthenticated = "/",
 }: ProtectedRouteProps) {
   const { user, isLoggedIn, isAdmin, initialize } = useUserStore();
   const router = useRouter();
@@ -24,16 +24,14 @@ export default function ProtectedRoute({
   const [isAllowed, setIsAllowed] = useState<boolean | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
 
-
   useEffect(() => {
     const checkAuth = async () => {
       console.log("Initializing auth for route:", pathname);
-      await initialize(); 
+      await initialize();
       setIsInitialized(true);
     };
     checkAuth();
   }, [initialize, pathname]);
-
 
   useEffect(() => {
     if (!isInitialized) return;
@@ -72,16 +70,13 @@ export default function ProtectedRoute({
     isInitialized,
   ]);
 
-
   if (!isInitialized || isAllowed === null) {
     return <div className="text-center">Checking access...</div>;
   }
-
 
   if (!isAllowed) {
     return <div className="text-center">Redirecting...</div>;
   }
 
- 
   return <>{children}</>;
 }

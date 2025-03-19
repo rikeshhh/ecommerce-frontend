@@ -12,7 +12,7 @@ export function FAQAccordion() {
   return (
     <section className="w-full py-16 ">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-xl md:text-4xl font-bold text-gray-800 dark:text-white text-left sm:text-center mb-4 sm:mb-12 tracking-tight">
+        <h2 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-white text-left sm:text-center mb-4 sm:mb-12 tracking-tight">
           Frequently Asked Questions
         </h2>
 

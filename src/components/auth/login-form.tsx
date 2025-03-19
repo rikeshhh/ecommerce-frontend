@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { useUserStore } from "../../store/userStore";
 import { useEffect } from "react";
@@ -29,7 +29,11 @@ export function LoginForm() {
     resolver: zodResolver(loginSchema),
   });
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login, setGoogleLogin } = useUserStore();
+
+
+  const returnUrl = searchParams.get("returnUrl") || "/";
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
@@ -37,7 +41,7 @@ export function LoginForm() {
       toast.success("Login successful!", {
         description: "Welcome back!",
       });
-      router.push("/");
+      router.push(returnUrl); 
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Login failed";
@@ -50,7 +54,9 @@ export function LoginForm() {
   };
 
   const handleGoogleSignIn = () => {
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`;
+    window.location.href = `${
+      process.env.NEXT_PUBLIC_API_URL
+    }/api/auth/google?returnUrl=${encodeURIComponent(returnUrl)}`;
   };
 
   useEffect(() => {
@@ -62,18 +68,18 @@ export function LoginForm() {
           toast.success("Logged in with Google!", {
             description: "Welcome back!",
           });
-          router.push("/");
+          router.push(returnUrl); 
         })
         .catch((error) => {
           console.error("Google login error:", error);
         });
     }
-  }, [router, setGoogleLogin]);
+  }, [router, setGoogleLogin, returnUrl]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4">
       <div className="max-w-md w-full mx-auto rounded-xl p-8 shadow-lg bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 transform transition-all hover:shadow-xl">
-        <h2 className="font-extrabold text-3xl text-gray-800 dark:text-white text-center mb-2">
+        <h2 className="font-extrabold text-2xl text-gray-800 dark:text-white text-center mb-2">
           Welcome Back
         </h2>
         <p className="text-gray-600 dark:text-gray-400 text-sm text-center mb-8">

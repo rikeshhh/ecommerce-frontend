@@ -13,15 +13,15 @@ interface CartState {
   selectedItems: string[];
   addToCart: (product: Product) => void;
   removeFromCart: (id: string) => void;
-  updateQuantity: (id: string, quantity: number) => void;
+  updateQuantity: (id: string, delta: number) => void;
   toggleItemSelection: (id: string) => void;
-  clearSelectedItems: () => void;
+  clearSelectedItems: (itemsToClear?: string[]) => void; 
   clearCart: () => void;
 }
 
 export const useCartStore = create<CartState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       cart: [],
       selectedItems: [],
       addToCart: (product) =>
@@ -45,14 +45,22 @@ export const useCartStore = create<CartState>()(
           cart: state.cart.filter((item) => item._id !== id),
           selectedItems: state.selectedItems.filter((itemId) => itemId !== id),
         })),
-      updateQuantity: (id, quantity) =>
-        set((state) => ({
-          cart: state.cart.map((item) =>
-            item._id === id
-              ? { ...item, quantity: Math.max(1, quantity) }
-              : item
-          ),
-        })),
+      updateQuantity: (id, delta) =>
+        set((state) => {
+          const updatedCart = state.cart
+            .map((item) =>
+              item._id === id
+                ? { ...item, quantity: item.quantity + delta }
+                : item
+            )
+            .filter((item) => item.quantity > 0);
+          return {
+            cart: updatedCart,
+            selectedItems: state.selectedItems.filter((itemId) =>
+              updatedCart.some((item) => item._id === itemId)
+            ),
+          };
+        }),
       toggleItemSelection: (id) =>
         set((state) => {
           const isSelected = state.selectedItems.includes(id);
@@ -62,19 +70,22 @@ export const useCartStore = create<CartState>()(
               : [...state.selectedItems, id],
           };
         }),
-      clearSelectedItems: () =>
-        set((state) => ({
-          cart: state.cart.filter(
-            (item) => !state.selectedItems.includes(item._id)
-          ),
-          selectedItems: [],
-        })),
-      clearCart: () => {
-        console.log("Before clearCart, cart:", get().cart);
-        set({ cart: [], selectedItems: [] });
-        localStorage.removeItem("cart-storage");
-        console.log("After clearCart, cart:", get().cart);
-      },
+      clearSelectedItems: (itemsToClear?: string[]) =>
+        set((state) => {
+        
+          const idsToRemove = itemsToClear || state.selectedItems;
+          return {
+            cart: state.cart.filter((item) => !idsToRemove.includes(item._id)),
+            selectedItems: state.selectedItems.filter(
+              (itemId) => !idsToRemove.includes(itemId)
+            ),
+          };
+        }),
+      clearCart: () =>
+        set(() => {
+          console.log("Clearing cart...");
+          return { cart: [], selectedItems: [] };
+        }),
     }),
     { name: "cart-storage" }
   )

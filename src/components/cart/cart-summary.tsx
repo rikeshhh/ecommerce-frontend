@@ -32,6 +32,7 @@ export function CartSummary({
         <div className="flex flex-col sm:flex-row justify-between w-full mb-4 text-base sm:text-lg font-medium gap-2 sm:gap-0">
           <span>Subtotal (Selected Items):</span>
           <span className="text-lg sm:text-xl">
+            <strong className="text-indigo-600 dark:text-indigo-400">रु</strong>{" "}
             {selectedTotalPrice.toFixed(2)}
           </span>
         </div>
@@ -53,8 +54,8 @@ export function CartSummary({
                 You are about to checkout with{" "}
                 <Badge variant="secondary">{selectedItemCount} items</Badge>.
                 Total:{" "}
-                <span className="font-medium">
-                  <strong>NPR</strong> {selectedTotalPrice.toFixed(2)}
+                <span className="font-medium ">
+                  <strong>रु</strong> {selectedTotalPrice.toFixed(2)}
                 </span>
                 .
               </DialogDescription>

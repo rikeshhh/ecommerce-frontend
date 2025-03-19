@@ -134,10 +134,10 @@ export default function ProductCard({ product }: ProductCardProps) {
         <p className="max-sm:text-xs text-gray-600 dark:text-gray-400 mt-1 line-clamp-1 sm:line-clamp-2">
           {product.description || "No description available"}
         </p>
-
         <div className="flex justify-between items-center mt-1 sm:mt-3">
           <span className="max-sm:text-xs font-bold text-indigo-600 dark:text-indigo-400">
-            <strong>NPR</strong> {product.price.toFixed(2)}
+            <strong className="text-indigo-600 dark:text-indigo-400">रु</strong>{" "}
+            {product.price.toFixed(2)}
           </span>
           <div className="flex gap-1">
             {colorOptions.map((option) => (

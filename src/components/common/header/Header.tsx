@@ -25,6 +25,8 @@ import { useCartStore } from "@/store/cartStore";
 import { useOutsideClick } from "@/hooks/use-outside-click";
 import { Switch } from "@/components/ui/switch";
 import { useTheme } from "next-themes";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -33,11 +35,16 @@ export default function Header() {
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
   const menuRef = useRef<HTMLDivElement>(null);
   const { theme, setTheme } = useTheme();
+  const router = useRouter();
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark");
   };
   useOutsideClick(menuRef, isMobileMenuOpen, () => setIsMobileMenuOpen(false));
-
+  const handleLogout = () => {
+    logout();
+    toast.success("Logged out successfully!");
+    router.push("/");
+  };
   return (
     <header className="sticky top-0 z-50 bg-white dark:bg-gray-900 shadow-md">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -116,7 +123,7 @@ export default function Header() {
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={logout}>
+                  <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="w-4 h-4 mr-2" />
                     Logout
                   </DropdownMenuItem>
@@ -188,11 +195,11 @@ export default function Header() {
             {isLoggedIn ? (
               <>
                 <Link
-                  href="/profile"
+                  href="/"
                   className="text-gray-700 dark:text-gray-200 hover:text-blue-500"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Profile
+                  {user?.name || "Profile"}
                 </Link>
                 <Link
                   href="/user/order-history"
@@ -215,7 +222,7 @@ export default function Header() {
                   variant="outline"
                   className="w-full text-gray-700 dark:text-gray-200 hover:text-blue-500 hover:bg-gray-100 dark:hover:bg-gray-800"
                   onClick={() => {
-                    logout();
+                    handleLogout();
                     setIsMobileMenuOpen(false);
                   }}
                 >

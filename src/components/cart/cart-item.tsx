@@ -64,10 +64,11 @@ export function CartItem({
         </p>
         <div className="flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 sm:gap-2 mt-1">
           <span className="text-sm sm:text-base font-semibold">
-            <strong>NPR</strong> {(item.price * item.quantity).toFixed(2)}
+            <strong className="text-indigo-600 dark:text-indigo-400">रु</strong>{" "}
+            {(item.price * item.quantity).toFixed(2)}
           </span>
           <span className="text-xs sm:text-sm text-gray-500">
-            <strong>NPR</strong> ({item.price.toFixed(2)} × {item.quantity})
+            <strong>रु</strong> ({item.price.toFixed(2)} × {item.quantity})
           </span>
         </div>
       </div>

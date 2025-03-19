@@ -76,7 +76,7 @@ export default function ProductListingPage() {
     <div className="container mx-auto py-8 min-h-screen md:p-0 p-4">
       <div className="mt-8 z-10 bg-white dark:bg-gray-900 py-4 border-b">
         <div className="flex items-start sm:items-center justify-between flex-col sm:flex-row gap-4">
-          <h1 className="text-xl md:text-4xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
             {selectedCategory || "All Products"}
           </h1>
           <div className="flex md:flex-row flex-col items-center gap-4 w-full sm:w-auto">
@@ -212,8 +212,8 @@ export default function ProductListingPage() {
                         <h3 className="text-xs sm:text-sm md:text-lg font-semibold text-gray-900 dark:text-white sm:mb-2 line-clamp-1">
                           {product.name}
                         </h3>
-                        <p className="sm:text-lg font-bold text-gray-700 dark:text-gray-300">
-                          <strong>NPR</strong>{" "}
+                        <p className="sm:text-base font-bold text-gray-700 dark:text-gray-300">
+                          <strong>रु</strong>{" "}
                           <span>{product.price.toFixed(2)}</span>
                         </p>
                       </div>

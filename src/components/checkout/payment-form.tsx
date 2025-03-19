@@ -28,7 +28,7 @@ export function PaymentForm({
 }: PaymentFormProps) {
   const stripe = useStripe();
   const elements = useElements();
-  const { cart, clearSelectedItems } = useCartStore(); 
+  const { cart, clearSelectedItems } = useCartStore();
   const { user } = useUserStore();
   const router = useRouter();
 
@@ -36,7 +36,7 @@ export function PaymentForm({
 
   const handlePlaceOrder = async () => {
     if (!user) {
-      router.push("/auth/login?returnUrl=/checkout");
+      router.push("/auth/login?returnUrl=/user/checkout");
       return;
     }
 
@@ -53,6 +53,11 @@ export function PaymentForm({
 
     if (totalPrice <= 0) {
       toast.error("Cart total must be greater than zero");
+      return;
+    }
+
+    if (selectedCart.length === 0) {
+      toast.error("No items selected for checkout");
       return;
     }
 
@@ -93,18 +98,20 @@ export function PaymentForm({
         }
       );
 
+      const orderId = response.data._id; 
+
       if (response.data.requiresAction) {
         const { error: confirmError } = await stripe.confirmCardPayment(
           response.data.clientSecret
         );
         if (confirmError) throw new Error(confirmError.message);
-        clearSelectedItems(); 
+        clearSelectedItems(selectedItems); 
         toast.success("Your order has been successful!");
-        router.push("/main/cart?paymentSuccess=true"); 
+        router.push(`/order-confirmation?orderId=${orderId}`);
       } else {
-        clearSelectedItems(); 
+        clearSelectedItems(selectedItems); 
         toast.success("Your order has been successfully processed!");
-        router.push("/main/cart?paymentSuccess=true");
+        router.push(`/order-confirmation?orderId=${orderId}`);
       }
     } catch (error) {
       console.error("Order placement failed:", error);

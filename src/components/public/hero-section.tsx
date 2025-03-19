@@ -60,7 +60,7 @@ export function HeroSection() {
           >
             <div className="container mx-auto sm:px-4 flex flex-col-reverse md:flex-row items-center gap-8">
               <div className=" text-left md:w-1/2">
-                <h3 className="text-xl md:text-4xl font-extrabold mb-4">
+                <h3 className="text-xl md:text-2xl font-extrabold mb-4">
                   {slide.title}
                 </h3>
                 <p className="sm:text-lg md:text-xl mb-6 opacity-90">

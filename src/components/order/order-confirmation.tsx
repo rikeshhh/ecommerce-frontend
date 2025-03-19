@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -6,6 +7,9 @@ import axios from "axios";
 import { toast } from "sonner";
 import { Package } from "lucide-react";
 import { DataTable } from "@/components/admin/Data-Table/data-table";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 
 interface Column<T> {
   key: keyof T | string;
@@ -79,23 +83,25 @@ export default function OrderConfirmation() {
   }, [orderId]);
 
   const columns: Column<OrderItem>[] = [
-    {
-      key: "name",
-      header: "Product Name",
-    },
-    {
-      key: "quantity",
-      header: "Quantity",
-    },
+    { key: "name", header: "Product Name" },
+    { key: "quantity", header: "Quantity" },
     {
       key: "price",
       header: "Price",
-      render: (item) => `$${item.price.toFixed(2)}`,
+      render: (item) => (
+        <span className="text-indigo-600 font-medium">
+          रु {item.price.toFixed(2)}
+        </span>
+      ),
     },
     {
       key: "total",
       header: "Total",
-      render: (item) => `$${item.total.toFixed(2)}`,
+      render: (item) => (
+        <span className="text-indigo-600 font-medium">
+          रु {item.total.toFixed(2)}
+        </span>
+      ),
     },
   ];
 
@@ -108,85 +114,145 @@ export default function OrderConfirmation() {
       total: (item.product?.price || 0) * item.quantity,
     })) || [];
 
-  const fetchData = async () => {
-    return;
+  const fetchData = async (page: number, limit: number, filters: any) => {
+    console.log(page + limit + filters);
+    return {
+      items: orderItems,
+      totalItems: orderItems.length,
+      totalPages: 1,
+    };
   };
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <p>Loading...</p>
+      <div className="flex justify-center items-center h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="flex items-center gap-2 text-lg text-gray-600 dark:text-gray-300 animate-pulse">
+          <Package className="w-6 h-6 text-green-500" />
+          <p>Loading your order...</p>
+        </div>
       </div>
     );
   }
 
   if (!order) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <p>No order found.</p>
+      <div className="flex justify-center items-center h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="text-center text-gray-600 dark:text-gray-300">
+          <Package className="w-12 h-12 mx-auto text-gray-400" />
+          <p className="mt-4 text-lg">No order found.</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full container mx-auto p-6">
-      <div className="text-center mb-6">
-        <Package className="w-12 h-12 mx-auto text-green-500" />
-        <h1 className="text-3xl font-bold mt-4">Order Confirmed!</h1>
-        <p className="text-gray-600 mt-2">
-          Thank you for your purchase. Here are the details of your order.
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+        <div className="text-center mb-8">
+          <Package className="w-16 h-16 mx-auto text-green-500 animate-bounce" />
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white mt-4">
+            Order Confirmed!
+          </h1>
+          <p className="text-md sm:text-lg text-gray-600 dark:text-gray-300 mt-2">
+            Thank you for your purchase. Here’s everything you need to know
+            about your order.
+          </p>
+        </div>
 
-      <div className="border rounded-lg p-4 bg-gray-50">
-        <h2 className="text-xl font-semibold mb-4">Order Details</h2>
-        <p>
-          <strong>Order ID:</strong> {order._id}
-        </p>
-        <p>
-          <strong>Status:</strong> {order.status}
-        </p>
-        <p>
-          <strong>Date:</strong>{" "}
-          {new Date(order.createdAt).toLocaleDateString()}
-        </p>
-        <p>
-          <strong>Total Amount:</strong> ${order.totalAmount.toFixed(2)}
-        </p>
-        <h3 className="text-lg font-medium mt-4 mb-2">Shipping Location</h3>
-        {order.location ? (
-          <div className="text-gray-700">
-            <p>{order.location.address}</p>
-            <p>
-              {order.location.city}, {order.location.state}{" "}
-              {order.location.postalCode}
-            </p>
-            <p>{order.location.country}</p>
-          </div>
-        ) : (
-          <p className="text-gray-500">No shipping location provided.</p>
-        )}
+        <Card className="shadow-lg border-none rounded-xl bg-white dark:bg-gray-950">
+          <CardHeader className="border-b border-gray-200 dark:border-gray-700">
+            <CardTitle className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-white">
+              Order Details
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6 space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700 dark:text-gray-300">
+              <div>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  Order ID
+                </p>
+                <p className="text-lg font-semibold">{order._id}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  Status
+                </p>
+                <Badge
+                  variant={order.status === "Pending" ? "secondary" : "default"}
+                  className="text-sm"
+                >
+                  {order.status}
+                </Badge>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  Date
+                </p>
+                <p className="text-lg font-semibold">
+                  {new Date(order.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  Total Amount
+                </p>
+                <p className="text-lg font-semibold text-indigo-600 dark:text-indigo-400">
+                  रु {order.totalAmount.toFixed(2)}
+                </p>
+              </div>
+            </div>
 
-        <h3 className="text-lg font-medium mt-4 mb-2">Items</h3>
-        <DataTable
-          title="Order Items"
-          data={orderItems}
-          columns={columns}
-          fetchData={fetchData}
-          initialPage={1}
-          initialLimit={10}
-          orderConfirmation={true}
-        />
-      </div>
+            <div>
+              <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-2">
+                Shipping Location
+              </h3>
+              {order.location ? (
+                <div className="text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
+                  <p>{order.location.address}</p>
+                  <p>
+                    {order.location.city}, {order.location.state}{" "}
+                    {order.location.postalCode}
+                  </p>
+                  <p className="font-medium">{order.location.country}</p>
+                </div>
+              ) : (
+                <p className="text-gray-500 dark:text-gray-400 italic">
+                  No shipping location provided.
+                </p>
+              )}
+            </div>
 
-      <div className="text-center mt-6">
-        <p className="text-gray-600">
-          You can track this order in your{" "}
-          <a href="/user/order-history" className="text-blue-500 underline">
-            Order History
-          </a>
-          .
-        </p>
+            <Separator className="my-4" />
+
+            <div>
+              <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-4">
+                Items Purchased
+              </h3>
+              <DataTable
+                title="Order Items"
+                data={orderItems}
+                columns={columns}
+                fetchData={fetchData}
+                initialPage={1}
+                initialLimit={10}
+                orderConfirmation={true}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="text-center mt-8">
+          <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">
+            Want to track this order? Visit your{" "}
+            <a
+              href="/user/order-history"
+              className="text-indigo-600 dark:text-indigo-400 underline hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors"
+            >
+              Order History
+            </a>
+            .
+          </p>
+        </div>
       </div>
     </div>
   );

@@ -95,7 +95,7 @@ export function CheckoutForm() {
 
   return (
     <div className="md:max-w-4xl w-full mx-auto p-6 container">
-      <h1 className="text-3xl font-bold mb-6">Checkout</h1>
+      <h1 className="text-2xl font-bold mb-6">Checkout</h1>
       <OrderSummary
         cart={selectedCart}
         subtotal={subtotal}

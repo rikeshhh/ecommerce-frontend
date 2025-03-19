@@ -142,7 +142,7 @@ export default function ProductDetail() {
       <div className="max-w-4xl mx-auto p-6">
         <Card className="text-center border border-red-200 dark:border-red-800">
           <CardHeader>
-            <CardTitle className="text-3xl font-bold text-red-600 dark:text-red-400">
+            <CardTitle className="text-2xl font-bold text-red-600 dark:text-red-400">
               Oops!
             </CardTitle>
           </CardHeader>
@@ -196,7 +196,7 @@ export default function ProductDetail() {
 
             <div className="p-8 flex flex-col justify-between">
               <div>
-                <h1 className="text-xl sm:text-4xl font-extrabold text-gray-900 dark:text-white mb-2">
+                <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white mb-2">
                   {selectedProduct.name}
                 </h1>
                 <p className="text-lg text-gray-500 dark:text-gray-400 mb-4">
@@ -209,7 +209,9 @@ export default function ProductDetail() {
               <div>
                 <div className="flex items-center justify-between mb-6">
                   <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                    <strong>NPR</strong>
+                    <strong className="text-indigo-600 dark:text-indigo-400">
+                      रु
+                    </strong>{" "}
                     <span> {selectedProduct.price.toFixed(2)}</span>
                   </p>
                   <Badge
@@ -295,7 +297,7 @@ export default function ProductDetail() {
                             {relatedProduct.name}
                           </h4>
                           <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                            <strong>NPR</strong>
+                            <strong>रु</strong>
                             <span> {relatedProduct.price.toFixed(2)}</span>
                           </p>
                         </motion.div>

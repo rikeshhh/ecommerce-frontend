@@ -32,8 +32,8 @@ export default function RootLayout({
           </main>
 
           {!isAdminRoute && <Footer />}
+          <Toaster />
         </ThemeProvider>
-        <Toaster />
       </body>
     </html>
   );

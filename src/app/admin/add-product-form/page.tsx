@@ -160,7 +160,7 @@ export default function AddProductForm() {
     >
       <Card className="w-full max-w-2xl mx-auto shadow-xl border-none overflow-hidden">
         <CardHeader className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6 rounded-t-lg">
-          <CardTitle className="text-3xl font-bold tracking-tight">
+          <CardTitle className="text-2xl font-bold tracking-tight">
             Add New Product
           </CardTitle>
           <p className="text-sm text-indigo-100 mt-1">
@@ -233,7 +233,7 @@ export default function AddProductForm() {
                   htmlFor="price"
                   className="text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  Price <strong>NPR</strong>
+                  Price <strong>रु</strong>
                 </Label>
                 <Input
                   id="price"

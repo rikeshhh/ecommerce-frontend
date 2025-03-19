@@ -50,7 +50,7 @@ export default function FavoritesPage() {
   }, [favorites]);
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6">Your Favorites</h1>
+      <h1 className="text-2xl font-bold mb-6">Your Favorites</h1>
       {loading ? (
         <p>Loading favorites...</p>
       ) : fetchError ? (
