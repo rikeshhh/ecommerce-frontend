@@ -296,6 +296,8 @@ export default function AddProductForm() {
                 >
                   <Image
                     src={imagePreview}
+                    width={300}
+                    height={300}
                     alt="Product preview"
                     className="w-full h-48 object-cover rounded-lg shadow-md"
                     onError={() => setImagePreview(null)}

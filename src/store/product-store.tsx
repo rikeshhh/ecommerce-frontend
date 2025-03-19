@@ -65,6 +65,15 @@ export const useProductStore = create<ProductState>((set) => ({
     exclude,
   } = {}) => {
     set({ loading: true, error: undefined });
+    console.log("fetchProducts called with:", {
+      page,
+      limit,
+      search,
+      from,
+      to,
+      category,
+      exclude,
+    });
     try {
       const safePage = Math.max(1, parseInt(String(page), 10) || 1);
       const safeLimit = Math.max(1, parseInt(String(limit), 10) || 10);

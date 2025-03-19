@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import axios from "axios";
 import { toast } from "sonner";
 import { Package } from "lucide-react";
-import { DataTable } from "@/components/admin/data-table";
+import { DataTable } from "@/components/admin/Data-Table/data-table";
 
 interface Column<T> {
   key: keyof T | string;

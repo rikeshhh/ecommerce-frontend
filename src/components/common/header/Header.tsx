@@ -62,6 +62,12 @@ export default function Header() {
             Favorite
           </Link>
           <Link
+            href="/main/all-product"
+            className="text-gray-700 dark:text-gray-200 hover:text-blue-500"
+          >
+            All Products
+          </Link>
+          <Link
             href="/main/cart"
             className="text-gray-700 dark:text-gray-200 hover:text-blue-500 flex items-center"
           >
@@ -159,6 +165,12 @@ export default function Header() {
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Favorite
+            </Link>
+            <Link
+              href="/main/all-product"
+              className="text-gray-700 dark:text-gray-200 hover:text-blue-500"
+            >
+              All Products
             </Link>
             <Link
               href="/main/cart"

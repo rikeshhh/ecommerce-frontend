@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import UsersTable from "./user-management/page";
-import OrdersTable from "@/components/admin/orders-table";
+import OrdersTable from "@/components/admin/admin-order-table/orders-table";
 
 export default function AdminPage() {
   const router = useRouter();

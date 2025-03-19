@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { useProductStore } from "@/store/product-store";
-import { DataTable } from "@/components/admin/data-table";
+import { DataTable } from "@/components/admin/Data-Table/data-table";
 import { format, isValid } from "date-fns";
 import { Product } from "@/lib/types";
 import { Button } from "@/components/ui/button";

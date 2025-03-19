@@ -87,7 +87,7 @@ export default function AdminSidebar() {
                   className={cn(
                     "flex items-center gap-2",
                     pathname === item.href
-                      ? "bg-gray-300"
+                      ? "bg-gray-400 dark:bg-white text-black "
                       : "hover:bg-gray-400",
                     "data-[state=collapsed]:justify-center"
                   )}

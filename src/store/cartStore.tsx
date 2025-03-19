@@ -10,9 +10,12 @@ interface CartItem extends Product {
 
 interface CartState {
   cart: CartItem[];
+  selectedItems: string[];
   addToCart: (product: Product) => void;
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
+  toggleItemSelection: (id: string) => void;
+  clearSelectedItems: () => void;
   clearCart: () => void;
 }
 
@@ -20,6 +23,7 @@ export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       cart: [],
+      selectedItems: [],
       addToCart: (product) =>
         set((state) => {
           const existingItem = state.cart.find(
@@ -39,6 +43,7 @@ export const useCartStore = create<CartState>()(
       removeFromCart: (id) =>
         set((state) => ({
           cart: state.cart.filter((item) => item._id !== id),
+          selectedItems: state.selectedItems.filter((itemId) => itemId !== id),
         })),
       updateQuantity: (id, quantity) =>
         set((state) => ({
@@ -48,9 +53,25 @@ export const useCartStore = create<CartState>()(
               : item
           ),
         })),
+      toggleItemSelection: (id) =>
+        set((state) => {
+          const isSelected = state.selectedItems.includes(id);
+          return {
+            selectedItems: isSelected
+              ? state.selectedItems.filter((itemId) => itemId !== id)
+              : [...state.selectedItems, id],
+          };
+        }),
+      clearSelectedItems: () =>
+        set((state) => ({
+          cart: state.cart.filter(
+            (item) => !state.selectedItems.includes(item._id)
+          ),
+          selectedItems: [],
+        })),
       clearCart: () => {
         console.log("Before clearCart, cart:", get().cart);
-        set({ cart: [] });
+        set({ cart: [], selectedItems: [] });
         localStorage.removeItem("cart-storage");
         console.log("After clearCart, cart:", get().cart);
       },

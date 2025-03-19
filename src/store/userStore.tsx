@@ -17,6 +17,12 @@ interface UserState {
   totalPages: number;
   limit: number;
   loading: boolean;
+  filters: {
+    search?: string;
+    createdAt?: { from?: string; to?: string };
+    role?: string;
+    isBanned?: boolean;
+  };
   login: (credentials: { email: string; password: string }) => Promise<void>;
   setGoogleLogin: (token: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -28,10 +34,12 @@ interface UserState {
       search?: string;
       createdAt?: { from?: string; to?: string };
       role?: string;
+      isBanned?: boolean;
     }
   ) => Promise<void>;
   updateUserRole: (id: string, isAdmin: boolean) => Promise<void>;
   deleteUser: (id: string) => Promise<void>;
+  banUser: (id: string, isBanned: boolean) => Promise<void>;
   updateLocation: (location: LocationFormValues) => void;
   updateLiveLocation: (location: LocationFormValues) => void;
   error?: string;
@@ -39,7 +47,7 @@ interface UserState {
 
 export const useUserStore = create<UserState>()(
   persist(
-    (set) => {
+    (set, get) => {
       const fetchUserData = async (token: string) => {
         try {
           const response = await axios.get(
@@ -70,6 +78,7 @@ export const useUserStore = create<UserState>()(
         totalPages: 1,
         limit: 10,
         loading: false,
+        filters: {}, 
 
         login: async (credentials: { email: string; password: string }) => {
           console.log("Login Credentials:", credentials);
@@ -149,6 +158,7 @@ export const useUserStore = create<UserState>()(
               dateFrom: filters.createdAt?.from,
               dateTo: filters.createdAt?.to,
               role: filters.role,
+              isBanned: filters.isBanned,
             };
             const response = await axios.get(`${API_URL}/api/users`, {
               headers: { Authorization: `Bearer ${token}` },
@@ -163,6 +173,7 @@ export const useUserStore = create<UserState>()(
               limit: response.data.limit || limit,
               loading: false,
               error: undefined,
+              filters,
             });
           } catch (error) {
             const errorMessage =
@@ -199,9 +210,46 @@ export const useUserStore = create<UserState>()(
                   : user
               ),
             }));
+            const { currentPage, limit, filters } = get();
+            await get().fetchItems(currentPage, limit, filters);
             toast.success("User role updated successfully");
           } catch (error) {
             toast.error("Error updating user role", {
+              description: axios.isAxiosError(error)
+                ? error.response?.data?.message || error.message
+                : "Unknown error",
+            });
+          }
+        },
+
+        banUser: async (id: string, isBanned: boolean) => {
+          const token = localStorage.getItem("authToken");
+          if (!token) {
+            toast.error("Authentication required", {
+              description: "Please log in to ban users.",
+            });
+            return;
+          }
+          try {
+            const response = await axios.patch(
+              `${process.env.NEXT_PUBLIC_API_URL}/api/users/${id}/ban`,
+              { isBanned },
+              { headers: { Authorization: `Bearer ${token}` } }
+            );
+            set((state) => ({
+              items: state.items.map((user) =>
+                user._id === id
+                  ? { ...user, isBanned: response.data.isBanned }
+                  : user
+              ),
+            }));
+            const { currentPage, limit, filters } = get();
+            await get().fetchItems(currentPage, limit, filters); 
+            toast.success(
+              `User ${isBanned ? "banned" : "unbanned"} successfully`
+            );
+          } catch (error) {
+            toast.error(`Error ${isBanned ? "banning" : "unbanning"} user`, {
               description: axios.isAxiosError(error)
                 ? error.response?.data?.message || error.message
                 : "Unknown error",
@@ -220,15 +268,15 @@ export const useUserStore = create<UserState>()(
           try {
             await axios.delete(
               `${process.env.NEXT_PUBLIC_API_URL}/api/users/${id}`,
-              {
-                headers: { Authorization: `Bearer ${token}` },
-              }
+              { headers: { Authorization: `Bearer ${token}` } }
             );
             set((state) => ({
               items: state.items.filter((user) => user._id !== id),
               totalItems: state.totalItems - 1,
               totalPages: Math.ceil((state.totalItems - 1) / state.limit),
             }));
+            const { currentPage, limit, filters } = get();
+            await get().fetchItems(currentPage, limit, filters); 
             toast.success("User deleted successfully");
           } catch (error) {
             if (axios.isAxiosError(error) && error.response?.status === 404) {

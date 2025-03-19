@@ -1,8 +1,8 @@
 "use client";
 
-import { getUserColumns } from "@/components/admin/admin-user-management-table/user-columns";
-import { useUsersTableLogic } from "@/components/admin/admin-user-management-table/useUsersTableLogic";
 import { DataTable } from "@/components/admin/Data-Table/data-table";
+import { useUsersTableLogic } from "./useUsersTableLogic";
+import { getUserColumns } from "./user-columns";
 
 export default function UsersTable() {
   const {

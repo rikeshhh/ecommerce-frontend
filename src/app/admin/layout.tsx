@@ -10,6 +10,7 @@ type AdminLayoutProps = {
 };
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
+  
   return (
     <ProtectedRoute access="admin">
       <SidebarProvider>
@@ -17,7 +18,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <aside>
             <AdminSidebar />
           </aside>
-          <main className="p-6 bg-gray-200 flex-1">
+          <main className="px-2 sm:p-6  flex-1">
             <SidebarTrigger className="mb-4" />
             {children}
           </main>

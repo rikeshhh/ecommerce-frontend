@@ -23,6 +23,7 @@ export const UserSchema = z.object({
   email: z.string().email("Invalid email format"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   isAdmin: z.boolean().optional(),
+  isBanned: z.boolean().default(false),
   location: z.object({
     address: z.string().min(1, "Address is required"),
     city: z.string().min(1, "City is required"),

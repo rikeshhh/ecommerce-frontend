@@ -3,12 +3,11 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useUserStore } from "@/store/userStore";
-
 import { ReactNode } from "react";
 
 interface ProtectedRouteProps {
   children: ReactNode;
-  access?: string;
+  access?: "public" | "user" | "admin"; 
   redirectUnauthorized?: string;
   redirectUnauthenticated?: string;
 }
@@ -17,7 +16,7 @@ export default function ProtectedRoute({
   children,
   access = "public",
   redirectUnauthorized = "/unauthorized",
-  redirectUnauthenticated = "/login",
+  redirectUnauthenticated = "/", 
 }: ProtectedRouteProps) {
   const { user, isLoggedIn, isAdmin, initialize } = useUserStore();
   const router = useRouter();
@@ -25,14 +24,16 @@ export default function ProtectedRoute({
   const [isAllowed, setIsAllowed] = useState<boolean | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
 
+
   useEffect(() => {
     const checkAuth = async () => {
       console.log("Initializing auth for route:", pathname);
-      await initialize();
+      await initialize(); 
       setIsInitialized(true);
     };
     checkAuth();
   }, [initialize, pathname]);
+
 
   useEffect(() => {
     if (!isInitialized) return;
@@ -41,14 +42,20 @@ export default function ProtectedRoute({
       "Checking access - isLoggedIn:",
       isLoggedIn,
       "isAdmin:",
-      isAdmin
+      isAdmin,
+      "path:",
+      pathname
     );
+
     if (access === "user" && !isLoggedIn) {
-      console.log("Redirecting to:", redirectUnauthenticated);
+      console.log(
+        "User not logged in, redirecting to:",
+        redirectUnauthenticated
+      );
       router.push(redirectUnauthenticated);
       setIsAllowed(false);
     } else if (access === "admin" && (!isLoggedIn || !isAdmin)) {
-      console.log("Redirecting to:", redirectUnauthorized);
+      console.log("User not authorized, redirecting to:", redirectUnauthorized);
       router.push(redirectUnauthorized);
       setIsAllowed(false);
     } else {
@@ -65,12 +72,16 @@ export default function ProtectedRoute({
     isInitialized,
   ]);
 
+
   if (!isInitialized || isAllowed === null) {
     return <div className="text-center">Checking access...</div>;
   }
+
+
   if (!isAllowed) {
     return <div className="text-center">Redirecting...</div>;
   }
 
+ 
   return <>{children}</>;
 }
