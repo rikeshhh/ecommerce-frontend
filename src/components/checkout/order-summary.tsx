@@ -25,23 +25,35 @@ export function OrderSummary({
           <span>
             {item.name} (x{item.quantity})
           </span>
-          <span>रु{(item.price * item.quantity).toFixed(2)}</span>
+          <span>
+            <strong>NPR</strong>
+            {(item.price * item.quantity).toFixed(2)}
+          </span>
         </div>
       ))}
       <div className="space-y-2 mt-4">
         <div className="flex justify-between">
           <span>Subtotal:</span>
-          <span>रु{subtotal.toFixed(2)}</span>
+          <span>
+            <strong>NPR</strong>
+            {subtotal.toFixed(2)}
+          </span>
         </div>
         {promoApplied && (
           <div className="flex justify-between text-green-600">
             <span>Discount ({promoApplied.code}):</span>
-            <span>-रु{discount.toFixed(2)}</span>
+            <span>
+              -<strong>NPR</strong>
+              {discount.toFixed(2)}
+            </span>
           </div>
         )}
         <div className="flex justify-between font-bold">
           <span>Total:</span>
-          <span>रु{totalPrice.toFixed(2)}</span>
+          <span>
+            <strong>NPR</strong>
+            {totalPrice.toFixed(2)}
+          </span>
         </div>
       </div>
     </div>

@@ -215,7 +215,8 @@ const OrderHistory = () => {
                               {item.quantity}
                             </TableCell>
                             <TableCell className="text-right">
-                              ${item.product?.price ?? "N/A"}
+                              <strong>NPR</strong>
+                              {item.product?.price ?? "N/A"}
                             </TableCell>
                           </TableRow>
                         ))}

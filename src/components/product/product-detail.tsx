@@ -208,9 +208,10 @@ export default function ProductDetail() {
               </div>
               <div>
                 <div className="flex items-center justify-between mb-6">
-                  <span className="text-base sm:text-3xl font-bold text-indigo-600 dark:text-indigo-400">
-                    ${selectedProduct.price.toFixed(2)}
-                  </span>
+                  <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                    <strong>NPR</strong>
+                    <span> {selectedProduct.price.toFixed(2)}</span>
+                  </p>
                   <Badge
                     variant={
                       selectedProduct.stock > 0 ? "default" : "destructive"
@@ -293,9 +294,10 @@ export default function ProductDetail() {
                           <h4 className="text-xs sm:text-lg font-medium text-gray-800 dark:text-gray-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 mb-2">
                             {relatedProduct.name}
                           </h4>
-                          <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                            ${relatedProduct.price.toFixed(2)}
-                          </span>
+                          <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                            <strong>NPR</strong>
+                            <span> {relatedProduct.price.toFixed(2)}</span>
+                          </p>
                         </motion.div>
                       </Link>
                     ))}

@@ -233,7 +233,7 @@ export default function AddProductForm() {
                   htmlFor="price"
                   className="text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  Price ($)
+                  Price <strong>NPR</strong>
                 </Label>
                 <Input
                   id="price"

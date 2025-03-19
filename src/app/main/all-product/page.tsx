@@ -213,7 +213,8 @@ export default function ProductListingPage() {
                           {product.name}
                         </h3>
                         <p className="sm:text-lg font-bold text-gray-700 dark:text-gray-300">
-                          ${product.price.toFixed(2)}
+                          <strong>NPR</strong>{" "}
+                          <span>{product.price.toFixed(2)}</span>
                         </p>
                       </div>
                     </Card>

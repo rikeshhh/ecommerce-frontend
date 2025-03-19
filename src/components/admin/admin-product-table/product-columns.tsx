@@ -25,7 +25,7 @@ export const getProductColumns = () => [
   {
     key: "price",
     header: "Price",
-    render: (product: Product) => `$${product.price.toLocaleString()}`,
+    render: (product: Product) => `${product.price.toLocaleString()}`,
   },
   {
     key: "stock",

@@ -307,7 +307,8 @@ export default function ProductListingPage() {
                         </h3>
                         <div className="flex items-center justify-between">
                           <p className="text-lg font-bold text-gray-700">
-                            ${product.price.toFixed(2)}
+                            <strong>NPR</strong>{" "}
+                            <span> {product.price.toFixed(2)}</span>
                           </p>
                           {/* {product.originalPrice && (
                             <p className="text-sm text-gray-500 line-through">

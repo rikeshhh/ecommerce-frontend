@@ -28,6 +28,16 @@ export function CartItem({
   onQuantityChange,
   onRemove,
 }: CartItemProps) {
+  const handleQuantityChange = (delta: number) => {
+    const newQuantity = item.quantity + delta;
+
+    if (newQuantity <= 0) {
+      onRemove(item._id);
+    } else {
+      onQuantityChange(item._id, delta);
+    }
+  };
+
   return (
     <div
       className={cn(
@@ -54,10 +64,10 @@ export function CartItem({
         </p>
         <div className="flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 sm:gap-2 mt-1">
           <span className="text-sm sm:text-base font-semibold">
-            ${(item.price * item.quantity).toFixed(2)}
+            <strong>NPR</strong> {(item.price * item.quantity).toFixed(2)}
           </span>
           <span className="text-xs sm:text-sm text-gray-500">
-            (${item.price.toFixed(2)} × {item.quantity})
+            <strong>NPR</strong> ({item.price.toFixed(2)} × {item.quantity})
           </span>
         </div>
       </div>
@@ -67,7 +77,7 @@ export function CartItem({
             variant="ghost"
             size="icon"
             className="w-7 sm:w-8 h-7 sm:h-8 text-gray-600 hover:bg-gray-100"
-            onClick={() => onQuantityChange(item._id, -1)}
+            onClick={() => handleQuantityChange(-1)}
           >
             <Minus className="w-3 sm:w-4 h-3 sm:h-4" />
           </Button>
@@ -78,7 +88,7 @@ export function CartItem({
             variant="ghost"
             size="icon"
             className="w-7 sm:w-8 h-7 sm:h-8 hover:bg-gray-100"
-            onClick={() => onQuantityChange(item._id, 1)}
+            onClick={() => handleQuantityChange(1)}
           >
             <Plus className="w-3 sm:w-4 h-3 sm:h-4" />
           </Button>

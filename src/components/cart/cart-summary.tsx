@@ -32,7 +32,7 @@ export function CartSummary({
         <div className="flex flex-col sm:flex-row justify-between w-full mb-4 text-base sm:text-lg font-medium gap-2 sm:gap-0">
           <span>Subtotal (Selected Items):</span>
           <span className="text-lg sm:text-xl">
-            ${selectedTotalPrice.toFixed(2)}
+            {selectedTotalPrice.toFixed(2)}
           </span>
         </div>
         <Dialog>
@@ -54,7 +54,7 @@ export function CartSummary({
                 <Badge variant="secondary">{selectedItemCount} items</Badge>.
                 Total:{" "}
                 <span className="font-medium">
-                  ${selectedTotalPrice.toFixed(2)}
+                  <strong>NPR</strong> {selectedTotalPrice.toFixed(2)}
                 </span>
                 .
               </DialogDescription>
