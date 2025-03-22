@@ -1,8 +1,8 @@
 "use client";
 
+import { Product } from "@/lib/types/product-type";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { Product } from "@/lib/types";
 
 interface CartItem extends Product {
   quantity: number;

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Trash, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utils";
 
 interface CartItemProps {
   item: {

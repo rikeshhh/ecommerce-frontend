@@ -14,9 +14,9 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import axios from "axios";
 import { Textarea } from "@/components/ui/textarea";
-import { User as UserType } from "@/lib/schema/zod-schema";
-import { Product } from "@/lib/types";
-import { normalizeImageUrl } from "@/lib/utils";
+import { User as UserType } from "@/lib/schema/user-schema";
+import { normalizeImageUrl } from "@/lib/utils/utils";
+import { Product } from "@/lib/types/product-type";
 
 interface FrontendProduct extends Omit<Product, "image"> {
   image?: string;

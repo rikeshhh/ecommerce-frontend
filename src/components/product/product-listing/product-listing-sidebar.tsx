@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Search, X, ChevronDown } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utils";
 import { useOutsideClick } from "@/hooks/use-outside-click";
 
 interface SidebarProps {

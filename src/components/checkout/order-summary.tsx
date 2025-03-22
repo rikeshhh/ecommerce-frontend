@@ -1,14 +1,7 @@
 "use client";
 
+import { OrderSummaryProps } from "@/lib/types/order-summary-type";
 import React from "react";
-
-interface OrderSummaryProps {
-  cart: { _id: string; name: string; price: number; quantity: number }[];
-  subtotal: number;
-  discount: number;
-  totalPrice: number;
-  promoApplied: { code: string; discount: number } | null;
-}
 
 export function OrderSummary({
   cart,

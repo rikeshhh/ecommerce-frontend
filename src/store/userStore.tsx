@@ -5,7 +5,8 @@ import { persist } from "zustand/middleware";
 import axios from "axios";
 import { toast } from "sonner";
 import { login, logout } from "@/lib/api/auth-api";
-import { LocationFormValues, User } from "@/lib/schema/zod-schema";
+import { LocationFormValues } from "@/lib/schema/cart-schema";
+import { User } from "@/lib/schema/user-schema";
 
 interface UserState {
   user: User | null;
@@ -78,7 +79,7 @@ export const useUserStore = create<UserState>()(
         totalPages: 1,
         limit: 10,
         loading: false,
-        filters: {}, 
+        filters: {},
 
         login: async (credentials: { email: string; password: string }) => {
           console.log("Login Credentials:", credentials);
@@ -244,7 +245,7 @@ export const useUserStore = create<UserState>()(
               ),
             }));
             const { currentPage, limit, filters } = get();
-            await get().fetchItems(currentPage, limit, filters); 
+            await get().fetchItems(currentPage, limit, filters);
             toast.success(
               `User ${isBanned ? "banned" : "unbanned"} successfully`
             );
@@ -276,7 +277,7 @@ export const useUserStore = create<UserState>()(
               totalPages: Math.ceil((state.totalItems - 1) / state.limit),
             }));
             const { currentPage, limit, filters } = get();
-            await get().fetchItems(currentPage, limit, filters); 
+            await get().fetchItems(currentPage, limit, filters);
             toast.success("User deleted successfully");
           } catch (error) {
             if (axios.isAxiosError(error) && error.response?.status === 404) {

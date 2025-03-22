@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { Product } from "@/lib/types";
-import { normalizeImageUrl } from "@/lib/utils";
+import { normalizeImageUrl } from "@/lib/utils/utils";
+import { Product } from "@/lib/types/product-type";
 
 interface ProductThumbnailProps {
   product: Product;

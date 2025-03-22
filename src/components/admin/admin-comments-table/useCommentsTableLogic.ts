@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "sonner";
-import { Product, User } from "@/lib/schema/zod-schema";
+import { Product, User } from "@/lib/schema/cart-schema";
 
 interface Comment {
   _id: string;

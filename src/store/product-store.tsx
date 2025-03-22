@@ -2,46 +2,7 @@
 
 import { create } from "zustand";
 import axios from "axios";
-import { Product } from "@/lib/types";
-
-interface Category {
-  name: string;
-  slug: string;
-  image: string;
-}
-
-interface ProductState {
-  products: Product[];
-  categories: Category[];
-  totalProducts: number;
-  recommendations: Product[];
-  currentPage: number;
-  totalPages: number;
-  limit: number;
-  loading: boolean;
-  error?: string;
-  selectedProduct: Product | null;
-  fetchProducts: (params?: {
-    page?: number;
-    limit?: number;
-    search?: string;
-    category?: string;
-    exclude?: string;
-    from?: string;
-    to?: string;
-  }) => Promise<{
-    items: Product[];
-    totalItems: number;
-    totalPages: number;
-  }>;
-  fetchProductById: (id: string) => Promise<void>;
-  fetchRecommendations: (userId: string) => Promise<void>;
-  addProduct: (data: FormData) => Promise<Product>;
-  fetchCategories: () => Promise<Category[]>;
-  updateProduct: (id: string, data: Partial<Product>) => Promise<void>;
-  deleteProduct: (id: string) => Promise<void>;
-  reset: () => Promise<void>;
-}
+import { Product, ProductState } from "@/lib/types/product-type";
 
 export const useProductStore = create<ProductState>((set) => ({
   products: [],

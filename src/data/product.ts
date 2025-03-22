@@ -1,4 +1,4 @@
-import { Product } from "@/lib/schema/zod-schema";
+import { Product } from "@/lib/schema/product-scheman";
 
 export const dummyProducts: Product[] = [
   {

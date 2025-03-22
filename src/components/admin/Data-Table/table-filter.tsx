@@ -18,7 +18,7 @@ import {
 import { Search, CalendarIcon, Filter, X, ChevronDown } from "lucide-react";
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utils";
 
 interface TableFiltersProps<T> {
   title: string;

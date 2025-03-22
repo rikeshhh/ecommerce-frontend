@@ -1,5 +1,5 @@
 import axios from "axios";
-import { LocationFormValues } from "./schema/zod-schema";
+import { LocationFormValues } from "./schema/cart-schema";
 
 export const reverseGeocode = async (
   lat: number,

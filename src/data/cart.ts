@@ -1,4 +1,4 @@
-import { Cart } from "@/lib/schema/zod-schema";
+import { Cart } from "@/lib/schema/cart-schema";
 
 export const dummyCart: Cart = {
   _id: "200",

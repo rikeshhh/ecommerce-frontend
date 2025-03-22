@@ -4,13 +4,13 @@ import { useState, useCallback } from "react";
 import Image from "next/image";
 import { Heart } from "lucide-react";
 import { motion } from "framer-motion";
-import { Product } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cartStore";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utils";
 import { useFavoritesStore } from "@/store/favorites-store";
+import { Product } from "@/lib/types/product-type";
 
 interface ProductCardProps {
   product: Product;

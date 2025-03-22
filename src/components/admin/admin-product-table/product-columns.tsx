@@ -1,5 +1,5 @@
+import { Product } from "@/lib/types/product-type";
 import { format, isValid } from "date-fns";
-import { Product } from "@/lib/types";
 
 export const getProductColumns = () => [
   {

@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useCallback, useRef } from "react";
-import { Product } from "@/lib/types";
 import { useProductStore } from "@/store/product-store";
+import { Product } from "@/lib/types/product-type";
 
 export function useProductsTableLogic() {
   const { products, loading, fetchProducts, deleteProduct, updateProduct } =

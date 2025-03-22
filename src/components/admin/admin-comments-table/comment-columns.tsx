@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
+import { User } from "@/lib/schema/user-schema";
+import { Product } from "@/lib/types/product-type";
 import { Eye, EyeOff, Loader2, Trash2 } from "lucide-react";
-import { Product, User } from "@/lib/schema/zod-schema";
 
 interface Comment {
   _id: string;

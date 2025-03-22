@@ -1,4 +1,4 @@
-import { normalizeImageUrl } from "@/lib/utils";
+import { normalizeImageUrl } from "@/lib/utils/utils";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -8,8 +8,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { Order } from "@/store/order-store";
 import Image from "next/image";
+import { Order } from "@/lib/types/order-type";
 
 export const getOrderColumns = (
   handleStatusChange: (orderId: string, newStatus: string) => void

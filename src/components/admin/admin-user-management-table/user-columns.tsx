@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { User } from "@/lib/schema/zod-schema";
+import { User } from "@/lib/schema/user-schema";
 
 export const getUserColumns = (
   handleRoleToggle: (userId: string, currentRole: boolean) => void,

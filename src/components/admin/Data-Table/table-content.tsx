@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { normalizeImageUrl } from "@/lib/utils";
+import { normalizeImageUrl } from "@/lib/utils/utils";
 import { useMemo } from "react";
 import { isValid } from "date-fns";
 import { DateRange } from "react-day-picker";

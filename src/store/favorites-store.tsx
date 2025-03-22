@@ -115,7 +115,6 @@ export const useFavoritesStore = create<FavoritesState>()(
               ),
               loading: false,
             });
-            toast.success("Favorites fetched successfully");
             useUserStore.setState({
               user: {
                 ...user,

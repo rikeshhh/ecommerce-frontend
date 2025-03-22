@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { useProductStore } from "@/store/product-store";
 import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utils";
 
 export default function ProductCategory() {
   const { fetchCategories, categories, products, loading, error } =

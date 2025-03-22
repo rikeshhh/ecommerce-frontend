@@ -6,7 +6,7 @@ import * as z from "zod";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utils";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { useUserStore } from "../../store/userStore";
@@ -32,7 +32,6 @@ export function LoginForm() {
   const searchParams = useSearchParams();
   const { login, setGoogleLogin } = useUserStore();
 
-
   const returnUrl = searchParams.get("returnUrl") || "/";
 
   const onSubmit = async (data: LoginFormValues) => {
@@ -41,7 +40,7 @@ export function LoginForm() {
       toast.success("Login successful!", {
         description: "Welcome back!",
       });
-      router.push(returnUrl); 
+      router.push(returnUrl);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Login failed";
@@ -68,7 +67,7 @@ export function LoginForm() {
           toast.success("Logged in with Google!", {
             description: "Welcome back!",
           });
-          router.push(returnUrl); 
+          router.push(returnUrl);
         })
         .catch((error) => {
           console.error("Google login error:", error);

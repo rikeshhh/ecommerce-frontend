@@ -25,7 +25,7 @@ import {
 import { useUserStore } from "@/store/userStore";
 import { LucideIcon } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utils";
 
 type MenuItem = {
   href: string;
