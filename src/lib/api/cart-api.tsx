@@ -1,19 +1,4 @@
-interface CartItem {
-  productId: string;
-  quantity: number;
-}
-
-interface CartResponse {
-  _id?: string;
-  user?: string;
-  items?: Array<{
-    _id?: string;
-    product: string;
-    quantity: number;
-  }>;
-  message?: string;
-  error?: string;
-}
+import { CartItem, CartResponse } from "../types/cart-type";
 
 export async function addToCart(
   cartData: CartItem,

@@ -6,18 +6,9 @@ import axios from "axios";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 import { useUserStore } from "./userStore";
+import { FavoritesState } from "@/lib/types/favourite-prod-type";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
-
-interface FavoritesState {
-  favorites: string[];
-  loading: boolean;
-  error?: string;
-  publicUserId: string | null;
-  toggleFavorite: (productId: string) => Promise<void>;
-  fetchFavorites: () => Promise<void>;
-  initialize: () => Promise<void>;
-}
 
 export const useFavoritesStore = create<FavoritesState>()(
   persist(
@@ -137,7 +128,9 @@ export const useFavoritesStore = create<FavoritesState>()(
               params: { userId: publicUserId },
             });
             set({
-              favorites: response.data.favorites.map((p: { _id: string }) => p._id),
+              favorites: response.data.favorites.map(
+                (p: { _id: string }) => p._id
+              ),
               loading: false,
             });
           } catch (error) {

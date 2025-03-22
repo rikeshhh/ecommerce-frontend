@@ -1,23 +1,8 @@
 "use client";
 
-import { Product } from "@/lib/types/product-type";
+import { CartState } from "@/lib/types/cart-type";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-
-interface CartItem extends Product {
-  quantity: number;
-}
-
-interface CartState {
-  cart: CartItem[];
-  selectedItems: string[];
-  addToCart: (product: Product) => void;
-  removeFromCart: (id: string) => void;
-  updateQuantity: (id: string, delta: number) => void;
-  toggleItemSelection: (id: string) => void;
-  clearSelectedItems: (itemsToClear?: string[]) => void; 
-  clearCart: () => void;
-}
 
 export const useCartStore = create<CartState>()(
   persist(
@@ -72,7 +57,6 @@ export const useCartStore = create<CartState>()(
         }),
       clearSelectedItems: (itemsToClear?: string[]) =>
         set((state) => {
-        
           const idsToRemove = itemsToClear || state.selectedItems;
           return {
             cart: state.cart.filter((item) => !idsToRemove.includes(item._id)),

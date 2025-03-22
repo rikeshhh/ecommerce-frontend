@@ -8,12 +8,12 @@ import { toast } from "sonner";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 
-import { reverseGeocode } from "@/lib/geocode";
 import axios from "axios";
 import { OrderSummary } from "./order-summary";
 import { PromoCodeSection } from "./promo-code-section";
 import { ShippingInfo } from "./shipping-info";
 import { PaymentForm } from "./payment-form";
+import { reverseGeocode } from "@/lib/utils/geocode";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!

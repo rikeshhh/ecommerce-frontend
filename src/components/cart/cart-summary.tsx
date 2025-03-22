@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 interface CartSummaryProps {
   selectedTotalPrice: number;
   selectedItemCount: number;
+  isLoading?: boolean;
   onCheckout: () => void;
 }
 
@@ -24,6 +25,7 @@ export function CartSummary({
   selectedTotalPrice,
   selectedItemCount,
   onCheckout,
+  isLoading,
 }: CartSummaryProps) {
   return (
     <>
