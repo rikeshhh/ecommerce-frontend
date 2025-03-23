@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, X, ChevronDown } from "lucide-react";
@@ -26,6 +26,7 @@ export default function Sidebar({
 }: SidebarProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [categorySearch, setCategorySearch] = useState("");
+  const [isMounted, setIsMounted] = useState(false); // New state to delay rendering
   const sidebarRef = useRef<HTMLDivElement | null>(null);
 
   useOutsideClick(
@@ -34,6 +35,12 @@ export default function Sidebar({
     () => setIsSidebarOpen(false),
     isMobile
   );
+
+  // Delay mounting the sidebar to let other content render first
+  useEffect(() => {
+    const timer = setTimeout(() => setIsMounted(true), 100); // Adjust delay as needed (e.g., 100ms)
+    return () => clearTimeout(timer);
+  }, []);
 
   const filteredCategories = useMemo(() => {
     return categorySearch
@@ -44,6 +51,8 @@ export default function Sidebar({
   }, [categories, categorySearch]);
 
   const sidebarX = isMobile && isSidebarOpen ? 0 : -300;
+
+  if (!isMounted) return null; // Don’t render until mounted
 
   return (
     <>
@@ -59,7 +68,7 @@ export default function Sidebar({
       )}
       <motion.aside
         ref={sidebarRef}
-        initial={{ x: isMobile ? -300 : 0, opacity: 0 }}
+        initial={{ x: isMobile ? -300 : 0, opacity: isMobile ? 0 : 1 }}
         animate={{ x: isMobile ? sidebarX : 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
         className={cn(

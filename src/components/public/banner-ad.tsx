@@ -15,7 +15,7 @@ interface AdProps {
 export default function BannerAd({ ad }: AdProps) {
   return (
     <div
-      className="relative w-64 h-48 rounded-md overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-300 group"
+      className="relative sm:w-64 sm:h-32 h-24 w-full rounded-md overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-300 group"
       style={{
         backgroundImage: `url(${ad.imageUrl})`,
         backgroundSize: "cover",

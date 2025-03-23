@@ -64,7 +64,7 @@ export default function PublicAdBanner() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className="w-full max-w-4xl mx-auto my-6 space-y-6 flex"
+      className="w-full  sm:max-w-4xl mx-auto my-6 space-y-6 flex sm:flex-row flex-col container max-sm:px-4"
     >
       <Link href="#contact" onClick={handleScrollToContact}>
         Sponsor an Ad
