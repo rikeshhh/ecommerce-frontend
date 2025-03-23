@@ -13,6 +13,7 @@ import ContactPage from "@/components/public/conatct";
 import { FAQAccordion } from "@/components/public/faq-accordion";
 import { useFavoritesStore } from "@/store/favorites-store";
 import { useProductStore } from "@/store/product-store";
+import PublicAdBanner from "@/components/public/PublicAdBanner";
 
 export default function Home() {
   const { isAdmin } = useUserStore();
@@ -46,12 +47,15 @@ export default function Home() {
   return (
     <section className="min-h-screen flex flex-col justify-center items-center container mx-auto">
       <HeroSection />
+      <PublicAdBanner />
       <RecentlyAdded />
       <Giveaway />
       <ProductListingPage />
       <ProductCategory />
       <Recommendations />
-      <ContactPage />
+      <section id="conatct" className="w-full">
+        <ContactPage />
+      </section>
       <FAQAccordion />
     </section>
   );

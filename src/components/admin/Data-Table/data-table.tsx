@@ -5,7 +5,6 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { usePagination } from "@/hooks/use-pagination";
 import { Card } from "@/components/ui/card";
-
 import { DateRange } from "react-day-picker";
 import { TableContent } from "./table-content";
 import { TableFilters } from "./table-filter";
@@ -92,7 +91,7 @@ export function DataTable<T>({
         return result;
       },
     }),
-    [fetchData, appliedSearchQuery, dateRange, statusFilter, data]
+    [fetchData, appliedSearchQuery, dateRange, statusFilter, data, initialLimit]
   );
 
   const {
@@ -105,6 +104,12 @@ export function DataTable<T>({
     handlePageChange,
     handleLimitChange,
   } = usePagination({ store: paginationStore, initialPage, initialLimit });
+
+  useEffect(() => {
+    if (!hasFetched && data.length === 0) {
+      handlePageChange(initialPage);
+    }
+  }, [hasFetched, data.length, handlePageChange, initialPage]);
 
   const fetchDataWithFilters = useCallback(
     async (overrideRange?: DateRange, overrideSearch?: string) => {
@@ -145,13 +150,18 @@ export function DataTable<T>({
   );
 
   useEffect(() => {
-    if (!hasFetched) return;
     const q = searchParams.get("q") || "";
     const from = searchParams.get("from");
     const to = searchParams.get("to");
     const status = searchParams.get("status");
-    const page = parseInt(searchParams.get("page") || "1", 10);
-    const limitParam = parseInt(searchParams.get("limit") || "10", 10);
+    const page = parseInt(
+      searchParams.get("page") || initialPage.toString(),
+      10
+    );
+    const limitParam = parseInt(
+      searchParams.get("limit") || initialLimit.toString(),
+      10
+    );
 
     let shouldFetch = false;
     if (q !== appliedSearchQuery) {
@@ -165,7 +175,7 @@ export function DataTable<T>({
     }
     if (limitParam !== limit) {
       handleLimitChange(limitParam);
-      return;
+      shouldFetch = true;
     }
     if (from && to) {
       const newRange = { from: new Date(from), to: new Date(to) };
@@ -180,10 +190,11 @@ export function DataTable<T>({
       setDateRange(undefined);
       shouldFetch = true;
     }
-    if (!hasFetched || shouldFetch) {
-      if (page !== currentPage) handlePageChange(page);
+    if (shouldFetch) {
+      fetchDataWithFilters();
+    } else if (page !== currentPage) {
+      handlePageChange(page);
     }
-    if (shouldFetch) fetchDataWithFilters();
   }, [
     searchParams,
     fetchDataWithFilters,
@@ -194,7 +205,8 @@ export function DataTable<T>({
     limit,
     handlePageChange,
     handleLimitChange,
-    hasFetched,
+    initialPage,
+    initialLimit,
   ]);
 
   if (loading) return <TableSkeleton />;
@@ -227,7 +239,7 @@ export function DataTable<T>({
           dateRange={dateRange}
           orderConfirmation={orderConfirmation}
         />
-        {!orderConfirmation && (
+        {!orderConfirmation && totalPages > 1 && (
           <TablePagination
             totalItems={totalItems}
             currentPage={currentPage}

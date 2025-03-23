@@ -32,6 +32,11 @@ export const getProductColumns = () => [
     header: "Stock",
   },
   {
+    key: "status",
+    header: "Status",
+    render: (product: Product) => product.status || "N/A",
+  },
+  {
     key: "createdAt",
     header: "Added On",
     hiddenOnMobile: true,

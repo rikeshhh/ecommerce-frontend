@@ -7,7 +7,6 @@ import { useUserStore } from "@/store/userStore";
 import { toast } from "sonner";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
-
 import axios from "axios";
 import { OrderSummary } from "./order-summary";
 import { PromoCodeSection } from "./promo-code-section";
@@ -20,7 +19,7 @@ const stripePromise = loadStripe(
 );
 
 export function CheckoutForm() {
-  const { cart } = useCartStore();
+  const { cart, initializeCart } = useCartStore();
   const { user } = useUserStore();
   const searchParams = useSearchParams();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -40,13 +39,15 @@ export function CheckoutForm() {
   const selectedCart = cart.filter((item) => selectedItems.includes(item._id));
 
   const subtotal = selectedCart.reduce(
-    (total, item) => total + item.price * item.quantity,
+    (total, item) => total + (item.price || 0) * item.quantity,
     0
   );
   const discount = promoApplied ? (subtotal * promoApplied.discount) / 100 : 0;
   const totalPrice = subtotal - discount;
 
   useEffect(() => {
+    initializeCart();
+
     if (!navigator.geolocation) {
       toast.error("Geolocation not supported by your browser");
       return;
@@ -91,7 +92,7 @@ export function CheckoutForm() {
     );
 
     return () => navigator.geolocation.clearWatch(watchId);
-  }, []);
+  }, [initializeCart]);
 
   return (
     <div className="md:max-w-4xl w-full mx-auto p-6 container">

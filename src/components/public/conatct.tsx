@@ -256,6 +256,9 @@ const ContactPage = () => {
                   123 Main St, City, Country
                 </p>
               </div>
+              <p className="text-gray-600 dark:text-gray-400">
+                You can also advertise your business here
+              </p>
             </div>
           </CardContent>
         </Card>

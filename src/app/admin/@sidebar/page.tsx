@@ -21,6 +21,7 @@ import {
   ShoppingCart,
   LogOut,
   Settings2,
+  Settings,
 } from "lucide-react";
 import { useUserStore } from "@/store/userStore";
 import { LucideIcon } from "lucide-react";
@@ -45,7 +46,7 @@ const menuItems: MenuItem[] = [
   },
   { href: "/admin/products", icon: FileText, label: "Products" },
   { href: "/admin/orders", icon: ShoppingCart, label: "Orders" },
-  // { href: "/admin/settings", icon: Settings, label: "Settings" },
+  { href: "/admin/adManager", icon: Settings, label: "Ad Manager" },
   { href: "/admin/add-product-form", icon: Settings2, label: "Add Product" },
 ];
 

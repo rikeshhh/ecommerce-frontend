@@ -1,4 +1,6 @@
-import axios, { AxiosError } from "axios";
+/* eslint-disable */
+
+import axios from "axios";
 import { Order } from "@/lib/types/order-type";
 
 interface FetchOrdersParams {
@@ -67,7 +69,7 @@ export const fetchOrders = async (
 
 export const applyPromoCode = async (
   code: string,
-  orders: any 
+  orders: any
 ): Promise<PromoValidationResult> => {
   const response = await fetch("/api/promo/validate", {
     method: "POST",

@@ -2,10 +2,6 @@ import axios from "axios";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
 
-interface FavoriteResponse {
-  favorites: string[]; 
-}
-
 export const fetchFavorites = async (userId?: string): Promise<string[]> => {
   const token = localStorage.getItem("authToken");
 

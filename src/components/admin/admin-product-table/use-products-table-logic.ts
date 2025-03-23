@@ -4,19 +4,18 @@ import { useEffect, useCallback, useRef } from "react";
 import { useProductStore } from "@/store/product-store";
 import { Product } from "@/lib/types/product-type";
 
-export function useProductsTableLogic() {
+export function useProductsTableLogic(initialLimit: number = 10) {
   const { products, loading, fetchProducts, deleteProduct, updateProduct } =
     useProductStore();
-
-  const hasFetchedInitially = useRef(false); 
+  const hasFetchedInitially = useRef(false);
 
   useEffect(() => {
-    if (!hasFetchedInitially.current && products.length === 0) {
-      console.log("Fetching initial products...");
-      fetchProducts({ page: 1, limit: 10 });
-      hasFetchedInitially.current = true; 
+    if (!hasFetchedInitially.current) {
+      console.log(`Fetching initial products with limit: ${initialLimit}`);
+      fetchProducts({ page: 1, limit: initialLimit });
+      hasFetchedInitially.current = true;
     }
-  }, [fetchProducts, products.length]);
+  }, [fetchProducts, initialLimit]);
 
   const handleFetchData = useCallback(
     async (
@@ -29,41 +28,29 @@ export function useProductsTableLogic() {
         to?: string;
       }
     ) => {
-      console.log("handleFetchData called with:", { page, limit, filters });
-      try {
-        const result = await fetchProducts({ page, limit, ...filters });
-        console.log("Fetch result:", result);
-        return result;
-      } catch (error) {
-        console.error("Error fetching products:", error);
-        throw error;
-      }
+      const result = await fetchProducts({ page, limit, ...filters });
+      console.log("handleFetchData result:", result);
+      return result;
     },
-    [fetchProducts] 
+    [fetchProducts]
   );
 
   const handleDeleteProduct = useCallback(
     async (id: string) => {
       if (confirm("Are you sure you want to delete this product?")) {
-        try {
-          await deleteProduct(id);
-        } catch (error) {
-          console.error("Error deleting product:", error);
-        }
+        await deleteProduct(id);
+        await handleFetchData(1, initialLimit, {});
       }
     },
-    [deleteProduct]
+    [deleteProduct, handleFetchData, initialLimit]
   );
 
   const handleUpdateProduct = useCallback(
     async (id: string, data: Partial<Product>) => {
-      try {
-        await updateProduct(id, data); 
-      } catch (error) {
-        console.error("Error updating product:", error);
-      }
+      await updateProduct(id, data);
+      await handleFetchData(1, initialLimit, {});
     },
-    [updateProduct]
+    [updateProduct, handleFetchData, initialLimit]
   );
 
   return {

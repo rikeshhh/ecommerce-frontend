@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Product, Category } from "@/lib/types/product-type";
+import { Product } from "@/lib/types/product-type";
 
 export const fetchProducts = async ({
   page = 1,
@@ -101,7 +101,7 @@ export const fetchProductsByIds = async (ids: string[]): Promise<Product[]> => {
         }
       })
     );
-    return response.filter((p): p is Product => p !== null); 
+    return response.filter((p): p is Product => p !== null);
   } catch (error) {
     throw new Error(
       axios.isAxiosError(error)

@@ -42,7 +42,7 @@ export default function PromoManagement() {
 
   const generatePromoCode = () => {
     const prefixes = ["SAVE", "FLASH", "SUMMER", "WINTER", "DEAL"];
-    const suffix = Math.floor(Math.random() * 90 + 10); // 10-99
+    const suffix = Math.floor(Math.random() * 90 + 10);
     const randomPrefix = prefixes[Math.floor(Math.random() * prefixes.length)];
     setCode(`${randomPrefix}${suffix}`);
   };

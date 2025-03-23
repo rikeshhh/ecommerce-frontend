@@ -2,13 +2,15 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import axios from "axios";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 import { useUserStore } from "./userStore";
 import { FavoritesState } from "@/lib/types/favourite-prod-type";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
+import {
+  addFavorite,
+  fetchFavorites,
+  removeFavorite,
+} from "@/lib/api/favourite-api";
 
 export const useFavoritesStore = create<FavoritesState>()(
   persist(
@@ -20,137 +22,84 @@ export const useFavoritesStore = create<FavoritesState>()(
 
       toggleFavorite: async (productId: string) => {
         const { user, isLoggedIn } = useUserStore.getState();
-        const token = localStorage.getItem("authToken");
         set({ loading: true, error: undefined });
 
-        if (isLoggedIn && user && token) {
-          try {
-            const isFavorited = get().favorites.includes(productId);
+        try {
+          const isFavorited = get().favorites.includes(productId);
+          if (isLoggedIn && user) {
+            let updatedFavorites: string[];
             if (isFavorited) {
-              await axios.delete(`${API_URL}/api/favorites/${productId}`, {
-                headers: { Authorization: `Bearer ${token}` },
-              });
-              set({
-                favorites: get().favorites.filter((id) => id !== productId),
-                loading: false,
-              });
+              updatedFavorites = await removeFavorite(productId);
               toast.success("Removed from favorites");
-              useUserStore.setState({
-                user: { ...user, favorites: get().favorites },
-              });
             } else {
-              const response = await axios.post(
-                `${API_URL}/api/favorites`,
-                { productId },
-                { headers: { Authorization: `Bearer ${token}` } }
-              );
-              set({ favorites: response.data.favorites, loading: false });
+              updatedFavorites = await addFavorite(productId);
               toast.success("Added to favorites");
-              useUserStore.setState({
-                user: { ...user, favorites: response.data.favorites },
-              });
             }
-          } catch (error) {
-            set({
-              loading: false,
-              error: `Failed to update favorites ${error}`,
+            set({ favorites: updatedFavorites, loading: false });
+            useUserStore.setState({
+              user: { ...user, favorites: updatedFavorites },
             });
-            toast.error("Failed to update favorites");
-          }
-        } else {
-          const publicUserId = get().publicUserId || uuidv4();
-          set({ publicUserId });
+          } else {
+            const publicUserId = get().publicUserId || uuidv4();
+            set({ publicUserId });
 
-          try {
-            const isFavorited = get().favorites.includes(productId);
+            let updatedFavorites: string[];
             if (isFavorited) {
-              const response = await axios.delete(
-                `${API_URL}/api/favorites/${productId}`,
-                {
-                  data: { userId: publicUserId },
-                }
-              );
-              set({ favorites: response.data.favorites, loading: false });
+              updatedFavorites = await removeFavorite(productId, publicUserId);
               toast.success("Removed from favorites (public)");
             } else {
-              const response = await axios.post(`${API_URL}/api/favorites`, {
-                productId,
-                userId: publicUserId,
-              });
-              set({ favorites: response.data.favorites, loading: false });
+              updatedFavorites = await addFavorite(productId, publicUserId);
               toast.success("Added to favorites (public)");
             }
-          } catch (error) {
-            set({
-              loading: false,
-              error: "Failed to update favorites" + error,
-            });
-            toast.error("Failed to update favorites");
+            set({ favorites: updatedFavorites, loading: false });
           }
+        } catch (error) {
+          const errorMessage =
+            error instanceof Error
+              ? error.message
+              : "Failed to update favorites";
+          set({ loading: false, error: errorMessage });
+          toast.error("Failed to update favorites", {
+            description: errorMessage,
+          });
         }
       },
 
       fetchFavorites: async () => {
         const { isLoggedIn, user } = useUserStore.getState();
-        const token = localStorage.getItem("authToken");
         set({ loading: true, error: undefined });
 
-        if (isLoggedIn && user && token) {
-          try {
-            const response = await axios.get(`${API_URL}/api/favorites`, {
-              headers: { Authorization: `Bearer ${token}` },
-            });
-            set({
-              favorites: response.data.favorites.map(
-                (p: { _id: string }) => p._id
-              ),
-              loading: false,
-            });
+        try {
+          const favorites =
+            isLoggedIn && user
+              ? await fetchFavorites()
+              : await fetchFavorites(get().publicUserId || uuidv4());
+
+          set({ favorites, loading: false });
+          if (isLoggedIn && user) {
             useUserStore.setState({
-              user: {
-                ...user,
-                favorites: response.data.favorites.map(
-                  (p: { _id: string }) => p._id
-                ),
-              },
-            });
-          } catch (error) {
-            set({
-              loading: false,
-              error: `Failed to fetch favorites ${error}`,
+              user: { ...user, favorites },
             });
           }
-        } else {
-          const publicUserId = get().publicUserId || uuidv4();
-          set({ publicUserId });
-          try {
-            const response = await axios.get(`${API_URL}/api/favorites`, {
-              params: { userId: publicUserId },
-            });
-            set({
-              favorites: response.data.favorites.map(
-                (p: { _id: string }) => p._id
-              ),
-              loading: false,
-            });
-          } catch (error) {
-            set({
-              loading: false,
-              error: `Failed to fetch favorites ${error}`,
-            });
-          }
+        } catch (error) {
+          const errorMessage =
+            error instanceof Error
+              ? error.message
+              : "Failed to fetch favorites";
+          set({ loading: false, error: errorMessage });
+          toast.error("Failed to fetch favorites", {
+            description: errorMessage,
+          });
         }
       },
 
       initialize: async () => {
         const { isLoggedIn } = useUserStore.getState();
-        if (isLoggedIn) {
-          await get().fetchFavorites();
-        } else {
+        if (!isLoggedIn) {
           const publicUserId = get().publicUserId || uuidv4();
           set({ publicUserId });
-          await get().fetchFavorites();
         }
+        await get().fetchFavorites();
       },
     }),
     {

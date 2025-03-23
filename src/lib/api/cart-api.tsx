@@ -73,3 +73,54 @@ export async function removeFromCart(
     );
   }
 }
+
+export async function updateCartQuantity(
+  itemId: string,
+  quantity: number,
+  token: string
+): Promise<CartResponse> {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/cart/${itemId}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ quantity }),
+      }
+    );
+
+    const data: CartResponse = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to update cart quantity");
+    }
+    return data;
+  } catch (error) {
+    throw new Error(
+      error instanceof Error ? error.message : "Update cart quantity failed"
+    );
+  }
+}
+
+export async function clearCart(token: string): Promise<void> {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || "Failed to clear cart");
+    }
+  } catch (error) {
+    throw new Error(
+      error instanceof Error ? error.message : "Clear cart failed"
+    );
+  }
+}

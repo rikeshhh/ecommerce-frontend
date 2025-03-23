@@ -18,10 +18,11 @@ export interface CartItem extends Product {
 export interface CartState {
   cart: CartItem[];
   selectedItems: string[];
-  addToCart: (product: Product) => void;
-  removeFromCart: (id: string) => void;
-  updateQuantity: (id: string, delta: number) => void;
+  initializeCart: () => Promise<void>;
+  addToCart: (product: CartItem) => Promise<void>;
+  removeFromCart: (id: string) => Promise<void>;
+  updateQuantity: (id: string, delta: number) => Promise<void>;
   toggleItemSelection: (id: string) => void;
-  clearSelectedItems: (itemsToClear?: string[]) => void;
-  clearCart: () => void;
+  clearSelectedItems: (itemsToClear?: string[]) => Promise<void>;
+  clearCart: () => Promise<void>;
 }

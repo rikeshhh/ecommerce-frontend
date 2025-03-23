@@ -1,31 +1,22 @@
 /* eslint-disable */
 "use client";
 
-import { DataTable } from "@/components/admin/Data-Table/data-table";
-import { getOrderColumns } from "./orderColumns";
+import { OrdersDataTable } from "../Data-Table/new-orders-table";
 import { useOrdersTableLogic } from "./use-order-table-logic";
 
 export default function OrdersTable() {
   const { orders, handleStatusChange, handleFetchData } = useOrdersTableLogic();
-
-  const columns = getOrderColumns(handleStatusChange);
+  console.log(
+    "Orders passed to OrdersDataTable:",
+    orders.map((o) => ({ id: o._id, status: o.status }))
+  );
 
   return (
-    <DataTable
+    <OrdersDataTable
       title="Orders"
       data={orders}
-      columns={columns}
+      handleStatusChange={handleStatusChange}
       fetchData={handleFetchData}
-      filterOptions={{
-        statusOptions: [
-          "Placed",
-          "Processing",
-          "Shipped",
-          "Delivered",
-          "Cancelled",
-        ],
-        dateField: "createdAt",
-      }}
       initialPage={1}
       initialLimit={10}
     />

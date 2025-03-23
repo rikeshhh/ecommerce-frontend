@@ -1,3 +1,4 @@
+import { Order } from "@/lib/types/order-type";
 import { normalizeImageUrl } from "@/lib/utils/utils";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
@@ -9,11 +10,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Image from "next/image";
-import { Order } from "@/lib/types/order-type";
+
+export interface Column<T> {
+  key: keyof T | string;
+  header: string;
+  render?: (item: T) => React.ReactNode;
+  hiddenOnMobile?: boolean;
+}
 
 export const getOrderColumns = (
   handleStatusChange: (orderId: string, newStatus: string) => void
-) => [
+): Column<Order>[] => [
   { key: "_id", header: "Order ID", hiddenOnMobile: true },
   {
     key: "customerName",

@@ -17,7 +17,7 @@ export default function ProductsTable() {
       fetchData={handleFetchData}
       filterOptions={{ dateField: "createdAt" }}
       initialPage={1}
-      initialLimit={10}
+      initialLimit={5}
     />
   );
 }
