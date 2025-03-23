@@ -7,7 +7,6 @@ export function cn(...inputs: ClassValue[]) {
 export const normalizeImageUrl = (
   image?: string | { url?: string; pathname?: string }
 ): string => {
-  console.log("normalizeImageUrl input:", image, typeof image);
   if (!image) return "/placeholder.png";
 
   if (typeof image === "string") {

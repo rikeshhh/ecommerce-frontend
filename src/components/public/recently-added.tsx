@@ -1,36 +1,38 @@
 "use client";
 
-import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { fetchProducts } from "@/lib/api/product-api";
 import ProductCard from "../product/product-card";
-import { useProductStore } from "@/store/product-store";
 import { motion } from "framer-motion";
 
 export default function RecentlyAdded() {
   const {
-    products: storeProducts,
-    fetchProducts,
-    loading,
+    data: productsData,
+    isLoading: loading,
     error,
-  } = useProductStore();
+  } = useQuery({
+    queryKey: ["products", { page: 1, limit: 10 }],
+    queryFn: () => fetchProducts({ page: 1, limit: 10 }),
+    select: (data) => {
+      const sortedProducts = [...data.items].sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      return sortedProducts.slice(0, 4);
+    },
+  });
 
-  useEffect(() => {
-    console.log("Mounting RecentlyAdded, fetching products...");
-    fetchProducts({ page: 1, limit: 10 })
-      .then((result) => {
-        console.log("Fetch result:", result);
-      })
-      .catch((err) => {
-        console.error("Fetch failed:", err);
-      });
-  }, [fetchProducts]);
+  const recentProducts = productsData || [];
+
   if (loading) {
     return <div className="py-8 text-center">Loading...</div>;
   }
 
   if (error) {
-    return <div className="py-8 text-center text-red-500">{error}</div>;
+    const errorMessage =
+      error instanceof Error ? error.message : "An error occurred";
+    return <div className="py-8 text-center text-red-500">{errorMessage}</div>;
   }
-  const recentProducts = storeProducts.slice(0, 4);
 
   if (!recentProducts.length) {
     return <div className="py-8 text-center">No recently added products</div>;
@@ -39,12 +41,12 @@ export default function RecentlyAdded() {
   return (
     <section className="p-4 md:p-16 container min-h-screen flex flex-col justify-center items-start w-full">
       <motion.h2
-        className="text-xl md:text-2xl font-bold mb-4 sm:mb-10 text-start "
+        className="text-xl md:text-2xl font-bold mb-4 sm:mb-10 text-start"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        Recently Added Product{" "}
+        Recently Added Products
       </motion.h2>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 md:gap-6 w-full">
         {recentProducts.map((product) => (

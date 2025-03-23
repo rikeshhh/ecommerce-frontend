@@ -2,56 +2,51 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Product } from "@/lib/types";
+import { useQuery } from "@tanstack/react-query";
+
 import { Button } from "@/components/ui/button";
-import axios from "axios";
 import ProductCard from "@/components/product/product-card";
 import { useFavoritesStore } from "@/store/favorites-store";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
+import { fetchProductsByIds } from "@/lib/api/product-api";
 
 export default function FavoritesPage() {
-  const { favorites, loading } = useFavoritesStore();
+  const { favorites, loading: favoritesLoading } = useFavoritesStore();
   const router = useRouter();
-  const [products, setProducts] = useState<Product[]>([]);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadFavorites = async () => {
-      setFetchError(null);
-      try {
-        if (favorites.length > 0) {
-          const fetchedProducts = await Promise.all(
-            favorites.map(async (id) => {
-              try {
-                const res = await axios.get(`${API_URL}/api/products/${id}`);
-                return res.data.product;
-              } catch (error) {
-                console.error(`Product ${id} fetch failed:`, error);
-                return null;
-              }
-            })
-          );
-          const validProducts = fetchedProducts.filter((p) => p !== null);
-          setProducts(validProducts);
-          if (validProducts.length === 0) {
-            setFetchError("No valid products found");
-          }
-        } else {
-          setProducts([]);
-        }
-      } catch (error) {
-        setFetchError("Failed to load favorites");
-        console.error("Load favorites error:", error);
-      }
-    };
+  const {
+    data: products = [],
+    isLoading: productsLoading,
+    error: productsError,
+  } = useQuery({
+    queryKey: ["favoriteProducts", favorites],
+    queryFn: async () => {
+      if (favorites.length === 0) return [];
+      const fetchedProducts = await fetchProductsByIds(favorites);
+      return fetchedProducts.filter((p) => p !== null);
+    },
+    enabled: favorites.length > 0, 
+  });
 
-    loadFavorites();
-  }, [favorites]);
+  useEffect(() => {
+    if (productsError) {
+      setFetchError("Failed to load favorites");
+      console.error("Load favorites error:", productsError);
+    } else if (
+      favorites.length > 0 &&
+      products.length === 0 &&
+      !productsLoading
+    ) {
+      setFetchError("No valid products found");
+    } else {
+      setFetchError(null);
+    }
+  }, [products, productsError, productsLoading, favorites]);
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Your Favorites</h1>
-      {loading ? (
+      {favoritesLoading || productsLoading ? (
         <p>Loading favorites...</p>
       ) : fetchError ? (
         <p className="text-red-500">{fetchError}</p>

@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { useProductStore } from "@/store/product-store";
+import { useQuery } from "@tanstack/react-query";
+import { fetchProducts, fetchCategories } from "@/lib/api/product-api";
 import { useIsMobile } from "@/hooks/use-mobile";
-
 import { motion } from "framer-motion";
 import Sidebar from "@/components/product/product-listing/product-listing-sidebar";
 import ProductGrid from "@/components/product/product-listing/product-listing-grid";
@@ -11,16 +11,6 @@ import { SearchComponent } from "@/components/common/search-component";
 import { TablePagination } from "@/components/admin/Data-Table/table-pagination";
 
 export default function ProductListingPage() {
-  const {
-    products,
-    categories,
-    fetchProducts,
-    fetchCategories,
-    loading,
-    error,
-    totalProducts,
-  } = useProductStore();
-
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -28,26 +18,43 @@ export default function ProductListingPage() {
   const isMobile = useIsMobile();
   const limit = isMobile ? 5 : 10;
 
-  useEffect(() => {
-    const loadData = async () => {
-      if (!categories.length && !loading) await fetchCategories();
-      await fetchProducts({
+  const {
+    data: categoriesData,
+    isLoading: categoriesLoading,
+    error: categoriesError,
+  } = useQuery({
+    queryKey: ["categories"],
+    queryFn: fetchCategories,
+  });
+
+  const {
+    data: productsData,
+    isLoading: productsLoading,
+    error: productsError,
+    refetch,
+  } = useQuery({
+    queryKey: [
+      "products",
+      { page: currentPage, limit, searchTerm, selectedCategory },
+    ],
+    queryFn: () =>
+      fetchProducts({
         page: currentPage,
         limit,
         search: searchTerm || undefined,
         category: selectedCategory || undefined,
-      });
-      setHasMounted(true);
-    };
-    loadData();
-  }, [
-    fetchProducts,
-    fetchCategories,
-    searchTerm,
-    selectedCategory,
-    currentPage,
-    limit,
-  ]);
+      }),
+    keepPreviousData: true,
+  });
+
+  const categories = categoriesData || [];
+  const products = productsData?.items || [];
+  const totalProducts = productsData?.totalItems || 0;
+  const totalPages = productsData?.totalPages || 1;
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   const filteredProducts = useMemo(() => {
     return selectedCategory
@@ -55,7 +62,8 @@ export default function ProductListingPage() {
       : products;
   }, [products, selectedCategory]);
 
-  const totalPages = Math.ceil(totalProducts / limit);
+  const loading = categoriesLoading || productsLoading;
+  const error = categoriesError || productsError;
 
   return (
     <div className="w-full mx-auto px-4 py-8 flex flex-col md:flex-row gap-8">
@@ -78,14 +86,23 @@ export default function ProductListingPage() {
           </h1>
           <SearchComponent
             searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
+            onSearchChange={(term) => {
+              setSearchTerm(term);
+              setCurrentPage(1); 
+            }}
           />
         </div>
         <ProductGrid
           products={filteredProducts}
           loading={loading}
-          error={error ?? null}
-          onRetry={fetchProducts}
+          error={
+            error instanceof Error
+              ? error.message
+              : error
+              ? "An error occurred"
+              : null
+          }
+          onRetry={refetch}
         />
         {totalPages > 1 && (
           <TablePagination

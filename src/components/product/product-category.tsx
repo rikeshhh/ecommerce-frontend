@@ -1,23 +1,35 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
-import { useProductStore } from "@/store/product-store";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils/utils";
+import { useQuery } from "@tanstack/react-query";
+import { fetchCategories, fetchProducts } from "@/lib/api/product-api";
 
 export default function ProductCategory() {
-  const { fetchCategories, categories, products, loading, error } =
-    useProductStore();
+  const {
+    data: categoriesData,
+    isLoading: categoriesLoading,
+    error: categoriesError,
+  } = useQuery({
+    queryKey: ["categories"],
+    queryFn: fetchCategories,
+  });
 
-  useEffect(() => {
-    if (categories.length === 0 && !loading) {
-      fetchCategories();
-    }
-  }, [fetchCategories, categories.length, loading]);
+  const {
+    data: productsData,
+    isLoading: productsLoading,
+    error: productsError,
+  } = useQuery({
+    queryKey: ["products", { page: 1, limit: 100 }],
+    queryFn: () => fetchProducts({ page: 1, limit: 100 }),
+  });
+
+  const categories = categoriesData || [];
+  const products = productsData?.items || [];
 
   const getCategoryCount = (category: string) =>
     products.filter((p) => p.category === category).length;
@@ -28,7 +40,7 @@ export default function ProductCategory() {
     hover: { scale: 1.05, transition: { duration: 0.3 } },
   };
 
-  if (loading) {
+  if (categoriesLoading || productsLoading) {
     return (
       <section className="py-12 w-full container text-center">
         <Loader2 className="h-8 w-8 animate-spin mx-auto text-indigo-600" />
@@ -37,15 +49,21 @@ export default function ProductCategory() {
     );
   }
 
-  if (error) {
+  if (categoriesError || productsError) {
+    const errorMessage =
+      categoriesError instanceof Error
+        ? categoriesError.message
+        : productsError instanceof Error
+        ? productsError.message
+        : "Failed to load categories or products";
     return (
       <section className="py-12 w-full container text-center">
-        <p className="text-red-500">{error}</p>
+        <p className="text-red-500">{errorMessage}</p>
       </section>
     );
   }
 
-  if (categories.length === 0 && !loading && !error) {
+  if (categories.length === 0 && !categoriesLoading && !categoriesError) {
     return (
       <section className="py-12 w-full container text-center">
         <p className="text-muted-foreground">No categories available.</p>
@@ -54,9 +72,9 @@ export default function ProductCategory() {
   }
 
   return (
-    <section className="p-4 md:p-16 container min-h-screen flex flex-col  w-full">
+    <section className="p-4 md:p-16 container min-h-screen flex flex-col w-full">
       <motion.h2
-        className="text-xl md:text-2xl font-bold mb-4 sm:mb-10 text-start "
+        className="text-xl md:text-2xl font-bold mb-4 sm:mb-10 text-start"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -76,7 +94,7 @@ export default function ProductCategory() {
             <Link href={`/category/${category.slug}`}>
               <Card
                 className={cn(
-                  "relative size-[160px] sm:w-full  sm:h-72 overflow-hidden bg-gray-800 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300"
+                  "relative size-[160px] sm:w-full sm:h-72 overflow-hidden bg-gray-800 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300"
                 )}
               >
                 <div className="relative h-48 w-full">
@@ -84,7 +102,7 @@ export default function ProductCategory() {
                     src={category.image}
                     alt={category.name}
                     fill
-                    className=" transition-transform duration-300 hover:scale-105"
+                    className="transition-transform duration-300 hover:scale-105"
                     sizes="(max-width: 640px) 200px, (max-width: 1024px) 33vw, 25vw"
                     placeholder="blur"
                     blurDataURL="/placeholder.png"

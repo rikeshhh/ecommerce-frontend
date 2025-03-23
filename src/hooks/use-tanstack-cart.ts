@@ -10,7 +10,7 @@ export const useCart = (token?: string) => {
   const localCart = useCartStore((state) => state.cart);
 
   return useQuery({
-    queryKey: ["cart", token], // Include token in queryKey to differentiate between auth states
+    queryKey: ["cart", token],
     queryFn: async () => {
       if (!token) {
         return { cart: localCart } as CartResponse;
@@ -27,7 +27,6 @@ export const useCart = (token?: string) => {
   });
 };
 
-// Add to Cart Mutation
 export const useAddToCart = (token?: string) => {
   const queryClient = useQueryClient();
   const addToCartStore = useCartStore((state) => state.addToCart);

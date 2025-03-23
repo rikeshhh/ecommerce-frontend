@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
+import { fetchOrders } from "@/lib/api/order-api";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -45,41 +45,24 @@ interface Order {
 }
 
 const OrderHistory = () => {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const token = localStorage.getItem("authToken");
-        if (!token) {
-          router.push("/auth/login?returnUrl=/user/order-history");
-          return;
-        }
-
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/orders`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setOrders(response.data.orders);
-        console.log(response.data.orders);
-      } catch (error) {
-        console.error("Failed to fetch orders:", error);
-        toast.error("Failed to load your order history. Please try again.");
-      } finally {
-        setLoading(false);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["orders", { page: 1, limit: 100 }], 
+    queryFn: () => fetchOrders({ page: 1, limit: 100 }),
+    enabled: !!localStorage.getItem("authToken"),
+    onError: (err) => {
+      console.error("Failed to fetch orders:", err);
+      toast.error("Failed to load your order history. Please try again.");
+      if (err instanceof Error && err.message === "Authentication required") {
+        router.push("/auth/login?returnUrl=/user/order-history");
       }
-    };
+    },
+  });
 
-    fetchOrders();
-  }, [router]);
+  const orders = data?.items || [];
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-8">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">

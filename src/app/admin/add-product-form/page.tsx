@@ -11,11 +11,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { useUserStore } from "@/store/userStore";
-import { useProductStore } from "@/store/product-store";
 import { Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { addProduct } from "@/lib/api/product-api";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ACCEPTED_IMAGE_TYPES = [
@@ -53,7 +54,7 @@ type ProductFormValues = z.infer<typeof productSchema>;
 
 export default function AddProductForm() {
   const { isAdmin } = useUserStore();
-  const { addProduct } = useProductStore();
+  const queryClient = useQueryClient();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
 
@@ -78,6 +79,31 @@ export default function AddProductForm() {
     reset,
   } = form;
 
+  const mutation = useMutation({
+    mutationFn: (formData: FormData) => addProduct(formData),
+    onSuccess: (newProduct) => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      toast.success("Product added successfully!", {
+        description: "The product has been added to the catalog.",
+        action: {
+          label: "View",
+          onClick: () => console.log("View product:", newProduct._id),
+        },
+      });
+      reset();
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
+      setImagePreview(null);
+      setFile(null);
+    },
+    onError: (error) => {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to add product";
+      console.error("Add product error:", errorMessage);
+      setError("root", { message: errorMessage });
+      toast.error("Failed to add product", { description: errorMessage });
+    },
+  });
+
   const onSubmit = async (data: ProductFormValues) => {
     console.log("Form submitted with data:", data);
     if (!isAdmin) {
@@ -87,6 +113,7 @@ export default function AddProductForm() {
       console.log("Blocked: User is not admin");
       return;
     }
+
     try {
       const formData = new FormData();
       formData.append("name", data.name);
@@ -101,24 +128,14 @@ export default function AddProductForm() {
         console.log(`${key}:`, value);
       }
 
-      console.log("Calling addProduct...");
-      const productData = await addProduct(formData);
-      console.log("addProduct response:", productData);
-
-      toast.success("Product added successfully!", {
-        description: "The product has been added to the catalog.",
-        action: { label: "View", onClick: () => console.log("View product") },
-      });
-      reset();
-      if (imagePreview) URL.revokeObjectURL(imagePreview);
-      setImagePreview(null);
-      setFile(null);
+      console.log("Calling addProduct via mutation...");
+      mutation.mutate(formData);
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : "Failed to add product";
-      console.error("Add product error:", errorMessage);
+        error instanceof Error ? error.message : "Failed to prepare form data";
+      console.error("Form preparation error:", errorMessage);
       setError("root", { message: errorMessage });
-      toast.error("Failed to add product", { description: errorMessage });
+      toast.error("Form error", { description: errorMessage });
     }
   };
 
@@ -144,7 +161,7 @@ export default function AddProductForm() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="text-center text-red-500 py-10 "
+        className="text-center text-red-500 py-10"
       >
         Unauthorized: Only admins can access this page
       </motion.div>
@@ -318,8 +335,12 @@ export default function AddProductForm() {
 
             <Separator className="my-6 bg-gray-200 dark:bg-gray-700" />
 
-            <Button type="submit" disabled={isSubmitting} className="w-full">
-              {isSubmitting ? (
+            <Button
+              type="submit"
+              disabled={isSubmitting || mutation.isPending}
+              className="w-full"
+            >
+              {isSubmitting || mutation.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   Adding Product...
